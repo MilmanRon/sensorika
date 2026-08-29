@@ -1,17 +1,14 @@
 ---
-
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout
+  title="Home"
+  description="A place for kids with special needs to play and grow."
+>
+  <main class="flex min-h-screen items-center justify-center px-gutter">
+    <h1 class="font-display text-4xl font-bold text-ink-900">
+      Sensorika — site under construction
+    </h1>
+  </main>
+</BaseLayout>

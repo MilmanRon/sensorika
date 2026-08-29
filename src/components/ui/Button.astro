@@ -1,0 +1,26 @@
+---
+/**
+ * Example `ui/` primitive — generic, content-agnostic, reusable
+ * anywhere. Styled entirely from design tokens (src/styles/tokens.css),
+ * never a one-off color/spacing value. Use this as the template for
+ * new primitives (Card, Badge, Input, ...).
+ */
+interface Props {
+  href?: string;
+  variant?: 'primary' | 'secondary';
+}
+
+const { href, variant = 'primary' } = Astro.props;
+const Tag = href ? 'a' : 'button';
+
+const base =
+  'inline-flex items-center justify-center rounded-control px-6 py-3 font-display font-semibold transition-colors duration-[var(--duration-base)]';
+const variants = {
+  primary: 'bg-brand-600 text-white hover:bg-brand-700',
+  secondary: 'bg-accent-100 text-accent-800 hover:bg-accent-200',
+};
+---
+
+<Tag href={href} class={`${base} ${variants[variant]}`}>
+  <slot />
+</Tag>
