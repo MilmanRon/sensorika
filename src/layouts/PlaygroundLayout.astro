@@ -1,0 +1,35 @@
+---
+/**
+ * Dev-only shell for building/reviewing one component in isolation
+ * (see src/pages/playground/). Wraps BaseLayout so playground pages
+ * still get real fonts/tokens/RTL — just with a lightweight chrome
+ * (back link + title) instead of the full site header/nav, since
+ * those are often exactly what's being built.
+ */
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<BaseLayout title={`${title} · Playground`} description="Component playground">
+  <div class="min-h-screen">
+    <div
+      class="flex items-center gap-4 border-b border-ink-900/10 bg-paper-100 px-gutter py-4 lg:px-gutter-lg"
+    >
+      <a
+        href="/playground"
+        class="text-sm font-medium text-ink-600 transition-colors duration-[var(--duration-fast)] hover:text-ink-900"
+      >
+        ← כל הרכיבים
+      </a>
+      <h1 class="font-display text-lg font-semibold text-ink-900">{title}</h1>
+    </div>
+    <div class="px-gutter py-12 lg:px-gutter-lg">
+      <slot />
+    </div>
+  </div>
+</BaseLayout>

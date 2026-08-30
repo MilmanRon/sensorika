@@ -1,0 +1,30 @@
+---
+import PlaygroundLayout from '../../layouts/PlaygroundLayout.astro';
+import NavItem from '../../components/layout/NavItem.astro';
+---
+
+<PlaygroundLayout title="NavItem">
+  <div class="flex flex-col gap-8">
+    <section>
+      <p class="mb-3 text-sm text-ink-500">On the nav background (hover to check the fill)</p>
+      <ul class="flex flex-wrap items-center gap-1 rounded-card bg-paper-200 p-2">
+        <li><NavItem href="#a">מהו ויסות חושי</NavItem></li>
+        <li><NavItem href="#b">באילו מקרים אנחנו יכולים לעזור</NavItem></li>
+        <li><NavItem href="#c">קצת עליי</NavItem></li>
+        <li><NavItem href="#d">שאלות נפוצות</NavItem></li>
+        <li><NavItem href="#e">צרו קשר</NavItem></li>
+      </ul>
+    </section>
+
+    <section>
+      <p class="mb-3 text-sm text-ink-500">Long label — stays on one line</p>
+      <ul class="flex max-w-xs flex-wrap items-center gap-1 rounded-card bg-paper-200 p-2">
+        <li>
+          <NavItem href="#long">
+            כותרת ארוכה במיוחד שאמורה להישאר בשורה אחת ולא להתפצל
+          </NavItem>
+        </li>
+      </ul>
+    </section>
+  </div>
+</PlaygroundLayout>

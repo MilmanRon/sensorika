@@ -1,0 +1,19 @@
+---
+/**
+ * One link inside Nav.astro. Always a single line — `whitespace-nowrap`,
+ * not wrapping/truncating — so a long label just stays as wide as it
+ * needs to be rather than breaking the nav's rhythm.
+ */
+interface Props {
+  href: string;
+}
+
+const { href } = Astro.props;
+---
+
+<a
+  href={href}
+  class="block rounded-control bg-paper-100 px-5 py-3 text-sm leading-snug font-medium whitespace-nowrap text-ink-700 transition-colors duration-[var(--duration-fast)] hover:bg-white hover:text-ink-900 focus-visible:bg-white focus-visible:text-ink-900"
+>
+  <slot />
+</a>

@@ -1,0 +1,22 @@
+---
+/**
+ * Primary nav — links only (logo lives in Header.astro). First pass:
+ * a plain horizontal row, no mobile toggle yet.
+ */
+import { siteConfig } from '../../data/site';
+import NavItem from './NavItem.astro';
+
+const { nav } = siteConfig;
+---
+
+<nav aria-label="ניווט ראשי">
+  <ul class="flex flex-wrap items-center gap-1 rounded-card bg-paper-200 p-2">
+    {
+      nav.map((item) => (
+        <li>
+          <NavItem href={item.href}>{item.label}</NavItem>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
