@@ -10,15 +10,33 @@ interface Props {
 
 const { title, description } = Astro.props;
 const siteName = 'Sensorika';
+
+/**
+ * First draft is Hebrew-only, so lang/dir are hardcoded here rather
+ * than driven by i18n routing yet. When Russian content is ready,
+ * this becomes per-locale (Astro i18n routing + dir="ltr" for /ru/)
+ * instead of a constant — every component should already be written
+ * with logical properties (ms-/me-/text-start) so that swap doesn't
+ * require touching them.
+ */
+const lang = 'he';
+const dir = 'rtl';
 ---
 
-<html lang="en">
+<html lang={lang} dir={dir}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
 
     <title>{title} · {siteName}</title>
     <meta name="description" content={description} />

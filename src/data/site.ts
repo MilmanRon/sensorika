@@ -16,8 +16,16 @@ export const siteConfig = {
     // TODO: e.g. instagram: 'https://instagram.com/...'
   },
   /**
-   * Primary nav — fill in once the sitemap is decided. Each entry
-   * becomes one link in Header/Nav components.
+   * Primary nav. This is a one-page site for now, so links are
+   * same-page anchors, not routes. Labels are final copy; hrefs are
+   * placeholder slugs (TODO) until each matching section exists and
+   * gets a real `id`.
    */
-  nav: [] as { label: string; href: string }[],
+  nav: [
+    { label: 'מהו ויסות חושי', href: '#sensory-regulation' },
+    { label: 'באילו מקרים אנחנו יכולים לעזור', href: '#how-we-help' },
+    { label: 'קצת עליי', href: '#about' },
+    { label: 'שאלות נפוצות', href: '#faq' },
+    { label: 'צרו קשר', href: '#contact' },
+  ] as { label: string; href: string }[],
 };

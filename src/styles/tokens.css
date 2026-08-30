@@ -2,85 +2,93 @@
  * Design tokens — single source of truth for the visual language.
  *
  * Everything under `@theme` is consumed by Tailwind v4 and turned into
- * utility classes automatically (e.g. --color-brand-600 -> bg-brand-600,
- * text-brand-600, border-brand-600, ring-brand-600, ...).
+ * utility classes automatically (e.g. --color-ink-900 -> bg-ink-900,
+ * text-ink-900, border-ink-900, ring-ink-900, ...).
  *
  * Rule for every component in this project: reach for a token/utility
  * generated from here before writing a one-off value. If a value is
  * needed twice, it belongs in this file, not in a component.
  *
- * Colors below are a placeholder starting palette (warm, calm, high
- * contrast) — swap the OKLCH values once real brand colors/logo exist.
- * Keep the scale shape (50 -> 900, same step count) so every consumer
- * of these tokens keeps working.
+ * Palette source: the logo (src/assets/brand/logo.svg) and the brand
+ * colors given directly — #74B7A5 (teal), #FBBE3E (amber), #EC6E59
+ * (coral), #AF98D7 (purple), plus the logo wordmark's navy (#243C5A).
+ * Every shade below is derived from exactly one of those five values
+ * via color-mix(), so the whole palette traces back to one real
+ * source per hue instead of hand-picked approximations.
  */
 
 @theme {
   /* ---------------------------------------------------------------- */
-  /* Color — brand (primary): calm, trustworthy teal                  */
+  /* Color — ink: the logo wordmark navy, for text & structural UI    */
   /* ---------------------------------------------------------------- */
-  --color-brand-50:  oklch(97% 0.020 200);
-  --color-brand-100: oklch(93% 0.045 200);
-  --color-brand-200: oklch(87% 0.070 200);
-  --color-brand-300: oklch(79% 0.090 200);
-  --color-brand-400: oklch(70% 0.100 200);
-  --color-brand-500: oklch(61% 0.105 200);
-  --color-brand-600: oklch(52% 0.100 200);
-  --color-brand-700: oklch(44% 0.088 200);
-  --color-brand-800: oklch(36% 0.070 200);
-  --color-brand-900: oklch(28% 0.050 200);
+  --color-ink-950: color-mix(in oklch, var(--color-ink-900) 85%, black); /* hover/active state on ink-900 text */
+  --color-ink-900: #243c5a; /* exact logo wordmark color */
+  --color-ink-800: color-mix(in oklch, var(--color-ink-900) 88%, white);
+  --color-ink-700: color-mix(in oklch, var(--color-ink-900) 74%, white);
+  --color-ink-600: color-mix(in oklch, var(--color-ink-900) 60%, white);
+  --color-ink-500: color-mix(in oklch, var(--color-ink-900) 46%, white);
+  --color-ink-400: color-mix(in oklch, var(--color-ink-900) 34%, white);
+  --color-ink-300: color-mix(in oklch, var(--color-ink-900) 22%, white);
+  --color-ink-200: color-mix(in oklch, var(--color-ink-900) 13%, white);
+  --color-ink-100: color-mix(in oklch, var(--color-ink-900) 7%, white);
+  --color-ink-50: color-mix(in oklch, var(--color-ink-900) 3%, white);
 
   /* ---------------------------------------------------------------- */
-  /* Color — accent: warm, playful amber (CTAs, highlights, joy)      */
+  /* Color — paper: warm cream surfaces (the nav-pill background,     */
+  /* section backgrounds), tinted from the coral petal                */
   /* ---------------------------------------------------------------- */
-  --color-accent-50:  oklch(97% 0.030 70);
-  --color-accent-100: oklch(93% 0.060 70);
-  --color-accent-200: oklch(87% 0.090 70);
-  --color-accent-300: oklch(80% 0.115 70);
-  --color-accent-400: oklch(74% 0.135 65);
-  --color-accent-500: oklch(68% 0.150 60);
-  --color-accent-600: oklch(59% 0.145 50);
-  --color-accent-700: oklch(50% 0.125 45);
-  --color-accent-800: oklch(41% 0.100 45);
-  --color-accent-900: oklch(32% 0.075 45);
+  --color-paper-50: color-mix(in oklch, var(--color-coral-500) 2%, white);
+  --color-paper-100: color-mix(in oklch, var(--color-coral-500) 7%, white);
+  --color-paper-200: color-mix(in oklch, var(--color-coral-500) 13%, white);
+  --color-paper-300: color-mix(in oklch, var(--color-coral-500) 20%, white);
 
   /* ---------------------------------------------------------------- */
-  /* Color — ink: warm neutral scale for text & surfaces              */
+  /* Color — petals: the four brand accent hues from the logo.        */
+  /* Used for CTAs, section theming, and small decorative moments —   */
+  /* not full UI ramps, so each only gets a tint/base/shade.          */
   /* ---------------------------------------------------------------- */
-  --color-ink-50:  oklch(98.5% 0.004 80);
-  --color-ink-100: oklch(96% 0.006 80);
-  --color-ink-200: oklch(91% 0.008 80);
-  --color-ink-300: oklch(83% 0.010 80);
-  --color-ink-400: oklch(69% 0.012 80);
-  --color-ink-500: oklch(56% 0.012 80);
-  --color-ink-600: oklch(45% 0.012 80);
-  --color-ink-700: oklch(36% 0.010 80);
-  --color-ink-800: oklch(26% 0.008 80);
-  --color-ink-900: oklch(17% 0.006 80);
+  --color-coral-500: #ec6e59;
+  --color-coral-100: color-mix(in oklch, var(--color-coral-500) 25%, white);
+  --color-coral-700: color-mix(in oklch, var(--color-coral-500) 78%, black);
+
+  --color-purple-500: #af98d7;
+  --color-purple-100: color-mix(in oklch, var(--color-purple-500) 25%, white);
+  --color-purple-700: color-mix(in oklch, var(--color-purple-500) 78%, black);
+
+  --color-teal-500: #74b7a5;
+  --color-teal-100: color-mix(in oklch, var(--color-teal-500) 25%, white);
+  --color-teal-700: color-mix(in oklch, var(--color-teal-500) 78%, black);
+
+  --color-amber-500: #fbbe3e;
+  --color-amber-100: color-mix(in oklch, var(--color-amber-500) 25%, white);
+  --color-amber-700: color-mix(in oklch, var(--color-amber-500) 78%, black);
 
   /* ---------------------------------------------------------------- */
   /* Color — semantic (status, feedback, form validation)             */
+  /* Reuses petal hues instead of introducing unrelated colors.       */
   /* ---------------------------------------------------------------- */
-  --color-success-500: oklch(64% 0.135 150);
-  --color-success-700: oklch(42% 0.110 150);
-  --color-warning-500: oklch(76% 0.140 85);
-  --color-warning-700: oklch(50% 0.120 75);
-  --color-danger-500:  oklch(60% 0.170 25);
-  --color-danger-700:  oklch(42% 0.150 25);
+  --color-success-500: var(--color-teal-500);
+  --color-success-700: var(--color-teal-700);
+  --color-warning-500: var(--color-amber-500);
+  --color-warning-700: var(--color-amber-700);
+  --color-danger-500: var(--color-coral-500);
+  --color-danger-700: var(--color-coral-700);
 
   /* Accessible, high-contrast focus indicator — never remove outlines,
-     only ever restyle them with this token (ring-focus / outline-focus). */
-  --color-focus: oklch(60% 0.170 260);
+     only ever restyle them with this token (ring-focus / outline-focus).
+     Purple-700, not the pastel base, so it has real contrast on cream/white. */
+  --color-focus: var(--color-purple-700);
 
   /* ---------------------------------------------------------------- */
   /* Typography                                                        */
   /* ---------------------------------------------------------------- */
-  /* Display: warm, rounded, human — headings, hero copy.
-     Body: clean and highly legible at small sizes — paragraphs, UI.
-     Swap the first family in each stack once real fonts are chosen;
-     keep the fallback stack so layout doesn't shift before load. */
-  --font-display: 'Nunito', ui-rounded, 'Segoe UI', system-ui, sans-serif;
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* Rubik: rounded, warm, and — critically — has real Hebrew, Latin,
+     and Cyrillic coverage in one family, needed for the HE/RU site.
+     Loaded via Google Fonts in BaseLayout.astro. One family for both
+     roles for now (weight carries the distinction); easy to split
+     into two families later by editing just these two lines. */
+  --font-display: 'Rubik', ui-rounded, 'Segoe UI', system-ui, sans-serif;
+  --font-sans: 'Rubik', ui-sans-serif, system-ui, -apple-system, sans-serif;
 
   /* Comfortable reading line-heights, reused via leading-body / leading-heading */
   --leading-heading: 1.15;
