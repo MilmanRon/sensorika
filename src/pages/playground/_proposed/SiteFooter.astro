@@ -1,0 +1,138 @@
+---
+/**
+ * PROPOSED (new — no current counterpart; the site has no footer at all
+ * today).
+ *
+ * The page's floor, and nothing more than that. Three things, in three
+ * rows: the lockup, the social icons, the copyright line.
+ *
+ * WHY SO LITTLE. Its one real job is to END THE PAGE. Everything above
+ * sits on PageBackdrop's drifting ground, which has no bottom edge of
+ * its own — scroll to the end of the home page without this and the last
+ * panel simply stops. A solid band is what says the document is over,
+ * and a band can do that while carrying almost nothing.
+ *
+ * So the things a footer usually accumulates are all gone:
+ *
+ * - NO SITE MAP. Every nav entry is a same-page anchor, so a footer nav
+ *   on this site sends you back up the page you just finished reading —
+ *   and the sticky header that would take you there is still on screen.
+ * - NO CONTACT COLUMN. Phone and email belong to the contact section,
+ *   which is a destination with room to say more than a list of facts.
+ *   The whatsapp icon is the one shortcut worth keeping down here.
+ * - NO BLURB. The page above just spent four paragraphs saying it.
+ *
+ * LAYOUT: three grid columns from `md`, with the third left empty on
+ * purpose. That's what puts the icons at the true centre of the band
+ * rather than at the centre of the space the lockup leaves over — the
+ * arrangement the reference footer uses, and it only holds if the row
+ * is a fixed three-column track. Under `md` the same children stack and
+ * centre. The copyright sits below the rule, centred at every width.
+ *
+ * SURFACE: WHITE, LIKE THE HEADER, and for the same reason HeaderV2
+ * gives: white is the surface every card on the page already uses, so
+ * the two bars read as the topmost and bottommost of them, and the
+ * shadow is what says they float over the ground rather than being
+ * painted onto it. The header's own shadow falls downward onto the page;
+ * this one is `--shadow-card-up`, the same token mirrored, so it falls
+ * upward onto the page from below. The pair is what brackets the
+ * document.
+ *
+ * (It was `paper-100` first — the drawer's tone, on the argument that a
+ * footer is chrome. But paper-100 is the tone of chrome that OPENS OVER
+ * the page; a tinted band at the bottom of a page whose ground is
+ * already a colour wash just reads as one more zone of it.)
+ *
+ * No top margin: the section above ends on its own `py-section`, and a
+ * second gap on top of that leaves the footer floating rather than
+ * closing the page.
+ *
+ * `layout/` is where this belongs once the proposed direction ships
+ * (structural chrome shared across pages, next to Header and SideNav) —
+ * it's here for now because everything it's built from is.
+ */
+import Logo from '../../../components/layout/Logo.astro';
+import FacebookIcon from '../../../assets/icons/facebook.svg';
+import WhatsappIcon from '../../../assets/icons/whatsapp.svg';
+import { hasWhatsapp, siteConfig, whatsappHref } from '../../../data/site';
+
+/*
+ * The icon row. Both icons always render; each one's URL degrades to the
+ * on-page contact section while the field behind it is a TODO, which is
+ * the fallback `whatsappHref()` already takes for the header CTA. So an
+ * icon is never a dead link, and never silently missing either — the
+ * footer looks the same before and after site.ts gets the real URLs.
+ */
+const facebook = siteConfig.social.facebook;
+
+const socials = [
+  {
+    label: hasWhatsapp ? 'וואטסאפ' : 'יצירת קשר',
+    href: whatsappHref(),
+    Icon: WhatsappIcon,
+    /* Only a real off-site URL opens a new tab. */
+    external: hasWhatsapp,
+  },
+  {
+    label: facebook ? 'פייסבוק' : 'יצירת קשר',
+    href: facebook || '#contact',
+    Icon: FacebookIcon,
+    external: Boolean(facebook),
+  },
+];
+
+/* Built at build time, so it's the year the site was last deployed.
+   Good enough for a copyright line and cheaper than shipping a script. */
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-white shadow-card-up">
+  <div class="mx-auto max-w-[var(--width-content)] px-gutter py-10 lg:px-gutter-lg lg:py-12">
+    <div
+      class="flex flex-col items-center gap-8 md:grid md:grid-cols-3 md:items-center md:gap-6"
+    >
+      <!-- `variant="lockup"` rather than the header's `responsive`:
+           there's room for the wordmark at every width down here, and
+           the mark alone would read as an orphaned graphic.
+
+           `tone="mono"` puts the whole lockup — petals included — in one
+           flat ink instead of the four brand colours. The page above is
+           already carrying the palette; a full-colour mark down here is
+           a fifth bright thing competing with it, when the footer's job
+           is to close the page quietly. The ink is `text-ink-900`, which
+           tokens.css defines as `#243C5A` — the wordmark's own colour,
+           so the mono lockup is the artwork's navy applied to all of it
+           rather than a new colour. -->
+      <Logo class="h-14 text-ink-900 lg:h-16" variant="lockup" tone="mono" />
+
+      <!-- `justify-self-center` centres the list inside the middle
+           track; the track itself is what centres it on the band. -->
+      <ul class="flex items-center gap-4 md:justify-self-center">
+        {
+          socials.map(({ label, href, Icon, external }) => (
+            <li>
+              <a
+                href={href}
+                class="inline-flex text-ink-900 transition-colors duration-[var(--duration-fast)] hover:text-teal-800"
+                {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              >
+                {/* The glyphs are decorative; the link's name is the
+                    text beside them, which is why they're the ones
+                    carrying aria-hidden and this span is sr-only. */}
+                <span class="sr-only">{label}</span>
+                <Icon class="h-7 w-7" aria-hidden="true" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <!-- Third column left empty on purpose — see the header comment.
+           It's what makes the middle track the centre of the band. -->
+    </div>
+
+    <p class="mt-8 border-t border-ink-900/10 pt-6 text-center text-sm text-ink-600">
+      © {year} {siteConfig.name}. כל הזכויות שמורות.
+    </p>
+  </div>
+</footer>

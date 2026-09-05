@@ -4,7 +4,6 @@ description: מקום לילדים עם צרכים מיוחדים — אבחון
 order: 0
 nav: false
 brand:
-  prefix: ל-
   word: Sensorika
 panels:
   - accent: teal

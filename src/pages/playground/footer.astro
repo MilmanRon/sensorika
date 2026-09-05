@@ -1,0 +1,72 @@
+---
+/**
+ * SiteFooter on its own.
+ *
+ * Uses BaseLayout rather than PlaygroundLayout for two reasons.
+ * PlaygroundLayout pads its slot with `px-gutter py-12`, and the footer
+ * is full-bleed chrome — inset from the viewport edges it stops being
+ * the band it is. And its surface is only half the component: white with
+ * `shadow-card-up`, which is a shadow cast UPWARD onto the page ground.
+ * On a flat white page there is nothing for it to fall on, so this page
+ * renders PageBackdrop under it the way the real page does.
+ *
+ * The filler block above it is there because the footer's first job is
+ * to END a page (see the component's header comment) — that's only
+ * reviewable if there's a page above it that runs out.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageBackdrop from './_proposed/PageBackdrop.astro';
+import SiteFooter from './_proposed/SiteFooter.astro';
+
+const checks = [
+  'הצל נופל כלפי מעלה, על הרקע של העמוד — הפוטר מרחף מעל הקרקע ולא צבוע עליה.',
+  'הרקע לבן, כמו הכותרת — שתיהן קוראות ככרטיס העליון והתחתון של העמוד.',
+  'שלושה דברים בלבד: לוגו, אייקונים חברתיים, שורת זכויות. אין מפת אתר ואין פרטי קשר.',
+  'האייקונים במרכז הרוחב של הפוטר, לא במרכז המקום שנשאר אחרי הלוגו.',
+  'מתחת ל־md — הלוגו והאייקונים נערמים וממורכזים.',
+  'שורת הזכויות ממורכזת בכל רוחב.',
+  'שני האייקונים מוצגים תמיד. עד ש־site.ts יקבל טלפון וכתובת פייסבוק שניהם מובילים ל־#contact ולא נפתחים בלשונית חדשה.',
+  'אין רווח מיותר בין המקטע שמעל לפוטר — הפוטר סוגר את העמוד ולא מרחף מתחתיו.',
+];
+---
+
+<BaseLayout title="Footer · Playground" description="Component playground">
+  <PageBackdrop />
+
+  <main id="main" class="mx-auto max-w-[var(--width-content)] px-gutter py-12 lg:px-gutter-lg">
+    <a
+      href="/playground"
+      class="text-sm font-medium text-ink-600 transition-colors duration-[var(--duration-fast)] hover:text-ink-900"
+    >
+      ← כל הרכיבים
+    </a>
+
+    <h1 class="mt-8 font-display text-lg font-semibold text-ink-900">Footer</h1>
+
+    <div class="mt-4 flex flex-col gap-4 text-sm text-ink-600">
+      <p class="text-base font-semibold text-ink-900">מה לבדוק כאן</p>
+      <ul class="flex list-disc flex-col gap-2 ps-5">
+        {checks.map((check) => <li>{check}</li>)}
+      </ul>
+    </div>
+
+    <!-- Enough page to scroll past, so the footer is reached the way it
+         is on a real page: after the content has run out. -->
+    <div class="mt-10 h-[60vh] rounded-card border border-dashed border-ink-900/15"></div>
+  </main>
+
+  <SiteFooter />
+
+  <div class="bg-white">
+    <div
+      class="mx-auto flex max-w-[var(--width-content)] flex-wrap gap-6 border-t border-ink-900/10 px-gutter py-6 lg:px-gutter-lg"
+    >
+      <a
+        href="/playground/full-page"
+        class="text-sm text-ink-500 transition-colors duration-[var(--duration-fast)] hover:text-ink-900"
+      >
+        ↔ הפוטר בעמוד המלא
+      </a>
+    </div>
+  </div>
+</BaseLayout>

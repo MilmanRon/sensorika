@@ -19,8 +19,17 @@ export const siteConfig = {
     phone: '', // TODO
     address: '', // TODO
   },
+  /**
+   * Social profiles, as full URLs. Rendered as icons in the footer, and
+   * only where a URL exists — an empty string is a platform the clinic
+   * doesn't have (or hasn't handed over yet), not a broken link.
+   *
+   * WhatsApp is deliberately NOT here: it's derived from `contact.phone`
+   * through `whatsappHref()`, so it stays one field rather than two that
+   * can disagree.
+   */
   social: {
-    // TODO: e.g. instagram: 'https://instagram.com/...'
+    facebook: '', // TODO: e.g. 'https://facebook.com/sensorika'
   },
   /**
    * Primary nav. This is a one-page site for now, so links are

@@ -50,6 +50,13 @@ export const playgroundEntries = [
     status: 'in progress',
   },
   {
+    slug: 'footer',
+    title: 'Footer',
+    group: 'layout',
+    component: '_proposed/SiteFooter.astro',
+    status: 'in progress',
+  },
+  {
     slug: 'method',
     title: 'Method',
     group: 'sections',
@@ -78,6 +85,13 @@ export const playgroundEntries = [
     title: 'Hero + Method (combined)',
     group: 'sections',
     component: '_proposed/HeaderV2 + HeroMethod + ProgramsV2',
+    status: 'in progress',
+  },
+  {
+    slug: 'full-page',
+    title: 'Home (full page)',
+    group: 'pages',
+    component: '_proposed/PageBackdrop + HeaderV2 + HeroMethod + ProgramsV2 + SiteFooter',
     status: 'in progress',
   },
   {

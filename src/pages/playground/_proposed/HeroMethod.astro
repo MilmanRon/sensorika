@@ -10,10 +10,10 @@
  * is reduced to a single banner line, and immediately under it the
  * method — the real substance — is what fills the screen.
  *
- * Shape: `ברוכים הבאים ל-Sensorika` is the page's h1 and gets a row to
+ * Shape: `ברוכים הבאים Sensorika` is the page's h1 and gets a row to
  * itself, which is what lets it carry the whole greeting. It's set as a
  * two-line lockup — `ברוכים הבאים` as a smaller, lighter kicker centered
- * over `ל-Sensorika`. The brand line takes `text-brand` — a step of its
+ * over `Sensorika`. The brand line takes `text-brand` — a step of its
  * own, twice the top of the heading scale — so the wordmark is what you
  * land on and the greeting reads as its lead-in. Its letters are painted
  * in the four logo petals, cycling coral / amber / teal / purple, so the
@@ -96,14 +96,10 @@ if (!home?.data.brand || home.data.panels.length === 0) {
 
 /*
  * The greeting is a two-line lockup: a smaller, lighter kicker centered
- * over the brand line.
- *
- * `ל-` stays on the brand line and keeps its hyphen — it's the prefix
- * the word is attached to, and leaving it there means the LTR box that
- * follows contains nothing but the word itself.
+ * over the brand line, which is the wordmark on its own.
  */
 const greeting = home.data.title;
-const { prefix: brandPrefix, word: brand } = home.data.brand;
+const { word: brand } = home.data.brand;
 const brandLetters = [...brand];
 
 const method = home.data.panels[0];
@@ -147,8 +143,7 @@ const rules = {
         `sr-only` span beside them, so a screen reader says "Sensorika"
         instead of spelling out nine one-character elements. The tags are
         jammed together with no line breaks between them on purpose —
-        whitespace here would become a real space inside the LTR box and
-        push the word off the hyphen.
+        whitespace here would become a real space inside the LTR box.
 
         Each letter carries an empty `.letter-pop` span: the blob that
         bursts behind it on landing. It's a sibling of the glyph rather
@@ -160,7 +155,7 @@ const rules = {
       >
         <span class="block text-3xl font-medium sm:text-4xl lg:text-5xl">{greeting}</span>
         <span class="block text-brand"
-          >{brandPrefix}<span class="brand-word" dir="ltr" data-brand-word
+          ><span class="brand-word" dir="ltr" data-brand-word
           ><span class="sr-only">{brand}</span><span aria-hidden="true"
             >{
               brandLetters.map((letter) => <span class="brand-letter" data-brand-letter><span class="letter-pop" data-letter-pop /><span class="letter-glyph" data-letter-glyph>{letter}</span></span>)

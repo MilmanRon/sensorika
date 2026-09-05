@@ -114,12 +114,11 @@ const pages = defineCollection({
     nav: z.boolean().default(true),
     /**
      * The brand lockup under the greeting — home page only, where the h1
-     * is "ברוכים הבאים" over "ל-Sensorika" rather than a plain title.
-     * `prefix` stays a separate field because it's the Hebrew prefix the
-     * word is attached to, and the word itself has to sit in its own LTR
-     * box or it renders backwards.
+     * is "ברוכים הבאים" over "Sensorika" rather than a plain title. The
+     * word is its own field because it has to sit in its own LTR box on
+     * the RTL line, or it renders backwards.
      */
-    brand: z.object({ prefix: z.string(), word: z.string() }).optional(),
+    brand: z.object({ word: z.string() }).optional(),
     description: z.string(),
     /** Opening line, centered under the h1 in the intro band. */
     intro: z.string().optional(),

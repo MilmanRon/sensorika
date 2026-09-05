@@ -29,6 +29,25 @@
  * `overflow-hidden` sheared them — the parallax was technically running
  * and effectively invisible.
  *
+ * SHAPE: these are the logo's tiles, not blobs. The mark is four
+ * soft-cornered, hand-drawn quadrilaterals in a 2x2 grid, and the
+ * field draws those exact outlines — the path data below is lifted
+ * verbatim out of `assets/brand/logo.svg`, each one cropped to its own
+ * bounding box by its viewBox so it can be dropped anywhere at any
+ * size. An earlier version approximated them with a wobbly
+ * `border-radius` ellipse, which is cheaper but reads as generic
+ * "soft blob" — the whole reason the ground is allowed to have shapes
+ * in it is that they are recognisably the logo, so they have to
+ * actually be the logo.
+ *
+ * That is also why each petal is an `<svg>` rather than a clipped
+ * `<span>`: CSS applies `filter` BEFORE `clip-path`, so a clipped
+ * element has its blur sliced off flush at the silhouette and the far,
+ * heavily-blurred shapes would come back with hard edges. Blurring the
+ * svg itself blurs the finished drawing, which is what "far away"
+ * needs. Tint rides in on `currentColor` so the Tailwind colour
+ * utilities still name the palette.
+ *
  * They belong to the PAGE, so they live here now: eight shapes spread
  * down a full viewport height (and past it — the last two start below
  * the fold and arrive as you scroll), on a `fixed` layer, drifting
@@ -101,8 +120,15 @@
  * fixed — so values past 100% start below the fold and drift up into
  * view. `drift` is in vh and always negative: everything rises against
  * the scroll. `spin` is degrees over the same range; the shapes are
- * irregular blobs, so a few degrees of rotation reads as the shape
- * turning rather than as a circle doing nothing.
+ * asymmetric tiles with a clear "up", so a few degrees of rotation
+ * reads as the tile turning rather than as a circle doing nothing.
+ *
+ * `hue` picks BOTH the tint and the silhouette, and that is the point:
+ * each shape is drawn with the outline of ITS OWN tile from the logo —
+ * an amber shape is the amber tile, a coral one is the coral tile. The
+ * mark has four distinct hand-drawn quadrilaterals, so reusing them by
+ * colour keeps the pairing the reader already saw in the header rather
+ * than shuffling four outlines across four tints at random.
  *
  * `left` KEEPS THE CENTRE COLUMN CLEAR. The page's headings are
  * centred and its prose sits on a 42rem measure, so roughly 27%-73% is
@@ -119,16 +145,66 @@
  * before parallax stops reading as depth and starts reading as a
  * second thing scrolling.
  */
+/*
+ * The four tiles of the mark, straight out of `assets/brand/logo.svg`
+ * with nothing touched but the frame around them. `d` is the original
+ * path; `viewBox` is that path's own bounding box (measured off the
+ * curves, not the control points, so there is no slack), which crops
+ * the tile out of the full 150x143 lockup without moving a single
+ * coordinate. Re-exporting the logo? Copy the four `d` strings across
+ * and re-measure the boxes; change nothing else.
+ *
+ * All four are within 7% of square, so the drawing is stretched to the
+ * petal's square box (`preserveAspectRatio="none"`) rather than being
+ * letterboxed inside it — at these sizes the difference is invisible
+ * and it keeps `size` a single number.
+ */
+const TILES = {
+  teal: {
+    viewBox: '0 0 72 70',
+    d: 'M65.7589 64.483C58.2565 72.4614 20.7447 69.4695 9.74119 65.4803C-1.26228 61.4911 -3.26291 10.6289 8.24073 4.14651C19.7444 -2.33592 45.2524 0.655959 60.2572 6.63977C75.2619 12.6236 73.2613 56.5047 65.7589 64.483Z',
+  },
+  amber: {
+    viewBox: '78 1 72 70',
+    d: 'M143.432 63.2096C135.929 71.188 94.935 72.1988 83.9316 68.2096C72.9281 64.2205 79.9316 8.8494 93.4316 3.70964C106.932 -1.43013 122.927 3.22582 137.932 9.20963C152.936 15.1934 150.934 55.2313 143.432 63.2096Z',
+  },
+  coral: {
+    viewBox: '3 76 68 67',
+    d: 'M59.5058 138.509C51.9524 146.168 15.9776 141.317 9.90387 136.331C3.83016 131.345 -1.69063 83.2197 11.9999 79.5C25.6904 75.7804 51.9999 76.5 64.4999 77.5C76.9999 78.5 67.0592 130.85 59.5058 138.509Z',
+  },
+  purple: {
+    viewBox: '77 76 71 67',
+    d: 'M139.336 137.5C128.671 146 96.3037 140.5 86.1518 136C76 131.5 72.2569 82.7197 86.1518 79C100.047 75.2804 126.5 76.5 138 80C149.5 83.5 150 129 139.336 137.5Z',
+  },
+} as const;
+
+/*
+ * `phone: false` drops the shape below 48rem. Eight tiles is a field on
+ * a desktop and a crowd on a phone; the three that go are each the
+ * nearest duplicate of a neighbour in both hue and depth, which leaves
+ * every hue on screen and both depths represented in every region of
+ * the page.
+ */
 const petals = [
-  { tint: 'bg-amber-300/75',  size: '6rem',  left: '6%',  top: '14%',  drift: -78, spin: 14,  blur: '0.5px' },
-  { tint: 'bg-teal-200/85',   size: '14rem', left: '76%', top: '6%',   drift: -32, spin: 8,   blur: '3px' },
-  { tint: 'bg-purple-300/75', size: '7rem',  left: '88%', top: '38%',  drift: -72, spin: -12, blur: '0.5px' },
-  { tint: 'bg-coral-200/85',  size: '12rem', left: '-5%', top: '52%',  drift: -38, spin: 9,   blur: '2.5px' },
-  { tint: 'bg-teal-300/75',   size: '5rem',  left: '20%', top: '70%',  drift: -88, spin: -15, blur: '0.5px' },
-  { tint: 'bg-amber-200/85',  size: '16rem', left: '62%', top: '84%',  drift: -30, spin: 6,   blur: '3px' },
-  { tint: 'bg-purple-300/75', size: '8rem',  left: '15%', top: '112%', drift: -82, spin: 11,  blur: '1px' },
-  { tint: 'bg-coral-300/75',  size: '6rem',  left: '84%', top: '124%', drift: -76, spin: -13, blur: '0.5px' },
-];
+  { hue: 'amber',  tint: 'text-amber-300/75',  size: '6rem',  left: '6%',  top: '14%',  drift: -78, spin: 14,  blur: '0.5px', phone: true },
+  { hue: 'teal',   tint: 'text-teal-200/85',   size: '14rem', left: '76%', top: '6%',   drift: -32, spin: 8,   blur: '3px',   phone: true },
+  { hue: 'purple', tint: 'text-purple-300/75', size: '7rem',  left: '88%', top: '38%',  drift: -72, spin: -12, blur: '0.5px', phone: false },
+  { hue: 'coral',  tint: 'text-coral-200/85',  size: '12rem', left: '-5%', top: '52%',  drift: -38, spin: 9,   blur: '2.5px', phone: true },
+  { hue: 'teal',   tint: 'text-teal-300/75',   size: '5rem',  left: '20%', top: '70%',  drift: -88, spin: -15, blur: '0.5px', phone: true },
+  { hue: 'amber',  tint: 'text-amber-200/85',  size: '16rem', left: '62%', top: '84%',  drift: -30, spin: 6,   blur: '3px',   phone: false },
+  { hue: 'purple', tint: 'text-purple-300/75', size: '8rem',  left: '15%', top: '112%', drift: -82, spin: 11,  blur: '1px',   phone: true },
+  { hue: 'coral',  tint: 'text-coral-300/75',  size: '6rem',  left: '84%', top: '124%', drift: -76, spin: -13, blur: '0.5px', phone: false },
+] satisfies {
+  hue: keyof typeof TILES;
+  tint: string;
+  size: string;
+  left: string;
+  top: string;
+  drift: number;
+  spin: number;
+  blur: string;
+  phone: boolean;
+}[];
 ---
 
 <div class="page-backdrop pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
@@ -188,8 +264,10 @@ const petals = [
 
   {
     petals.map((petal) => (
-      <span
-        class:list={['petal', petal.tint]}
+      <svg
+        class:list={['petal', petal.tint, !petal.phone && 'petal-desktop']}
+        viewBox={TILES[petal.hue].viewBox}
+        preserveAspectRatio="none"
         style={{
           '--petal-size': petal.size,
           '--petal-left': petal.left,
@@ -199,7 +277,12 @@ const petals = [
         data-petal
         data-drift={petal.drift}
         data-spin={petal.spin}
-      />
+      >
+        {/* `currentColor`, so the tint stays a Tailwind palette class on
+            the element rather than a second hard-coded copy of the hue
+            inside the markup. */}
+        <path d={TILES[petal.hue].d} fill="currentColor" />
+      </svg>
     ))
   }
 </div>
@@ -220,6 +303,10 @@ const petals = [
     opacity: var(--backdrop-wash);
   }
 
+  /* The silhouette is the path's, not this box's — the element is a
+     plain square viewport and the tile is drawn stretched into it. No
+     `border-radius`: rounding the box would clip the drawing's own
+     corners off. */
   .petal {
     position: absolute;
     display: block;
@@ -227,29 +314,24 @@ const petals = [
     height: var(--petal-size);
     left: var(--petal-left);
     top: var(--petal-top);
-    /* Same irregular silhouettes as Decor's petals and the wordmark's
-       letter blooms — the logo is four soft-cornered petals, so every
-       decorative shape on the page is cut from that geometry rather
-       than being a plain circle. Two variants, alternating, so
-       neighbours don't trace each other. */
-    border-radius: var(--radius-blob);
+    /* On the svg, so it blurs the finished drawing. A `clip-path` on a
+       span would have the blur cut off flush at the outline instead —
+       see the note at the top. */
     filter: blur(var(--petal-blur));
+    /* Blur spreads past the element box; the drawing must not be
+       trimmed back to it. */
+    overflow: visible;
     /* These eight are the only things on the page animated on scroll,
        so they are exactly what the hint is for. */
     will-change: transform;
   }
 
-  .petal:nth-child(even) {
-    border-radius: var(--radius-blob-alt);
-  }
-
-  /* Thin the field on a phone. The three dropped are mid-depth: the
-     largest pale shapes still carry the ground, and the smallest sharp
-     ones still carry the movement. */
+  /* Thinning the field on a phone is a per-shape decision made in the
+     array (`phone: false`), not an nth-child count — the markup order
+     is a composition and shouldn't silently re-target when a shape is
+     added or moved. */
   @media (width < 48rem) {
-    .petal:nth-child(4),
-    .petal:nth-child(6),
-    .petal:nth-child(8) {
+    .petal-desktop {
       display: none;
     }
   }
@@ -297,15 +379,20 @@ const petals = [
   const mm = gsap.matchMedia();
 
   mm.add('(prefers-reduced-motion: no-preference)', () => {
-    const petals = gsap.utils.toArray<HTMLElement>('.page-backdrop [data-petal]');
+    /* SVGSVGElement, not HTMLElement, since the shapes became real logo
+       tiles. It still animates as an ordinary CSS-transformed box: GSAP
+       only switches to SVG-attribute transforms for elements INSIDE an
+       svg (it tests `ownerSVGElement`), and these are svg roots sitting
+       in the div. */
+    const petals = gsap.utils.toArray<SVGSVGElement>('.page-backdrop [data-petal]');
     if (!petals.length) return;
 
     /* One tween for all eight with function-based values, rather than a
        tween and a ScrollTrigger each. */
     gsap.to(petals, {
-      y: (_i: number, el: HTMLElement) =>
+      y: (_i: number, el: SVGSVGElement) =>
         (Number(el.dataset.drift) / 100) * window.innerHeight,
-      rotation: (_i: number, el: HTMLElement) => Number(el.dataset.spin),
+      rotation: (_i: number, el: SVGSVGElement) => Number(el.dataset.spin),
       /* Linear, always: any other ease would put a petal somewhere
          other than where the scroll position says it is. */
       ease: 'none',

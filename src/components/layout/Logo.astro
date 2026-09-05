@@ -14,7 +14,9 @@
  * can render both without the name being announced twice.
  */
 import LogoLockup from '../../assets/brand/logo.svg';
+import LogoLockupMono from '../../assets/brand/logo-mono.svg';
 import LogoMark from '../../assets/brand/logo-mark.svg';
+import LogoMarkMono from '../../assets/brand/logo-mark-mono.svg';
 import { siteConfig } from '../../data/site';
 
 interface Props {
@@ -28,9 +30,29 @@ interface Props {
    * whole bar sheds its labels at once. `lockup` and `mark` pin it.
    */
   variant?: 'responsive' | 'lockup' | 'mark';
+  /**
+   * `brand` is the artwork as drawn — four coloured petals and the navy
+   * wordmark. `mono` swaps in the variants whose petals and wordmark are
+   * `currentColor`, so the whole lockup takes the caller's text colour
+   * and the petal glyphs stay white cut-outs.
+   *
+   * `mono` is for places that are already carrying the brand colours
+   * somewhere else on screen — the footer sits under a whole page of
+   * them, and a second full-colour mark down there competes with the
+   * page rather than closing it.
+   */
+  tone?: 'brand' | 'mono';
 }
 
-const { class: className = 'h-18 lg:h-22', href = '/', variant = 'responsive' } = Astro.props;
+const {
+  class: className = 'h-18 lg:h-22',
+  href = '/',
+  variant = 'responsive',
+  tone = 'brand',
+} = Astro.props;
+
+const Lockup = tone === 'mono' ? LogoLockupMono : LogoLockup;
+const Mark = tone === 'mono' ? LogoMarkMono : LogoMark;
 
 /* Both artworks are sized by the caller's height utilities; only their
    visibility differs, so `display: none` keeps the unused one free of
@@ -43,10 +65,10 @@ const markClass = variant === 'responsive' ? 'sm:hidden' : '';
   href === null ? (
     <span class="inline-flex shrink-0 items-center">
       {variant !== 'mark' && (
-        <LogoLockup class={`w-auto ${className} ${lockupClass}`} aria-hidden="true" />
+        <Lockup class={`w-auto ${className} ${lockupClass}`} aria-hidden="true" />
       )}
       {variant !== 'lockup' && (
-        <LogoMark class={`w-auto ${className} ${markClass}`} aria-hidden="true" />
+        <Mark class={`w-auto ${className} ${markClass}`} aria-hidden="true" />
       )}
     </span>
   ) : (
@@ -56,10 +78,10 @@ const markClass = variant === 'responsive' ? 'sm:hidden' : '';
       class="inline-flex shrink-0 items-center rounded-control transition-opacity duration-[var(--duration-fast)] hover:opacity-80"
     >
       {variant !== 'mark' && (
-        <LogoLockup class={`w-auto ${className} ${lockupClass}`} aria-hidden="true" />
+        <Lockup class={`w-auto ${className} ${lockupClass}`} aria-hidden="true" />
       )}
       {variant !== 'lockup' && (
-        <LogoMark class={`w-auto ${className} ${markClass}`} aria-hidden="true" />
+        <Mark class={`w-auto ${className} ${markClass}`} aria-hidden="true" />
       )}
     </a>
   )
