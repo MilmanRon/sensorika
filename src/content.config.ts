@@ -120,6 +120,65 @@ const document = z.object({
   file: z.string().startsWith('/', 'A path under public/, so it must start with "/".'),
 });
 
+/**
+ * One entry of a page's disclosure list — a titled section a reader
+ * opens, rather than a panel that is already open.
+ *
+ * This is the shape the clinic asked the individual-programs page to
+ * take: four packages and the terms that govern all of them, as five
+ * closed rows. It differs from `faq` (one question, one answer string)
+ * because these bodies are documents in their own right — a price line,
+ * then paragraphs interleaved with headed lists of what the money buys.
+ */
+const disclosure = z.object({
+  /** The row's label, closed and open — "חבילה 1. אבחון + תוכנית עבודה ביתית". */
+  title: z.string(),
+  /**
+   * The package's price, set as a line at the top of the opened body,
+   * above everything else.
+   *
+   * It's structured rather than a line of prose, and it's separate from
+   * the body rather than being its first paragraph, for the same
+   * reason: the clinic's instruction is that the price comes FIRST on
+   * every package, and every package quotes two of them — an opening
+   * period and the months after it, or one session a week and two. As
+   * `label`/`amount` pairs the layout can set each label tight against
+   * its own figure; as sentences they'd be two more paragraphs to find
+   * the numbers in.
+   *
+   * A disclosure with no price (the terms row) simply opens on its body.
+   */
+  price: z
+    .array(z.object({ label: z.string(), amount: z.string() }))
+    .default([]),
+  /** Petal hue for the row. Omit and the list cycles them, as panels do. */
+  accent: z.enum(['coral', 'teal', 'amber', 'purple']).optional(),
+  /**
+   * The body, as an ordered run of parts. A part is any of: a heading, a
+   * few paragraphs, a bulleted list — and it renders in that order.
+   *
+   * ONE MECHANISM RATHER THAN TWO. This started as `body` (paragraphs)
+   * plus `sections` (the headed parts under them), which the clinic's
+   * copy then broke: a package opens with a paragraph, lists what the
+   * first stage includes, explains in prose what happens next, lists
+   * what each further month includes, and closes with another
+   * paragraph. Prose and lists interleave, so there is no "the
+   * paragraphs" and "the sections" — there's a sequence. A part with no
+   * `heading` is simply a run of paragraphs, which is how the copy's
+   * unheaded stretches are written here.
+   */
+  sections: z
+    .array(
+      z.object({
+        heading: z.string().optional(),
+        body: z.array(z.string()).default([]),
+        /** A bulleted list, under this part's paragraphs. */
+        items: z.array(z.string()).default([]),
+      }),
+    )
+    .default([]),
+});
+
 const pages = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/pages' }),
   schema: z.object({
@@ -152,6 +211,48 @@ const pages = defineCollection({
     /** Order in the nav / on the playground index. */
     order: z.number(),
     panels: z.array(panel).default([]),
+    /**
+     * Collapsed rows rendered AFTER the panels: the page's reference
+     * matter — prices, terms, the small print — which a parent opens the
+     * one row of that applies to them rather than reading top to bottom.
+     * The panels above are the argument; this is the paperwork.
+     *
+     * Rows are for things a reader CHOOSES BETWEEN — the four packages,
+     * of which exactly one is theirs. Reference matter that simply
+     * applies to all of them goes in `terms` below, as open panels.
+     */
+    disclosures: z
+      .object({
+        heading: z.string(),
+        intro: z.string().optional(),
+        items: z.array(disclosure).nonempty(),
+      })
+      .optional(),
+    /**
+     * The page's closing section: reference matter that governs
+     * everything above it, as a titled stack of open panels rendered
+     * after the disclosures.
+     *
+     * IT IS PANELS AND NOT MORE DISCLOSURE ROWS. The packages page's
+     * payment / interruption / cancellation terms were one fifth row in
+     * the list of four packages, and they read as a fifth package —
+     * something to weigh against the others and pick. There's nothing to
+     * choose here: these terms apply whichever package a parent takes,
+     * so they're set open, in boxes, the way group-forms.md sets the
+     * same kind of text. A toggle asks a question the reader doesn't
+     * have.
+     *
+     * `panels` rather than the page's own `panels` field because those
+     * render ABOVE the disclosures — they're the argument a page makes,
+     * and this comes after the offer it governs.
+     */
+    terms: z
+      .object({
+        heading: z.string(),
+        intro: z.string().optional(),
+        panels: z.array(panel).nonempty(),
+      })
+      .optional(),
     /**
      * Downloads, rendered as a card each ABOVE the panels — a page that
      * exists to hand a parent two forms shouldn't open with the reading

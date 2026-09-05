@@ -1,0 +1,145 @@
+---
+/**
+ * PROPOSED (new — no current counterpart).
+ *
+ * A run of ProsePanels from a `pages` entry's `panel[]` frontmatter —
+ * the body of every explanatory page on the site.
+ *
+ * It was inline in ProsePage until the packages page needed a SECOND
+ * stack: its terms are open panels under their own heading, below the
+ * collapsed packages, so the same forty lines would have had to be
+ * written twice in one file. What varies between the two calls is the
+ * heading level and the top margin; everything else — the accent cycle,
+ * the two list shapes, the note — is the same markup, which is exactly
+ * the thing that quietly drifts when it's duplicated.
+ *
+ * ACCENTS cycle coral → teal → purple → amber down the stack, so a
+ * reader scrolling a long page can tell one panel from the next without
+ * reading it. A panel can name its own hue. The hues carry no meaning;
+ * they're wayfinding, and they're ornament: a panel's own links and
+ * buttons stay teal like everything else on the site. Each stack starts
+ * the cycle over at coral rather than continuing the page's count — a
+ * stack under its own heading is a fresh list, not a continuation, and
+ * the hue is positional.
+ */
+import type { CollectionEntry } from 'astro:content';
+
+import ProsePanel from './ProsePanel.astro';
+
+type Panels = CollectionEntry<'pages'>['data']['panels'];
+
+interface Props {
+  panels: Panels;
+  /**
+   * The panels' heading level. `h2` on a page whose panels ARE its
+   * sections; `h3` for a stack that already sits under a heading of its
+   * own, so the outline doesn't put a panel at the same level as the
+   * block containing it.
+   */
+  headingAs?: 'h2' | 'h3';
+  class?: string;
+}
+
+const { panels, headingAs = 'h2', class: className = '' } = Astro.props;
+
+/* Wayfinding order, not a palette: see the note above. */
+const cycle = ['coral', 'teal', 'purple', 'amber'] as const;
+
+/* The bullet of a labelled list, tinted to the panel's own accent.
+   A real `list-disc` marker rather than a positioned span: the browser
+   puts it on the correct side under dir="rtl" and aligns it with the
+   item's first line on its own, with no hand-tuned offset to keep in
+   sync with the type scale. */
+const markers = {
+  coral: 'marker:text-coral-500',
+  teal: 'marker:text-teal-500',
+  amber: 'marker:text-amber-500',
+  purple: 'marker:text-purple-500',
+};
+
+/* Numbered badge — the same pairing as the panel's eyebrow pill, which
+   is what makes the accent legible at this size. */
+const badges = {
+  coral: 'bg-coral-100 text-coral-800',
+  teal: 'bg-teal-100 text-teal-800',
+  amber: 'bg-amber-100 text-amber-800',
+  purple: 'bg-purple-100 text-purple-800',
+};
+---
+
+<div class:list={['flex flex-col gap-8 lg:gap-10', className]}>
+  {
+    panels.map((panel, i) => {
+      const accent = panel.accent ?? cycle[i % cycle.length];
+      return (
+        <ProsePanel
+          accent={accent}
+          eyebrow={panel.eyebrow}
+          heading={panel.heading}
+          headingAs={headingAs}
+          lead={panel.lead}
+          pullout={panel.pullout}
+        >
+          {panel.body.map((paragraph) => (
+            <p>{paragraph}</p>
+          ))}
+
+          {/*
+            Two list shapes, because the copy has two.
+
+            NUMBERED — the four individual-work formats. The number is
+            the clinic's own, the name is a title, so it gets its own
+            line above its description.
+
+            PLAIN — "ויסות ורמת הפעילות. הילד נמצא כל הזמן בתנועה…" and
+            the terms page's payment methods. The source writes a
+            labelled item as a bold lead-in followed by the sentence it
+            introduces, so the term stays inline; pulling it onto its own
+            line would turn eight sentences into sixteen.
+          */}
+          {panel.items &&
+            (panel.numbered ? (
+              <ol class="mt-2 flex flex-col gap-6">
+                {panel.items.map((item, n) => (
+                  <li class="flex gap-4">
+                    <span
+                      class:list={[
+                        'mt-1 flex size-8 shrink-0 items-center justify-center rounded-pill font-display text-sm font-semibold',
+                        badges[accent],
+                      ]}
+                      aria-hidden="true"
+                    >
+                      {n + 1}
+                    </span>
+                    <div>
+                      {item.term && (
+                        <p class="font-display leading-heading font-semibold text-ink-900">
+                          {item.term}
+                        </p>
+                      )}
+                      <p class:list={[item.term && 'mt-1']}>{item.text}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <ul class:list={['mt-2 list-disc space-y-4 ps-6', markers[accent]]}>
+                {panel.items.map((item) => (
+                  <li>
+                    {item.term && (
+                      <strong class="font-display font-semibold text-ink-900">
+                        {item.term}{' '}
+                      </strong>
+                    )}
+                    {item.text}
+                  </li>
+                ))}
+              </ul>
+            ))}
+
+          {panel.note && <p class="text-ink-600">{panel.note}</p>}
+        </ProsePanel>
+      );
+    })
+  }
+</div>

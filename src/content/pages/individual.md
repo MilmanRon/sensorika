@@ -72,4 +72,13 @@ panels:
   and become a numbered `items` list, and the closing line of the "מעבודה
   פרטנית — לקבוצה" section, plus the one about steadily adjusting the
   load, are pulled out onto rules.
+
+  THE COSTS ARE NOT HERE, and the last panel says so in the clinic's own
+  words ("העלות של כל מסגרת תצוין בנפרד"). They're on
+  individual-packages.md — the four formats again, in their full priced
+  version, plus the payment / interruption / cancellation terms — which
+  has a route but is not in the nav: the home page's "אבחון וטיפול
+  פרטניים" card lands there. This page is the nav destination and its job
+  is the explanation; that one is the offer. Same split the group program
+  has between groups.md and group-forms.md.
 -->

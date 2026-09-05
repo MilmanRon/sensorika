@@ -2,8 +2,10 @@
 /**
  * PROPOSED (new — no current counterpart).
  *
- * The shared body of a nav-item page: intro band + a stack of accented
- * ProsePanels + (on the FAQ) an accordion. Everything a page differs in
+ * The shared body of a nav-item page: intro band + (on the forms page)
+ * its downloads + a stack of accented ProsePanels + (on the individual
+ * page) its collapsed packages and terms + (on the FAQ) an accordion.
+ * Everything a page differs in
  * — its title, its opening line, how its copy splits into panels — comes
  * from one .md file in the `pages` collection, so a copy change is a
  * content edit and never a component edit.
@@ -13,12 +15,11 @@
  * six of these pages and they're all the same shape: what changes per
  * page is the words.
  *
- * ACCENTS cycle coral → teal → purple → amber down the page, so a reader
- * scrolling a long explanatory page can tell one panel from the next
- * without reading it. A panel can name its own hue, but nothing does
- * yet — the cycle is the point. The hues carry no meaning; they're
- * wayfinding, and they're ornament: the panel's own links and buttons
- * stay teal like everything else on the site.
+ * THE PANELS THEMSELVES are PanelStack's — this file decides what a page
+ * is made of and in what order, not how a run of panels is drawn. The
+ * packages page needs a second stack (its terms, under their own
+ * heading, below the collapsed packages), and the same forty lines
+ * written twice in one file is how two stacks quietly stop matching.
  *
  * DECORATION: this page draws none of its own, and neither do its
  * panels (ProsePanel turns CardV2's corner petal off). The rule these
@@ -38,9 +39,10 @@
  */
 import type { CollectionEntry } from 'astro:content';
 
+import DisclosureList from './DisclosureList.astro';
 import DocumentList from './DocumentList.astro';
 import FaqList from './FaqList.astro';
-import ProsePanel from './ProsePanel.astro';
+import PanelStack from './PanelStack.astro';
 
 interface Props {
   /** A `pages` collection entry's frontmatter. */
@@ -49,29 +51,6 @@ interface Props {
 
 const { page } = Astro.props;
 
-/* Wayfinding order, not a palette: see the note above. */
-const cycle = ['coral', 'teal', 'purple', 'amber'] as const;
-
-/* The bullet of a labelled list, tinted to the panel's own accent.
-   A real `list-disc` marker rather than a positioned span: the browser
-   puts it on the correct side under dir="rtl" and aligns it with the
-   item's first line on its own, with no hand-tuned offset to keep in
-   sync with the type scale. */
-const markers = {
-  coral: 'marker:text-coral-500',
-  teal: 'marker:text-teal-500',
-  amber: 'marker:text-amber-500',
-  purple: 'marker:text-purple-500',
-};
-
-/* Numbered badge — the same pairing as the panel's eyebrow pill, which
-   is what makes the accent legible at this size. */
-const badges = {
-  coral: 'bg-coral-100 text-coral-800',
-  teal: 'bg-teal-100 text-teal-800',
-  amber: 'bg-amber-100 text-amber-800',
-  purple: 'bg-purple-100 text-purple-800',
-};
 ---
 
 <section class="pb-section lg:pb-section-lg">
@@ -125,89 +104,58 @@ const badges = {
       )
     }
 
+    {/* The intro band's own padding is the gap down to whatever comes
+        first, so the stack carries no top margin of its own; a second
+        block above it (the forms page's downloads) has to add one. */}
     {
       page.panels.length > 0 && (
-        <div
-          class:list={[
-            'flex flex-col gap-8 lg:gap-10',
-            /* The intro band's own padding is the gap down to whatever
-               comes first; a second block above the stack has to add
-               its own. */
-            page.documents && 'mt-14 lg:mt-20',
-          ]}
-        >
-          {page.panels.map((panel, i) => {
-            const accent = panel.accent ?? cycle[i % cycle.length];
-            return (
-              <ProsePanel
-                accent={accent}
-                eyebrow={panel.eyebrow}
-                heading={panel.heading}
-                lead={panel.lead}
-                pullout={panel.pullout}
-              >
-                {panel.body.map((paragraph) => (
-                  <p>{paragraph}</p>
-                ))}
+        <PanelStack panels={page.panels} class={page.documents ? 'mt-14 lg:mt-20' : ''} />
+      )
+    }
 
-                {/*
-                  Two list shapes, because the copy has two.
+    {/*
+      Disclosures AFTER the panels, where the downloads come before
+      them: a page's panels are the argument a parent reads, and the
+      rows below are what they consult once they've read it — prices,
+      the small print. Closed, they cost the reader a line each.
+    */}
+    {
+      page.disclosures && (
+        <DisclosureList
+          heading={page.disclosures.heading}
+          intro={page.disclosures.intro}
+          items={page.disclosures.items}
+          class="mt-14 lg:mt-20"
+        />
+      )
+    }
 
-                  NUMBERED — the four individual-work formats. The number
-                  is the clinic's own, the name is a title, so it gets its
-                  own line above its description.
+    {/*
+      Terms LAST, and open — see the schema's note on why they aren't
+      more disclosure rows. Their heading matches the disclosure block's
+      so the two read as the page's two sections, and the panels under it
+      drop to h3 so the outline doesn't put one level with the block that
+      contains it.
 
-                  PLAIN — "ויסות ורמת הפעילות. הילד נמצא כל הזמן
-                  בתנועה…". The source writes these as a bold lead-in
-                  followed by the sentence it introduces, so the term
-                  stays inline; pulling it onto its own line would turn
-                  eight sentences into sixteen.
-                */}
-                {panel.items &&
-                  (panel.numbered ? (
-                    <ol class="mt-2 flex flex-col gap-6">
-                      {panel.items.map((item, n) => (
-                        <li class="flex gap-4">
-                          <span
-                            class:list={[
-                              'mt-1 flex size-8 shrink-0 items-center justify-center rounded-pill font-display text-sm font-semibold',
-                              badges[accent],
-                            ]}
-                            aria-hidden="true"
-                          >
-                            {n + 1}
-                          </span>
-                          <div>
-                            {item.term && (
-                              <p class="font-display leading-heading font-semibold text-ink-900">
-                                {item.term}
-                              </p>
-                            )}
-                            <p class:list={[item.term && 'mt-1']}>{item.text}</p>
-                          </div>
-                        </li>
-                      ))}
-                    </ol>
-                  ) : (
-                    <ul class:list={['mt-2 list-disc space-y-4 ps-6', markers[accent]]}>
-                      {panel.items.map((item) => (
-                        <li>
-                          {item.term && (
-                            <strong class="font-display font-semibold text-ink-900">
-                              {item.term}{' '}
-                            </strong>
-                          )}
-                          {item.text}
-                        </li>
-                      ))}
-                    </ul>
-                  ))}
+      `mt-12` rather than the `mt-14` above: this is the gap between two
+      sections of the same page, not the gap between the page's argument
+      and its reference matter.
+    */}
+    {
+      page.terms && (
+        <section class="mt-12 lg:mt-16">
+          <h2 class="text-center font-display text-2xl leading-heading font-bold text-balance text-ink-900 sm:text-3xl">
+            {page.terms.heading}
+          </h2>
 
-                {panel.note && <p class="text-ink-600">{panel.note}</p>}
-              </ProsePanel>
-            );
-          })}
-        </div>
+          {page.terms.intro && (
+            <p class="mx-auto mt-4 max-w-[var(--width-prose)] text-center text-lg leading-body text-pretty text-ink-700">
+              {page.terms.intro}
+            </p>
+          )}
+
+          <PanelStack panels={page.terms.panels} headingAs="h3" class="mt-8" />
+        </section>
       )
     }
 

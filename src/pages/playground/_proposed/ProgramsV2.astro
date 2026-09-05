@@ -32,17 +32,26 @@ import SectionHeading from './SectionHeading.astro';
 import { hasWhatsapp, pagesBase, whatsappHref } from '../../../data/site';
 
 /**
- * `href` per card. The group program now has a destination of its own —
- * src/content/pages/group-forms.md, the two registration forms and the
- * terms that come with them — so its card goes there rather than to the
- * contact anchor. Built off `pagesBase` like every other page link, so
- * it moves with the site when the prototype is promoted.
+ * `href` per card. NEITHER CARD POINTS AT ITS NAV PAGE. Both tracks have
+ * a second, off-menu destination — the thing a parent needs once they've
+ * chosen that track — and the card is where they've just chosen it:
  *
- * The individual track has no such page yet and keeps the placeholder.
+ *   group      → src/content/pages/group-forms.md, the two registration
+ *                forms and the terms that come with them.
+ *   individual → src/content/pages/individual-packages.md, the four
+ *                packages with their prices and the payment /
+ *                interruption / cancellation rules.
  *
- * `cta` overrides the default label where the destination isn't "more
- * about this program": a card that lands a parent on a downloads page
- * should say so. PROPOSED NEW COPY — needs sign-off with the rest.
+ * The nav's "פעילות קבוצתית" and "אבחון וטיפול פרטני" still go to
+ * groups.md and individual.md, which explain the two tracks; these two
+ * pages are what follows the explanation. Both hrefs are built off
+ * `pagesBase` like every other page link, so they move with the site
+ * when the prototype is promoted.
+ *
+ * `cta` overrides the default "לפרטים נוספים" on both, since neither
+ * destination is "more about this program" — a card that lands a parent
+ * on forms or on a price list should say which. PROPOSED NEW COPY —
+ * needs sign-off with the rest.
  */
 const programs = [
   {
@@ -50,7 +59,8 @@ const programs = [
     body: 'מפגש אחד-על-אחד שמתחיל בהיכרות ובאבחון חושי-תפקודי, וממשיך בתוכנית טיפול שנבנית סביב הילד הזה — הקצב שלו, החוזקות שלו ומה שקשה לו.',
     accent: 'coral',
     icon: 'user',
-    href: '#contact',
+    href: `${pagesBase}/individual-packages`,
+    cta: 'למסגרות, למחירים ולתנאים',
   },
   {
     title: 'פעילויות קבוצתיות התפתחותיות',

@@ -41,8 +41,15 @@ interface Props {
   eyebrow?: string;
   /** Petal hue for the ring, the corner wash, the pill and the rule. */
   accent?: 'coral' | 'teal' | 'amber' | 'purple';
-  /** The panel's headline. Rendered as an <h2>. */
+  /** The panel's headline. */
   heading?: string;
+  /**
+   * The heading's level. `h2` on a page whose panels ARE its sections —
+   * every explanatory page today. `h3` for a stack that already sits
+   * under a heading of its own (the packages page's terms), so the
+   * outline doesn't put a panel level with the block containing it.
+   */
+  headingAs?: 'h2' | 'h3';
   /**
    * Opening sentence, set larger than the body — Method.astro's `lead`.
    * Use it instead of `heading` for a panel whose own first sentence is
@@ -62,6 +69,7 @@ const {
   eyebrow,
   accent = 'coral',
   heading,
+  headingAs: Heading = 'h2',
   lead,
   pullout,
   petal = false,
@@ -106,14 +114,18 @@ const rules = {
 
     {
       heading && (
-        <h2
+        /* Capitalized, so Astro reads it as the tag name in `headingAs`
+           rather than as a literal <Heading> element. The type scale is
+           the panel's, not the level's: an h3 here is still the biggest
+           thing in its card. */
+        <Heading
           class:list={[
             'font-display text-2xl leading-heading font-bold text-balance text-ink-900 sm:text-3xl',
             eyebrow && 'mt-5',
           ]}
         >
           {heading}
-        </h2>
+        </Heading>
       )
     }
 

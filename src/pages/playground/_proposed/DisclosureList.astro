@@ -1,0 +1,269 @@
+---
+/**
+ * PROPOSED (new — no current counterpart).
+ *
+ * A page's reference matter as closed rows. The clinic asked for exactly
+ * this shape — things a parent opens, not things they scroll past —
+ * because only one of the four packages is ever the one they're
+ * choosing, and the terms are small print that has to be on the page
+ * without being the page.
+ *
+ * ROWS ARE A CHOOSER. Everything in this list is something the reader
+ * picks one of; reference matter that applies to all of them is NOT a
+ * row here — the packages page's terms sit below in open panels (see the
+ * schema's `terms`), because a toggle over them asks a question the
+ * reader doesn't have.
+ *
+ * WHY NOT ProsePanel: a panel is open by definition, and open panels of
+ * program terms under the four that explain the method would bury the
+ * explanation. Collapsed, the whole offer is four lines a parent reads
+ * in one look before deciding which one to open.
+ *
+ * WHY NOT FaqList, which is already an accordion: a FAQ row is one
+ * question and one paragraph, and it numbers its rows 1–15 because the
+ * clinic's copy does. These rows carry a price, several paragraphs and
+ * (in the terms row) their own sub-headings, and their titles already
+ * number themselves — "חבילה 1. …" — so a second number beside them
+ * would be counting the same thing twice. The two accordions are close
+ * enough to look like one component and different enough in their
+ * bodies that merging them would mean a component that takes either a
+ * string or a document; the shared part is `<details>`, which is the
+ * browser's.
+ *
+ * `<details>`/`<summary>` rather than JS, for FaqList's reasons: it's
+ * open/close state the browser already owns — keyboard-operable, and it
+ * works before hydration because there is none.
+ *
+ * THE PRICE IS THE COMPONENT'S JOB, not the copy's. The clinic's
+ * instruction is that every package shows its price at the start of the
+ * body, above the description, so `price` is its own field and this
+ * renders it first. No entry can get the order wrong, and the terms row,
+ * which has no price, simply opens on its body.
+ *
+ * IT IS A PRICE LINE, NOT A PRICE TABLE. It began as a tinted card with
+ * each figure pushed to the far end of its row by `justify-between`,
+ * which is what a table does — and at this column width that put a
+ * label and the number it names 30-odd characters apart, so reading one
+ * price meant crossing the empty middle to find the digits. A package
+ * quotes two figures, not twenty; there are no columns to align. So the
+ * pairs now sit inline and PROXIMITY does the grouping: `gap-2` inside a
+ * pair, `gap-x-8` between them, which reads as two prices without a rule
+ * or a box drawn to say so. The tint is gone with the box — the amount
+ * keeps the row's hue, which is all the block was using it for — and one
+ * hairline under the line separates it from the prose. On a narrow
+ * screen the run wraps and each pair keeps its own line, still tight.
+ */
+import CardV2 from './CardV2.astro';
+
+interface Props {
+  heading: string;
+  intro?: string;
+  items: readonly {
+    title: string;
+    price: { label: string; amount: string }[];
+    accent?: 'coral' | 'teal' | 'amber' | 'purple';
+    sections: { heading?: string; body: string[]; items: string[] }[];
+  }[];
+  class?: string;
+}
+
+const { heading, intro, items, class: className = '' } = Astro.props;
+
+/* Same wayfinding cycle as ProsePage's panels and DocumentList's cards:
+   the hue tells one row from the next and means nothing else. */
+const cycle = ['coral', 'teal', 'purple', 'amber'] as const;
+
+/* One row per hue so a lookup can never produce an untokenized value.
+   The dot is the row's only mark when it's closed; the hover wash is
+   what makes the whole summary read as the control. */
+const dots = {
+  coral: 'bg-coral-500',
+  teal: 'bg-teal-500',
+  amber: 'bg-amber-500',
+  purple: 'bg-purple-500',
+};
+
+const washes = {
+  coral: 'hover:bg-coral-50',
+  teal: 'hover:bg-teal-50',
+  amber: 'hover:bg-amber-50',
+  purple: 'hover:bg-purple-50',
+};
+
+/* The amount — the -800 step, which is the only one of a petal that
+   carries text. Same rule as ProsePanel's eyebrow. With the tinted
+   ground gone this is the row's hue in the body, so it does the work
+   the panel behind it used to. */
+const amounts = {
+  coral: 'text-coral-800',
+  teal: 'text-teal-800',
+  amber: 'text-amber-800',
+  purple: 'text-purple-800',
+};
+
+const markers = {
+  coral: 'marker:text-coral-500',
+  teal: 'marker:text-teal-500',
+  amber: 'marker:text-amber-500',
+  purple: 'marker:text-purple-500',
+};
+---
+
+<!-- Heading and intro on the page's own ground, centered like the intro
+     band and the download block — the rows are the block's content, not
+     its frame. -->
+<section class:list={['scroll-mt-header lg:scroll-mt-header-lg', className]}>
+  <h2
+    class="text-center font-display text-2xl leading-heading font-bold text-balance text-ink-900 sm:text-3xl"
+  >
+    {heading}
+  </h2>
+
+  {
+    intro && (
+      <p class="mx-auto mt-4 max-w-[var(--width-prose)] text-center text-lg leading-body text-pretty text-ink-700">
+        {intro}
+      </p>
+    )
+  }
+
+  <!-- No accent on the card and no corner petal, as on the FAQ: this is
+       one surface holding the whole list, and the accents belong to the
+       rows inside it. -->
+  <CardV2 petal={false} class="mt-8 sm:p-4 lg:p-6">
+    <div class="divide-y divide-ink-900/10">
+      {
+        items.map((item, i) => {
+          const accent = item.accent ?? cycle[i % cycle.length];
+          return (
+            <details class="disclosure group">
+              <summary
+                class:list={[
+                  'flex cursor-pointer list-none items-start gap-4 rounded-card px-4 py-5 transition-colors duration-[var(--duration-fast)]',
+                  washes[accent],
+                ]}
+              >
+                {/* Decorative: the row's title says which row this is;
+                    the dot only gives the stack its rhythm. */}
+                <span
+                  class:list={['mt-2.5 size-2.5 shrink-0 rounded-pill', dots[accent]]}
+                  aria-hidden="true"
+                />
+
+                {/* A heading inside the summary, not a span: the terms
+                    row's own sub-headings sit under it, and an outline
+                    that jumps from the block's h2 straight to them would
+                    put the small print at the same level as the offer. */}
+                <h3 class="flex-1 font-display text-lg leading-heading font-semibold text-pretty text-ink-900">
+                  {item.title}
+                </h3>
+
+                {/* Decorative too: the summary is the control, and the
+                    browser announces its expanded state. */}
+                <svg
+                  class="chevron mt-1.5 size-4 shrink-0 text-ink-500"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M3 6l5 5 5-5"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </summary>
+
+              {/* `ps-11` lines the body up with the title, past the dot
+                  (size-2.5 + gap-4 + the summary's px-4).
+
+                  `pt-5` on top of the summary's own `py-5`: opened, the
+                  body used to start one line-height under the title,
+                  which is the spacing WITHIN a block of text — so the
+                  title read as the body's first line rather than as the
+                  control that revealed it. It's a bigger step than the
+                  gap between two paragraphs of the body (`gap-4`) on
+                  purpose: the title has to sit further from what it
+                  opened than that body's own parts sit from each other. */}
+              <div class="flex flex-col gap-4 px-4 pt-5 pb-8 ps-11 leading-body text-pretty text-ink-800">
+                {/* Still a description list, not a run of spans: each
+                    pair is a term ("כל חודש נוסף") and its value
+                    ("300 ₪"), which is what <dl> is — the change is that
+                    the pairs are laid out inline rather than as rows. */}
+                {item.price.length > 0 && (
+                  <dl class="flex flex-wrap items-baseline gap-x-8 gap-y-3 border-b border-ink-900/10 pb-4">
+                    {item.price.map((row) => (
+                      /* The pair is one flex item so a wrap can only ever
+                         break BETWEEN prices, never between a label and
+                         the number it names. */
+                      <div class="flex items-baseline gap-2">
+                        <dt class="text-sm text-ink-600">{row.label}</dt>
+                        <dd
+                          class:list={[
+                            'font-display text-lg leading-heading font-bold whitespace-nowrap sm:text-xl',
+                            amounts[accent],
+                          ]}
+                        >
+                          {row.amount}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+
+                {/* One run of parts, in the copy's own order — see the
+                    schema's note on why prose and lists can't be two
+                    separate fields here. A part with no heading is just
+                    its paragraphs, so the stack's `gap-4` is what
+                    separates them and nothing extra is drawn. */}
+                {item.sections.map((section) => (
+                  <div class="flex flex-col gap-4">
+                    {section.heading && (
+                      <h4 class="mt-2 font-display leading-heading font-semibold text-ink-900">
+                        {section.heading}
+                      </h4>
+                    )}
+
+                    {section.body.map((paragraph) => (
+                      <p>{paragraph}</p>
+                    ))}
+
+                    {/* A real `list-disc` marker rather than a
+                        positioned span, as in ProsePanel's lists: the
+                        browser puts it on the correct side under
+                        dir="rtl" on its own. */}
+                    {section.items.length > 0 && (
+                      <ul class:list={['list-disc space-y-2 ps-6', markers[accent]]}>
+                        {section.items.map((entry) => (
+                          <li>{entry}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </details>
+          );
+        })
+      }
+    </div>
+  </CardV2>
+</section>
+
+<style>
+  /* `list-none` covers Firefox; WebKit needs its own pseudo-element
+     turned off or the disclosure triangle stays. */
+  .disclosure summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .chevron {
+    transition: transform var(--duration-base) var(--ease-standard);
+  }
+
+  .disclosure[open] .chevron {
+    transform: rotate(180deg);
+  }
+</style>

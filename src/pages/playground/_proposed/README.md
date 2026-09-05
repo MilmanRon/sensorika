@@ -12,8 +12,9 @@ pending sign-off" isn't a category the site should ship with.
 
 Naming: `<Name>V2.astro` mirrors `<Name>.astro`. The pieces without a V2
 suffix (`SectionHeading`, `Icon`, `WaveDivider`, `Decor`, `ProsePanel`,
-`ProsePage`, `FaqList`, `PageBackdrop`, `HeroMethod`, `SiteFooter`) are
-new and have no current counterpart.
+`PanelStack`, `ProsePage`, `FaqList`, `DocumentList`, `DisclosureList`,
+`PageBackdrop`, `HeroMethod`, `SiteFooter`) are new and have no current
+counterpart.
 
 `/playground/full-page` is the home page assembled out of them —
 backdrop, header, HeroMethod, ProgramsV2, footer.
