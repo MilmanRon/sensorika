@@ -11,6 +11,14 @@
  * NOT listed here. They're one dynamic route ([navpage].astro) driven by
  * the `pages` content collection, so /playground reads them straight off
  * that collection — a new page there is a new .md file and nothing else.
+ *
+ * NEITHER IS THE HOME PAGE any more. /playground/full-page and those six
+ * are one walkable site now — same header, same footer, the nav linking
+ * them to each other — so /playground opens with a section for the site
+ * as a whole and lists the entry point there, next to the pages it
+ * leads to. Listing it here as well would put the same link in two
+ * places on the index for no reason. The entries below are what they
+ * always were: single components, seen on their own.
  */
 export const playgroundEntries = [
   {
@@ -85,13 +93,6 @@ export const playgroundEntries = [
     title: 'Hero + Method (combined)',
     group: 'sections',
     component: '_proposed/HeaderV2 + HeroMethod + ProgramsV2',
-    status: 'in progress',
-  },
-  {
-    slug: 'full-page',
-    title: 'Home (full page)',
-    group: 'pages',
-    component: '_proposed/PageBackdrop + HeaderV2 + HeroMethod + ProgramsV2 + SiteFooter',
     status: 'in progress',
   },
   {

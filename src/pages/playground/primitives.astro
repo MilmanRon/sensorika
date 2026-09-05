@@ -20,12 +20,14 @@ const accents = ['coral', 'teal', 'amber', 'purple'] as const;
 
 /**
  * Measured against white with the same oklch color-mix the tokens use.
- * The two failing rows are the shipped Button's only two variants.
+ * The failing row is the logo petal at full strength — the reason the
+ * CTA sits on coral-700 rather than on coral-500 itself.
  */
 const contrast = [
-  { pair: 'white on teal-700 (Button primary, current)', ratio: '5.92:1', pass: true },
-  { pair: 'teal-700 on white (Button secondary, current)', ratio: '5.92:1', pass: true },
-  { pair: 'white on teal-700 (ButtonV2 primary)', ratio: '5.92:1', pass: true },
+  { pair: 'white on coral-700 (Button primary)', ratio: '5.20:1', pass: true },
+  { pair: 'white on coral-800 (Button primary, hover)', ratio: '8.69:1', pass: true },
+  { pair: 'teal-700 on white (Button secondary)', ratio: '5.92:1', pass: true },
+  { pair: 'white on coral-700 (ButtonV2 primary)', ratio: '5.20:1', pass: true },
   { pair: 'teal-800 on white (ButtonV2 ghost)', ratio: '9.28:1', pass: true },
   { pair: 'coral-800 on coral-100 (eyebrow pill)', ratio: '7.14:1', pass: true },
   { pair: 'amber-800 on amber-100 (eyebrow pill)', ratio: '5.11:1', pass: true },

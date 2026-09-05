@@ -9,6 +9,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "forms": "node forms/build.mjs",
+    "forms:fonts": "node forms/fetch-fonts.mjs",
     "astro": "astro"
   },
   "dependencies": {

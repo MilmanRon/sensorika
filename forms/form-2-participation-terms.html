@@ -1,0 +1,167 @@
+<!doctype html>
+<!--
+  Form 2 — התנאים הבסיסיים להשתתפות בתוכנית.
+
+  Print source, not a site page: `npm run forms` renders it to
+  public/forms/sensorika-form-2-participation-terms.pdf.
+
+  Two sheets, because the source is two documents: the thing the parent
+  signs (page 1) and the standing terms it refers to — payment,
+  absences, cancellation, insurance (page 2). The source calls that
+  second half "בלוק נפרד", so it gets its own page rather than being
+  folded in above the signature; page 1's "מפורטים להלן" then points at
+  a page the parent is actually holding.
+
+  The source's one editorial line — that this block should also be
+  reachable from the group-activities page — is a note to us, not copy
+  for a parent, so it isn't printed. It's honoured by the page that
+  links to these PDFs.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <title>טופס 2 — התנאים הבסיסיים להשתתפות בתוכנית | Sensorika</title>
+    <link rel="stylesheet" href="assets/fonts.css" />
+    <link rel="stylesheet" href="assets/print.css" />
+  </head>
+  <body>
+    <section class="sheet">
+      <header class="sheet-head">
+        <img src="../src/assets/brand/logo.svg" alt="Sensorika" />
+        <span class="doc-id">פעילויות קבוצתיות התפתחותיות</span>
+      </header>
+
+      <div class="sheet-body">
+        <div class="title-block">
+          <p class="eyebrow">טופס 2</p>
+          <h1>התנאים הבסיסיים להשתתפות בתוכנית</h1>
+          <p class="lede">
+            למילוי על ידי ההורה או האפוטרופוס החוקי. התנאים המלאים — תשלום, היעדרויות, ביטול
+            וביטוח — מופיעים בעמוד הבא.
+          </p>
+        </div>
+
+        <p class="field">
+          <span class="field-label">שם ושם משפחה של הילד</span>
+          <span class="rule"></span>
+        </p>
+        <p class="field">
+          <span class="field-label">שם ההורה / האפוטרופוס החוקי</span>
+          <span class="rule"></span>
+        </p>
+
+        <section>
+          <h2>מידע על הילד</h2>
+          <p>
+            ההורה מאשר כי מסר מידע אמין ומלא על מצבו הבריאותי של הילד, התוויות נגד, מגבלות
+            ומאפיינים התנהגותיים משמעותיים, ומתחייב לעדכן על שינויים.
+          </p>
+        </section>
+
+        <section>
+          <h2>מתכונת ההשתתפות</h2>
+          <p>
+            התוכנית מיועדת להשתתפות רציפה במחזורים. מפגש ניסיון אינו נחשב בסיס מספק להערכת התאמת
+            התוכנית לילד, משום שהמתכונת מבוססת על תהליך דינמי והסתגלות הדרגתית.
+          </p>
+          <p class="note">
+            כללי התשלום, הביטול, ההשלמות והביטוח מפורטים להלן בבלוק אחיד ונפרד ואינם משוכפלים
+            בטופס זה.
+          </p>
+        </section>
+
+        <div class="signature">
+          <div>
+            <div class="sig-line"></div>
+            <p class="sig-label">חתימת ההורה / האפוטרופוס החוקי</p>
+          </div>
+          <div class="is-date">
+            <div class="sig-line"></div>
+            <p class="sig-label">תאריך</p>
+          </div>
+        </div>
+      </div>
+
+      <footer class="sheet-foot">
+        <span>Sensorika · טופס 2 — התנאים הבסיסיים להשתתפות בתוכנית</span>
+        <span>עמוד 1 מתוך 2</span>
+      </footer>
+    </section>
+
+    <section class="sheet annex">
+      <header class="sheet-head">
+        <img src="../src/assets/brand/logo.svg" alt="Sensorika" />
+        <span class="doc-id">פעילויות קבוצתיות התפתחותיות</span>
+      </header>
+
+      <div class="sheet-body">
+        <div class="title-block">
+          <p class="eyebrow">נספח</p>
+          <h1>תשלום, ביטול, השלמות וביטוח</h1>
+        </div>
+
+        <section>
+          <h2>תשלום</h2>
+          <p>ההשתתפות משולמת עבור מחזור.</p>
+          <p>
+            במקרה של הפסקת השתתפות ביוזמת ההורים, יינתן החזר רק עבור חודשים מלאים שטרם החלו. תשלום
+            עבור חודש שכבר החל אינו מוחזר ואינו מועבר.
+          </p>
+          <p>
+            אם לפי הערכתה המקצועית של מנהלת התוכנית המשך השתתפותו של הילד במסגרת הקבוצתית אינו
+            מתאים באופן זמני לצרכיו, מנהלת התוכנית רשאית להמליץ על מסגרת פרטנית. במקרה כזה ניתנת
+            להורים אפשרות בחירה: לזקוף את עלות כל המפגשים שלא נוצלו בחודש הנוכחי לטובת אבחון או
+            מפגשים פרטניים, או לקבל החזר עבור המפגשים שלא נוצלו בחודש הנוכחי.
+          </p>
+          <p class="note">
+            החלטה כזו אינה נחשבת לסירוב להשתתפות הילד: לאחר הכנה פרטנית ניתן לחזור לקבוצה.
+          </p>
+        </section>
+
+        <section>
+          <h2>היעדרויות</h2>
+          <p>
+            אם הילד נעדר מפעילות בשל מחלה, נסיבות משפחתיות או נסיעה, ניתן להשלים את הפעילות
+            שהוחמצה בקבוצה המתאימה, בכפוף למקום פנוי.
+          </p>
+          <p>
+            אם אין מקום פנוי, לא יתקיים מפגש נפרד במיוחד עבור ילד אחד, ועלות המפגש שהוחמץ לא
+            תוחזר.
+          </p>
+        </section>
+
+        <section>
+          <h2>ביטול פעילות</h2>
+          <p>
+            פעילות שבוטלה ביוזמת הסטודיו מסיבות טכניות או ארגוניות תועבר למועד אחר או תושלם.
+          </p>
+          <p>
+            פעילויות שאינן מתקיימות בחגים הרשמיים בישראל, אשר נכללו מראש בלוח השנה של הסטודיו,
+            אינן מזכות בהשלמה.
+          </p>
+        </section>
+
+        <section>
+          <h2>ביטוח ואחריות</h2>
+          <p>
+            הסטודיו מספק כיסוי ביטוחי לאחריות כלפי צד שלישי (צד ג׳) ואחראי לבטיחות המקום והסביבה
+            במסגרת תחומי אחריותו.
+          </p>
+          <p>
+            מנהלת התוכנית מקיימת את הפעילויות כאשר ברשותה ביטוח אחריות מקצועית (אחריות מקצועית)
+            בתוקף.
+          </p>
+          <p>
+            ההורה אחראי למסירה מלאה ובמועד של מידע על מצבו הבריאותי של הילד ועל מאפיינים משמעותיים
+            שלו.
+          </p>
+        </section>
+      </div>
+
+      <footer class="sheet-foot">
+        <span>Sensorika · טופס 2 — נספח: תשלום, ביטול, השלמות וביטוח</span>
+        <span>עמוד 2 מתוך 2</span>
+      </footer>
+    </section>
+  </body>
+</html>

@@ -4,6 +4,28 @@
  * section all need to agree on. Import this instead of hardcoding any
  * of these values in a component.
  */
+
+/**
+ * WHERE THE SITE CURRENTLY LIVES.
+ *
+ * The real pages are built out of `src/pages/playground/_proposed/`, so
+ * the walkable site is under /playground rather than at the root: home
+ * is /playground/full-page and each nav destination is
+ * /playground/<slug>. Nothing else in the codebase should know that —
+ * every href the chrome renders is derived from these two constants, so
+ * promoting the proposed components is one edit here (`pagesBase` to
+ * `''`, `homeHref` to `'/'`) and not a search for hardcoded paths.
+ *
+ * They live in site.ts rather than in a playground file because the
+ * SHIPPED Header and SideNav read `siteConfig.nav` too, and pointing
+ * them at the anchors they used to carry would send a visitor to
+ * fragments that no page defines.
+ */
+export const pagesBase = '/playground';
+
+/** The brand lockup's destination, in the header and in the footer. */
+export const homeHref = `${pagesBase}/full-page`;
+
 export const siteConfig = {
   name: 'Sensorika',
   tagline: '', // TODO: one-line description, once copy is finalized
@@ -32,10 +54,15 @@ export const siteConfig = {
     facebook: '', // TODO: e.g. 'https://facebook.com/sensorika'
   },
   /**
-   * Primary nav. This is a one-page site for now, so links are
-   * same-page anchors, not routes. Labels are final copy; hrefs are
-   * placeholder slugs (TODO) until each matching section exists and
-   * gets a real `id`.
+   * Primary nav. Each entry is a PAGE now, not a same-page anchor: every
+   * label here has a matching .md in src/content/pages/ that
+   * [navpage].astro renders as a route of its own, and `slug` is that
+   * file's id. The nav was a list of `#` placeholders while those pages
+   * didn't exist yet; they do, so it isn't any more.
+   *
+   * `href` is derived from `slug` rather than written out, so the six
+   * paths can never drift from the six files — and so the whole nav
+   * moves with `pagesBase` when the prototype is promoted (see there).
    *
    * The two conversion entries — "יצירת קשר" and "הרשמה" — are
    * deliberately absent. The header carries a standing WhatsApp CTA, so
@@ -44,13 +71,17 @@ export const siteConfig = {
    * finding out about the clinic; the CTA is for getting in touch.
    */
   nav: [
-    { label: 'מהו ויסות חושי', href: '#sensory-regulation' },
-    { label: 'מתי אנחנו יכולים לעזור', href: '#how-we-help' },
-    { label: 'אבחון וטיפול פרטניים', href: '#individual' },
-    { label: 'פעילות קבוצתית', href: '#groups' },
-    { label: 'קצת עליי', href: '#about' },
-    { label: 'שאלות נפוצות', href: '#faq' },
-  ] as { label: string; href: string }[],
+    { label: 'מהו ויסות חושי', slug: 'sensory-regulation' },
+    { label: 'מתי אנחנו יכולים לעזור', slug: 'how-we-help' },
+    { label: 'אבחון וטיפול פרטניים', slug: 'individual' },
+    { label: 'פעילות קבוצתית', slug: 'groups' },
+    { label: 'קצת עליי', slug: 'about' },
+    { label: 'שאלות נפוצות', slug: 'faq' },
+  ].map((item) => ({ ...item, href: `${pagesBase}/${item.slug}` })) as {
+    label: string;
+    slug: string;
+    href: string;
+  }[],
 };
 
 /**

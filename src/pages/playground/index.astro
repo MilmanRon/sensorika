@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { homeHref, siteConfig } from '../../data/site';
 import { playgroundEntries } from './_registry';
 
 /* The nav-item pages come from the content collection rather than from
@@ -10,6 +11,13 @@ import { playgroundEntries } from './_registry';
 const navPages = (await getCollection('pages', ({ data }) => data.nav)).sort(
   (a, b) => a.data.order - b.data.order,
 );
+
+/* Which of them the header's nav carries. All six today — the guard in
+   [navpage].astro fails the build if the nav names one that has no file
+   — but the reverse is allowed: a page can exist without being in the
+   nav, and this index should say so rather than implying every page is
+   reachable from the chrome. */
+const inNav = new Set(siteConfig.nav.map((item) => item.slug));
 
 const groups = ['pages', 'layout', 'ui', 'sections'] as const;
 const groupLabels: Record<(typeof groups)[number], string> = {
@@ -30,28 +38,75 @@ const groupLabels: Record<(typeof groups)[number], string> = {
       <code class="text-ink-700">src/pages/playground/_proposed/README.md</code>.
     </p>
 
+    <!--
+      THE SITE, WHOLE. Everything above this line in the index is a
+      component seen on its own; this section is the opposite — the
+      finished pages, wired to each other, meant to be walked rather
+      than inspected.
+
+      It leads with the home page and then lists what its nav points at,
+      because that's the order a visitor meets them in. The rows are
+      links, but the point of the section is that you only need the
+      FIRST one: from /playground/full-page the header's nav, the
+      drawer and the lockup reach every other row without coming back
+      here. The list is here for jumping straight to a page you're
+      working on.
+    -->
     <section class="mt-10">
       <h2 class="font-display text-sm font-semibold tracking-wide text-ink-500 uppercase">
-        nav-item pages
+        the site, whole
       </h2>
       <p class="mt-2 text-sm text-ink-600">
-        One page per nav entry, each rendered by <code class="text-ink-700">[navpage].astro</code>
-        out of a single <code class="text-ink-700">.md</code> file in
-        <code class="text-ink-700">src/content/pages/</code> — copy changes are content edits.
+        The real pages, assembled and linked to each other — same header, same footer, same
+        <code class="text-ink-700">PageBackdrop</code> under all of them. Start at the home page and
+        use the nav; you shouldn't need to come back here to get anywhere.
       </p>
+
       <ul class="mt-3 flex flex-col divide-y divide-ink-900/10 rounded-card bg-paper-100">
+        <li>
+          <a
+            href={homeHref}
+            class="flex items-center justify-between gap-4 px-6 py-5 transition-colors duration-[var(--duration-fast)] hover:bg-paper-200"
+          >
+            <span class="flex flex-wrap items-center gap-3">
+              <span class="font-display font-semibold text-ink-900">בית — Home</span>
+              <span class="rounded-pill bg-teal-100 px-2 py-0.5 text-xs font-semibold text-teal-800">
+                נקודת כניסה
+              </span>
+            </span>
+            <span class="text-sm text-ink-500">HeroMethod + ProgramsV2</span>
+          </a>
+        </li>
+
         {navPages.map((page) => (
           <li>
             <a
               href={`/playground/${page.id}`}
               class="flex items-center justify-between gap-4 px-6 py-4 transition-colors duration-[var(--duration-fast)] hover:bg-paper-200"
             >
-              <span class="font-medium text-ink-900">{page.data.navLabel ?? page.data.title}</span>
+              <span class="flex flex-wrap items-center gap-3">
+                <span class="font-medium text-ink-900">{page.data.navLabel ?? page.data.title}</span>
+                {!inNav.has(page.id) && (
+                  <span class="rounded-pill bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
+                    לא בתפריט
+                  </span>
+                )}
+              </span>
               <span class="text-sm text-ink-500">{page.id}.md</span>
             </a>
           </li>
         ))}
       </ul>
+
+      <p class="mt-3 text-sm text-ink-600">
+        Each nav-item row is rendered by <code class="text-ink-700">[navpage].astro</code> out of a
+        single <code class="text-ink-700">.md</code> file in
+        <code class="text-ink-700">src/content/pages/</code>, so copy changes are content edits. The
+        hrefs the chrome links them by come from
+        <code class="text-ink-700">siteConfig.nav</code>, built off
+        <code class="text-ink-700">pagesBase</code> — that constant is what currently pins the site
+        under <code class="text-ink-700">/playground</code>.
+      </p>
     </section>
 
     {

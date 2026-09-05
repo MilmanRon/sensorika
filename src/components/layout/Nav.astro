@@ -4,6 +4,13 @@
  * chrome in SideNav.astro). This renders the list and nothing else, so
  * the same items can appear in a horizontal bar, a vertical rail, or a
  * footer without duplicating `site.ts`.
+ *
+ * The current page is worked out HERE, off `Astro.url`, rather than
+ * being passed down from whatever renders the nav. Every caller would
+ * otherwise have to thread the same value through for no reason: the
+ * answer is a property of the request, identical for all of them, and
+ * this is the only component that has the list of candidates to compare
+ * it against.
  */
 import { siteConfig } from '../../data/site';
 import NavItem from './NavItem.astro';
@@ -20,6 +27,12 @@ interface Props {
 const { orientation = 'horizontal' } = Astro.props;
 const { nav } = siteConfig;
 
+/* Trailing slash trimmed on both sides: Astro serves these routes as
+   directories (`/playground/faq/`) while the href in site.ts has no
+   slash, and a raw `===` would then never match. */
+const trim = (path: string) => path.replace(/\/+$/, '');
+const here = trim(Astro.url.pathname);
+
 const layouts = {
   horizontal: 'flex flex-wrap items-center justify-center gap-1 rounded-card bg-paper-200 p-2',
   vertical: 'flex flex-col gap-1',
@@ -31,7 +44,11 @@ const layouts = {
     {
       nav.map((item) => (
         <li>
-          <NavItem href={item.href} class={orientation === 'vertical' ? 'text-lg whitespace-normal' : ''}>
+          <NavItem
+            href={item.href}
+            current={trim(item.href) === here}
+            class={orientation === 'vertical' ? 'text-lg whitespace-normal' : ''}
+          >
             {item.label}
           </NavItem>
         </li>

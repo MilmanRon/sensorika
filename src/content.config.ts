@@ -97,6 +97,29 @@ const panel = z.object({
   pullout: z.string().optional(),
 });
 
+/**
+ * A file a page hands the reader — today, the group program's two
+ * registration forms.
+ *
+ * `file` is a path under public/, not an astro:assets import: these are
+ * documents served as-is at a fixed URL a parent can be sent, not images
+ * for the build to fingerprint and transform. That also means nothing
+ * type-checks the path: the PDFs are generated from forms/*.html by
+ * `npm run forms` (see forms/README.md), and renaming one of those
+ * outputs without changing the `file` here leaves a dead download. Only
+ * the shape is checked below.
+ */
+const document = z.object({
+  title: z.string(),
+  /** One line on what's inside, under the title. */
+  description: z.string().optional(),
+  /** Shape and length — "PDF · 2 עמודים" — set beside the title. */
+  meta: z.string().optional(),
+  /** Petal hue for the card. Omit and the list cycles them, as panels do. */
+  accent: z.enum(['coral', 'teal', 'amber', 'purple']).optional(),
+  file: z.string().startsWith('/', 'A path under public/, so it must start with "/".'),
+});
+
 const pages = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/pages' }),
   schema: z.object({
@@ -105,18 +128,22 @@ const pages = defineCollection({
     /** The nav label, when the nav calls the page something shorter. */
     navLabel: z.string().optional(),
     /**
-     * Whether this page is one of the nav destinations, and so gets a
-     * route of its own from [navpage].astro. The home page's copy lives
-     * in this collection too — same panels, same everything — but it's
-     * rendered by the home hero rather than by that route, so it sets
-     * `nav: false`.
+     * Whether [navpage].astro gives this page a route of its own. The
+     * home page's copy lives in this collection too — same panels, same
+     * everything — but it's rendered by the home hero rather than by
+     * that route, so it sets `nav: false`.
+     *
+     * It does NOT decide what the header carries: `siteConfig.nav` names
+     * the six nav destinations, and a page can have a route without
+     * being one of them (the group program's forms page is reached from
+     * a card on the home page). /playground flags those as "לא בתפריט".
      */
     nav: z.boolean().default(true),
     /**
-     * The brand lockup under the greeting — home page only, where the h1
-     * is "ברוכים הבאים" over "Sensorika" rather than a plain title. The
-     * word is its own field because it has to sit in its own LTR box on
-     * the RTL line, or it renders backwards.
+     * The brand word — home page only, where the h1 is "Sensorika"
+     * itself rather than the `title` above. It's its own field because
+     * it has to sit in its own LTR box on the RTL line, or it renders
+     * backwards.
      */
     brand: z.object({ word: z.string() }).optional(),
     description: z.string(),
@@ -125,6 +152,18 @@ const pages = defineCollection({
     /** Order in the nav / on the playground index. */
     order: z.number(),
     panels: z.array(panel).default([]),
+    /**
+     * Downloads, rendered as a card each ABOVE the panels — a page that
+     * exists to hand a parent two forms shouldn't open with the reading
+     * matter that follows them.
+     */
+    documents: z
+      .object({
+        heading: z.string(),
+        intro: z.string().optional(),
+        items: z.array(document).nonempty(),
+      })
+      .optional(),
     /**
      * Q&A list, rendered as an accordion after the panels. Only the FAQ
      * page uses it, but it's here rather than in its own collection

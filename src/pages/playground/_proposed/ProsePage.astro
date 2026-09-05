@@ -20,33 +20,34 @@
  * wayfinding, and they're ornament: the panel's own links and buttons
  * stay teal like everything else on the site.
  *
- * DECORATION happens exactly once, in the intro band behind the h1 — the
- * hero's `Decor`, but the petals only (`dots={false}`). The dot grid
- * works under the hero, where it's the ground a whole band sits on; in a
- * short band it's a fine repeating pattern crowding the title. The
- * panels themselves are clean (ProsePanel turns CardV2's corner petal
- * off). The rule these pages settled: the ornament belongs to the PAGE,
- * not to each card — repeated down a stack the corner blob became a tile
- * you notice instead of a flourish you don't.
+ * DECORATION: this page draws none of its own, and neither do its
+ * panels (ProsePanel turns CardV2's corner petal off). The rule these
+ * pages settled: the ornament belongs to the PAGE, not to each card —
+ * repeated down a stack the corner blob became a tile you notice
+ * instead of a flourish you don't.
+ *
+ * The intro band used to carry a <Decor> — the hero's petals, without
+ * the dot grid — back when the route rendered on flat white. It doesn't
+ * any more: the route now puts a PageBackdrop under the whole document,
+ * exactly as /playground/full-page does, and that runs a petal field
+ * (plus the wash and the dither) down the entire page. A second set of
+ * shapes in the one band the two would overlap reads as clutter, which
+ * is the same call HeroMethod made when the backdrop arrived under it.
+ * The panels' white CardV2 surfaces now lift off that ground instead of
+ * sitting white-on-white.
  */
 import type { CollectionEntry } from 'astro:content';
 
-import Decor from './Decor.astro';
+import DocumentList from './DocumentList.astro';
 import FaqList from './FaqList.astro';
 import ProsePanel from './ProsePanel.astro';
 
 interface Props {
   /** A `pages` collection entry's frontmatter. */
   page: CollectionEntry<'pages'>['data'];
-  /**
-   * The section's `id`, so the shipped nav's same-page anchors still
-   * land somewhere while these are playground routes rather than the
-   * real pages. Drops out once the nav hrefs become paths.
-   */
-  anchor?: string;
 }
 
-const { page, anchor } = Astro.props;
+const { page } = Astro.props;
 
 /* Wayfinding order, not a palette: see the note above. */
 const cycle = ['coral', 'teal', 'purple', 'amber'] as const;
@@ -73,20 +74,23 @@ const badges = {
 };
 ---
 
-<section id={anchor} class="py-section lg:py-section-lg">
+<section class="pb-section lg:pb-section-lg">
   <div class="mx-auto max-w-[var(--width-content)] px-gutter lg:px-gutter-lg">
     <!--
-      The intro band: title, opening line, and the page's only ornament.
-      `isolate` + `-z-10` keeps Decor behind the text without it needing
-      a z-index of its own, and the generous `pb-*` is what gives the
-      petals room — Decor is `inset-0` on this box and clips to it, so a
-      band sized tight to two lines of text would shear them in half.
-      That padding is also the gap down to the first panel, which is why
-      the stack below carries no top margin.
-    -->
-    <div class="relative isolate pt-2 pb-14 lg:pb-20">
-      <Decor variant="hero" dots={false} class="-z-10" />
+      The intro band: title and opening line, on the backdrop's own
+      ground. Its `pb-*` is the gap down to the first panel, which is
+      why the stack below carries no top margin — it also keeps the
+      title clear of the panel stack while the backdrop's petals drift
+      behind both.
 
+      The band's own top padding is the gap up to the header, and it
+      matches that bottom gap rather than adding to the section's
+      `py-section` — hence `pb-section` on the section and a symmetric
+      `py-*` here. A full section's worth of air under a sticky bar
+      read as the page starting late; the title now sits as far below
+      the header as the first panel sits below the title.
+    -->
+    <div class="py-14 lg:py-20">
       <!-- One size step below the home page's h1 (no lg:text-6xl): an
            interior page shouldn't shout as loud as the greeting does. -->
       <h1
@@ -104,9 +108,34 @@ const badges = {
       }
     </div>
 
+    {/*
+      Downloads before the panels, not after: on the forms page the two
+      PDFs are what the visitor came for, and the terms under them are
+      what they read once they have them. A page with no `documents`
+      (all six nav pages today) is unchanged — the panels still open
+      directly under the intro band.
+    */}
+    {
+      page.documents && (
+        <DocumentList
+          heading={page.documents.heading}
+          intro={page.documents.intro}
+          items={page.documents.items}
+        />
+      )
+    }
+
     {
       page.panels.length > 0 && (
-        <div class="flex flex-col gap-8 lg:gap-10">
+        <div
+          class:list={[
+            'flex flex-col gap-8 lg:gap-10',
+            /* The intro band's own padding is the gap down to whatever
+               comes first; a second block above the stack has to add
+               its own. */
+            page.documents && 'mt-14 lg:mt-20',
+          ]}
+        >
           {page.panels.map((panel, i) => {
             const accent = panel.accent ?? cycle[i % cycle.length];
             return (

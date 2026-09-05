@@ -6,18 +6,20 @@
  * One section that does the job of Hero + Method together.
  *
  * The idea: a visitor shouldn't have to read a marketing preamble and
- * then scroll to find out what actually happens here. So the greeting
- * is reduced to a single banner line, and immediately under it the
- * method — the real substance — is what fills the screen.
+ * then scroll to find out what actually happens here. So the top of the
+ * page is reduced to the wordmark, and immediately under it the method
+ * — the real substance — is what fills the screen.
  *
- * Shape: `ברוכים הבאים Sensorika` is the page's h1 and gets a row to
- * itself, which is what lets it carry the whole greeting. It's set as a
- * two-line lockup — `ברוכים הבאים` as a smaller, lighter kicker centered
- * over `Sensorika`. The brand line takes `text-brand` — a step of its
- * own, twice the top of the heading scale — so the wordmark is what you
- * land on and the greeting reads as its lead-in. Its letters are painted
- * in the four logo petals, cycling coral / amber / teal / purple, so the
- * word at rest is the mark; the navy of the h1 is only the kicker's.
+ * Shape: `Sensorika` ALONE is the page's h1 and gets a row to itself.
+ * It used to sit under a `ברוכים הבאים` kicker, as the lower half of a
+ * two-line lockup. The greeting is gone: it's the one line on the page
+ * that says nothing a visitor didn't already know, and the wordmark is
+ * stronger standing on its own than as the payoff to it. `text-brand`
+ * is the h1's own size now — a step of its own, twice the top of the
+ * heading scale — so the mark is what you land on. Its letters are
+ * painted in the four logo petals, cycling coral / amber / teal /
+ * purple, so the word at rest is the mark, and there is no navy left
+ * in this h1 at all.
  * Each letter is shaded as an inflated object rather than as flat type —
  * a highlight, an underside and two shadows — so the word reads as nine
  * balloons under one light. That's all rest state: it's built from the
@@ -64,9 +66,10 @@
  * any more: PageBackdrop now runs a petal field down the whole page,
  * and a second set of shapes in the one band they'd overlap read as
  * clutter. That's the rule these pages settled on, finally applied —
- * the ornament belongs to the PAGE and happens once. HeroV2 and
- * ProsePage still use Decor; neither of them has a PageBackdrop under
- * it.
+ * the ornament belongs to the PAGE and happens once. ProsePage dropped
+ * its Decor for the same reason once the nav-item route picked up the
+ * backdrop too; HeroV2 is the only thing still using Decor, and it has
+ * no PageBackdrop under it
  *
  * The panel spans the content width, but the copy inside it sits on
  * --width-prose. Four paragraphs set across a 72rem measure would run
@@ -100,7 +103,7 @@ import CardV2 from './CardV2.astro';
 /*
  * All of the copy, from the one file that holds it. Thrown rather than
  * defaulted: a missing home.md means the page would render an empty
- * greeting and an empty panel, which is worse at build time than a
+ * banner and an empty panel, which is worse at build time than a
  * failed build.
  */
 const home = await getEntry('pages', 'home');
@@ -110,11 +113,8 @@ if (!home?.data.brand || home.data.panels.length === 0) {
   );
 }
 
-/*
- * The greeting is a two-line lockup: a smaller, lighter kicker centered
- * over the brand line, which is the wordmark on its own.
- */
-const greeting = home.data.title;
+/* The h1 is the wordmark and nothing else. home.md's `title` is the
+   page's name inside the collection, not a line that renders here. */
 const { word: brand } = home.data.brand;
 const brandLetters = [...brand];
 
@@ -142,13 +142,16 @@ const rules = {
 };
 ---
 
-<section id="method" class="overflow-x-clip py-section lg:py-section-lg">
+<section id="method" class="overflow-x-clip pb-section lg:pb-section-lg">
   <div class="mx-auto max-w-[var(--width-content)] px-gutter lg:px-gutter-lg">
     <!--
-      The greeting band. The `pb-*` is the gap down to the panel, which
-      is why the panel carries no top margin of its own.
+      The wordmark band. Its `pb-*` is the gap down to the panel, which
+      is why the panel carries no top margin of its own; its `pt-*`
+      matches it and is the gap up to the header, which is why the
+      section itself only pads at the bottom. See ProsePage — the two
+      pages open on the same rhythm.
     -->
-    <div class="pt-2 pb-14 lg:pb-20">
+    <div class="py-14 lg:py-20">
       <!--
         `dir="ltr"` is load-bearing, not cosmetic: the letter spans are
         inline boxes, so on this RTL line the paragraph direction would
@@ -166,25 +169,21 @@ const rules = {
         than a background on the letter itself because it has to outgrow
         its letter and fade on its own timing.
       -->
+      <!-- `font-extrabold` rather than the heading scale's `font-bold`.
+           Volume needs mass to sit in: at 700 the balloon shading has to
+           fit inside a stem barely wider than the rim, and it reads as a
+           bevel rather than as an inflated letter. 800 is the top weight
+           in the Rubik import. -->
       <h1
-        class="text-center font-display text-4xl leading-heading font-bold text-ink-900 sm:text-5xl lg:text-6xl"
-      >
-        <span class="block text-3xl font-medium sm:text-4xl lg:text-5xl">{greeting}</span>
-        <!-- `font-extrabold` overrides the h1's own `font-bold` for this
-             line alone. Volume needs mass to sit in: at 700 the balloon
-             shading has to fit inside a stem barely wider than the rim,
-             and it reads as a bevel rather than as an inflated letter.
-             800 is the top weight in the Rubik import. -->
-        <span class="block text-brand font-extrabold"
-          ><span class="brand-word" dir="ltr" data-brand-word
+        class="text-center font-display text-brand leading-heading font-extrabold"
+        ><span class="brand-word" dir="ltr" data-brand-word
           ><span class="sr-only">{brand}</span><span aria-hidden="true"
             >{
               brandLetters.map((letter) => <span class="brand-letter" data-brand-letter><span class="letter-pop" data-letter-pop /><span class="letter-glyph" data-letter-glyph>{letter}</span></span>)
             }</span
           ></span
-        ></span
-        >
-      </h1>
+        ></h1
+      >
     </div>
 
     <!-- `sm:p-*` / `lg:p-*` rather than a bare `p-*`: CardV2's base sets

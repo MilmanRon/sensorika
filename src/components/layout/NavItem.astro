@@ -9,19 +9,36 @@
  * passes `whitespace-normal` in that orientation — along with a step up
  * in size, since the drawer is the site's primary nav surface rather
  * than a secondary bar.
+ *
+ * `current` is the page you're already on. It matters now that the nav
+ * entries are routes rather than same-page anchors: a drawer of six
+ * links with nothing marked leaves you with no idea where you are. The
+ * marking is `aria-current="page"` FIRST — that's the part a screen
+ * reader gets — and the styling hangs off it, so the two can't disagree.
+ * Visually it's the hover surface made permanent plus an accent rule on
+ * the inline start: a colour change alone wouldn't carry at this size,
+ * and a rule reads as "you are here" rather than as "this one is
+ * special".
  */
 interface Props {
   href: string;
+  /** This link points at the page currently being viewed. */
+  current?: boolean;
   class?: string;
 }
 
-const { href, class: className = '' } = Astro.props;
+const { href, current = false, class: className = '' } = Astro.props;
 ---
 
 <a
   href={href}
+  aria-current={current ? 'page' : undefined}
   class:list={[
-    'block rounded-control bg-paper-100 px-5 py-3 text-base leading-snug font-medium whitespace-nowrap text-ink-700 transition-colors duration-[var(--duration-fast)] hover:bg-white hover:text-ink-900 focus-visible:bg-white focus-visible:text-ink-900',
+    'block rounded-control px-5 py-3 text-base leading-snug font-medium whitespace-nowrap transition-colors duration-[var(--duration-fast)] hover:bg-white hover:text-ink-900 focus-visible:bg-white focus-visible:text-ink-900',
+    /* Both states carry the rule so the label never shifts by its
+       width when the current item changes; only its colour differs. */
+    'border-s-4',
+    current ? 'border-s-teal-700 bg-white text-ink-900' : 'border-s-transparent bg-paper-100 text-ink-700',
     className,
   ]}
 >

@@ -1,0 +1,112 @@
+---
+/**
+ * PROPOSED (new — no current counterpart).
+ *
+ * The download block of a nav-item page: the files a parent leaves with,
+ * one card each. Today that's the group program's two registration
+ * forms, built out of forms/*.html into public/forms/ (see
+ * forms/README.md) — the page links them, it doesn't contain them.
+ *
+ * Driven by the page's `documents` frontmatter like every other block on
+ * these pages, so adding a third form is a content edit and never an
+ * edit here.
+ *
+ * The card is NOT `interactive`. CardV2's lift says "this whole surface
+ * is a target", which is true of a program card that wraps one link and
+ * false here: the button downloads a file and the rest of the card is
+ * the description of what that file is. Hover feedback belongs on the
+ * control that does something.
+ *
+ * `download` on the link rather than a plain href: the page's promise is
+ * a form to print and sign, so the file should land in the parent's
+ * downloads rather than open in a viewer tab they then have to save
+ * out of. Browsers that ignore the attribute for cross-origin files are
+ * not a concern — these are same-origin.
+ */
+import ButtonV2 from './ButtonV2.astro';
+import CardV2 from './CardV2.astro';
+import Icon from './Icon.astro';
+
+interface Props {
+  heading: string;
+  intro?: string;
+  items: readonly {
+    title: string;
+    description?: string;
+    meta?: string;
+    accent?: 'coral' | 'teal' | 'amber' | 'purple';
+    file: string;
+  }[];
+  class?: string;
+}
+
+const { heading, intro, items, class: className = '' } = Astro.props;
+
+/* Same wayfinding cycle as ProsePage's panels, for the same reason: the
+   hue tells one card from the next and means nothing else. */
+const cycle = ['coral', 'teal', 'purple', 'amber'] as const;
+
+/* The -800 step on its own -100 tint — the only pairing in which a petal
+   may carry a glyph or a label. Same table as ProsePanel's eyebrow. */
+const tiles = {
+  coral: 'bg-coral-100 text-coral-800',
+  teal: 'bg-teal-100 text-teal-800',
+  amber: 'bg-amber-100 text-amber-800',
+  purple: 'bg-purple-100 text-purple-800',
+};
+---
+
+<!-- Heading and intro on the page's own ground, centered like the intro
+     band above them — the cards are the block's content, not its frame. -->
+<section class:list={['scroll-mt-header lg:scroll-mt-header-lg', className]} id="documents">
+  <h2
+    class="text-center font-display text-2xl leading-heading font-bold text-balance text-ink-900 sm:text-3xl"
+  >
+    {heading}
+  </h2>
+
+  {
+    intro && (
+      <p class="mx-auto mt-4 max-w-[var(--width-prose)] text-center text-lg leading-body text-pretty text-ink-700">
+        {intro}
+      </p>
+    )
+  }
+
+  <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8">
+    {
+      items.map((item, i) => {
+        const accent = item.accent ?? cycle[i % cycle.length];
+        return (
+          <CardV2 accent={accent} class="flex h-full flex-col">
+            <span
+              class:list={[
+                'flex h-14 w-14 items-center justify-center rounded-card',
+                tiles[accent],
+              ]}
+            >
+              <Icon name="clipboard" class="h-7 w-7" />
+            </span>
+
+            <h3 class="mt-6 font-display text-xl leading-heading font-semibold text-pretty text-ink-900">
+              {item.title}
+            </h3>
+
+            {item.meta && <p class="mt-2 text-sm font-medium text-ink-500">{item.meta}</p>}
+
+            {item.description && (
+              <p class="mt-4 leading-body text-pretty text-ink-700">{item.description}</p>
+            )}
+
+            <div class="mt-auto pt-8">
+              <ButtonV2 href={item.file} download type="application/pdf">
+                <Icon name="download" class="h-5 w-5" />
+                הורדת הטופס
+              </ButtonV2>
+            </div>
+          </CardV2>
+        );
+      })
+    }
+  </div>
+</section>

@@ -1,0 +1,384 @@
+/**
+ * Print stylesheet for the two parent forms.
+ *
+ * These documents are rendered by a headless Chrome into
+ * public/forms/*.pdf, so they live outside the Astro/Tailwind build and
+ * can't consume src/styles/tokens.css through a utility class. What they
+ * can do is restate the same *expressions* — every color below is the
+ * same color-mix() off the same four logo values that tokens.css uses,
+ * copied verbatim rather than eyeballed into a hex. If a brand color
+ * changes there, change it here too; nothing else in this file holds a
+ * color.
+ *
+ * The page is deliberately quiet: navy type, one teal accent for
+ * structure (section rules, the form number), and the logo as the only
+ * place the other three petals appear. Everything a parent has to write
+ * in is a hairline on ink-300, and every hairline is the same weight.
+ */
+
+:root {
+  /* --- ink: the logo wordmark navy, for type and rules --- */
+  --ink-900: #243c5a;
+  --ink-700: color-mix(in oklch, var(--ink-900) 74%, white);
+  --ink-600: color-mix(in oklch, var(--ink-900) 60%, white);
+  --ink-500: color-mix(in oklch, var(--ink-900) 46%, white);
+  --ink-400: color-mix(in oklch, var(--ink-900) 34%, white);
+  --ink-300: color-mix(in oklch, var(--ink-900) 22%, white);
+  --ink-200: color-mix(in oklch, var(--ink-900) 13%, white);
+  --ink-100: color-mix(in oklch, var(--ink-900) 7%, white);
+  --ink-50: color-mix(in oklch, var(--ink-900) 3%, white);
+
+  /* --- teal: the one accent --- */
+  --teal-500: #74b7a5; /* exact logo petal — ornament only */
+  --teal-100: color-mix(in oklch, var(--teal-500) 12%, white);
+  --teal-50: color-mix(in oklch, var(--teal-500) 5%, white);
+  --teal-700: color-mix(in oklch, var(--teal-500) 68%, black); /* the step that may carry type */
+
+  /* Page geometry. The sheet is drawn at full A4 with its own padding
+     rather than leaning on @page margins, because each sheet also has to
+     pin a footer to its own bottom edge. */
+  --sheet-w: 210mm;
+  --sheet-h: 297mm; /* exactly one A4 page */
+  --pad-x: 18mm;
+  --pad-top: 14mm;
+  --pad-bottom: 12mm;
+
+  /* One hairline weight for every rule in the document. */
+  --hair: 0.5pt;
+
+  /* Height of one hand-writing line. Tuned to adult handwriting, not to
+     the type size — a 10.5pt line-height would be unwritable. */
+  --write-line: 10mm;
+}
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  /* Chrome drops backgrounds and tints when printing unless told not to. */
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body {
+  margin: 0;
+  font-family: 'Rubik', system-ui, sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.6;
+  color: var(--ink-900);
+  background: white;
+}
+
+/* ---------------------------------------------------------------- */
+/* The sheet: one printed page, laid out head / body / foot          */
+/* ---------------------------------------------------------------- */
+
+.sheet {
+  width: var(--sheet-w);
+  height: var(--sheet-h);
+  padding: var(--pad-top) var(--pad-x) var(--pad-bottom);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sheet + .sheet {
+  break-before: page;
+}
+
+.sheet-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- head: the lockup, and which form this is --- */
+
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 5mm;
+  border-bottom: var(--hair) solid var(--ink-200);
+}
+
+.sheet-head img {
+  display: block;
+  height: 11mm;
+  width: auto;
+}
+
+.doc-id {
+  font-size: 8.5pt;
+  font-weight: 500;
+  color: var(--ink-500);
+  letter-spacing: 0.02em;
+}
+
+/* --- foot: page number, pinned to the bottom of every sheet --- */
+
+.sheet-foot {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 4mm;
+  border-top: var(--hair) solid var(--ink-200);
+  font-size: 8pt;
+  color: var(--ink-400);
+}
+
+/* ---------------------------------------------------------------- */
+/* Document title                                                    */
+/* ---------------------------------------------------------------- */
+
+.title-block {
+  padding: 9mm 0 7mm;
+}
+
+.eyebrow {
+  margin: 0 0 2mm;
+  font-size: 9pt;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--teal-700);
+}
+
+h1 {
+  margin: 0;
+  font-size: 19pt;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+/* Sheet 2 of a form: the same title, at a size that says "you are still
+   in this document" rather than "a new one starts here". It's repeated
+   at all because a signed sheet can end up separated from its first
+   page. */
+.title-block.is-continued {
+  padding: 7mm 0 5mm;
+}
+
+.title-block.is-continued h1 {
+  font-size: 13pt;
+}
+
+.lede {
+  margin: 3mm 0 0;
+  font-size: 10pt;
+  color: var(--ink-600);
+  max-width: 130mm;
+}
+
+/* ---------------------------------------------------------------- */
+/* Sections                                                          */
+/* ---------------------------------------------------------------- */
+
+/* Scoped to the sheet's own sections: a bare `section + section` also
+   matches one .sheet after another (a sheet IS a <section>), and 8mm of
+   margin on sheet two pushed its last 8mm onto a third, near-blank
+   page. */
+.sheet-body section + section {
+  margin-top: 8mm;
+}
+
+h2 {
+  margin: 0 0 3.5mm;
+  padding-inline-start: 4mm;
+  font-size: 12pt;
+  font-weight: 600;
+  line-height: 1.3;
+  border-inline-start: 1.5pt solid var(--teal-500);
+}
+
+p {
+  margin: 0 0 2.5mm;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+.prompt {
+  margin: 5mm 0 2.5mm;
+  color: var(--ink-700);
+}
+
+/* ---------------------------------------------------------------- */
+/* Fields — a label and the line the parent writes on                */
+/* ---------------------------------------------------------------- */
+
+/* `align-items: end` and a zero-height rule: the line lands on the
+   bottom of the label's own box, so the label sits on the line the way a
+   printed form's does, whatever it wraps to. A stretched rule inside a
+   min-height row instead leaves the label floating well above it. */
+.field {
+  display: flex;
+  align-items: end;
+  gap: 3mm;
+  margin: 0;
+}
+
+.field + .field {
+  margin-top: 6mm;
+}
+
+.field-label {
+  flex: none;
+  padding-bottom: 1mm; /* the sliver of air between the text and its rule */
+  font-size: 10pt;
+  color: var(--ink-700);
+}
+
+/* The line itself. `align-self: stretch` + a bottom border rather than an
+   <hr>, so the rule sits on the writing baseline whatever the label wraps
+   to, and grows to eat whatever width is left in the row. */
+.rule {
+  flex: 1;
+  border-bottom: var(--hair) solid var(--ink-300);
+}
+
+/* A field is followed by a section often enough to earn a rule: without
+   it the section's heading sits right on top of the line above it. */
+.field + section,
+.field-row + section {
+  margin-top: 8mm;
+}
+
+/* Two fields side by side, the second sized to what it holds (a date). */
+.field-row {
+  display: flex;
+  gap: 8mm;
+}
+
+.field-row > * {
+  flex: 1;
+}
+
+.field-row > .is-date {
+  flex: 0 0 52mm;
+}
+
+/* A run of empty writing lines under a prompt. */
+.write-lines {
+  margin-top: 1mm;
+}
+
+.write-lines > i {
+  display: block;
+  height: var(--write-line);
+  border-bottom: var(--hair) solid var(--ink-300);
+}
+
+/* ---------------------------------------------------------------- */
+/* Checkbox list                                                     */
+/* ---------------------------------------------------------------- */
+
+.checks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.checks li {
+  display: flex;
+  align-items: baseline;
+  gap: 3mm;
+  padding: 1.6mm 0;
+}
+
+.checks li + li {
+  border-top: var(--hair) solid var(--ink-100);
+}
+
+/* The box. Sized in mm and nudged off the baseline so it reads as
+   centred on the first line of its label. */
+.box {
+  flex: none;
+  width: 4mm;
+  height: 4mm;
+  transform: translateY(0.5mm);
+  border: 0.75pt solid var(--ink-400);
+  border-radius: 0.8mm;
+}
+
+.checks .rule {
+  min-height: 5mm;
+}
+
+/* ---------------------------------------------------------------- */
+/* Signature block — always the last thing on a signed sheet         */
+/* ---------------------------------------------------------------- */
+
+/* `margin-top: auto`: the signature is pinned to the bottom of its
+   sheet, not left floating wherever the last question happened to end.
+   A form page whose slack sits above the signature reads as finished;
+   the same slack under it reads as a page that was cut off. */
+.signature {
+  margin-top: auto;
+  padding-block-start: 10mm;
+  padding-top: 6mm;
+  border-top: var(--hair) solid var(--ink-200);
+  display: flex;
+  gap: 10mm;
+}
+
+.signature > div {
+  flex: 1;
+}
+
+.signature > .is-date {
+  flex: 0 0 52mm;
+}
+
+.sig-line {
+  height: 12mm;
+  border-bottom: var(--hair) solid var(--ink-300);
+}
+
+.sig-label {
+  margin-top: 2mm;
+  font-size: 9pt;
+  color: var(--ink-500);
+}
+
+/* ---------------------------------------------------------------- */
+/* The annex block (form 2, page 2)                                  */
+/* ---------------------------------------------------------------- */
+
+.annex h3 {
+  margin: 6mm 0 2mm;
+  font-size: 10.5pt;
+  font-weight: 600;
+  color: var(--teal-700);
+}
+
+.annex .sheet-body section + section {
+  margin-top: 6mm;
+}
+
+/* A quiet tinted panel for the one paragraph a parent is most likely to
+   need twice: what happens to money already paid. */
+.note {
+  margin-top: 3mm;
+  padding: 4mm 5mm;
+  background: var(--teal-50);
+  border-inline-start: 1.5pt solid var(--teal-500);
+  border-radius: 1.5mm;
+  font-size: 10pt;
+  color: var(--ink-700);
+}
+
+/* "המשך" on a heading that carries over to the next sheet — the same
+   word the sheet's eyebrow uses, at the weight of a caption so the
+   heading still reads as its own section name. */
+h2 .cont {
+  font-size: 9pt;
+  font-weight: 500;
+  color: var(--ink-500);
+}

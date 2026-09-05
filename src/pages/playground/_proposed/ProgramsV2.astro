@@ -29,9 +29,21 @@ import ButtonV2 from './ButtonV2.astro';
 import CardV2 from './CardV2.astro';
 import Icon from './Icon.astro';
 import SectionHeading from './SectionHeading.astro';
-import { hasWhatsapp, whatsappHref } from '../../../data/site';
+import { hasWhatsapp, pagesBase, whatsappHref } from '../../../data/site';
 
-/** `href` is still a placeholder — no per-program target exists yet. */
+/**
+ * `href` per card. The group program now has a destination of its own —
+ * src/content/pages/group-forms.md, the two registration forms and the
+ * terms that come with them — so its card goes there rather than to the
+ * contact anchor. Built off `pagesBase` like every other page link, so
+ * it moves with the site when the prototype is promoted.
+ *
+ * The individual track has no such page yet and keeps the placeholder.
+ *
+ * `cta` overrides the default label where the destination isn't "more
+ * about this program": a card that lands a parent on a downloads page
+ * should say so. PROPOSED NEW COPY — needs sign-off with the rest.
+ */
 const programs = [
   {
     title: 'אבחון וטיפול פרטניים',
@@ -45,7 +57,8 @@ const programs = [
     body: 'קבוצות קטנות לפי גיל ורמה, שבהן ילדים מתנסים בתנועה, במשחק ובשיתוף פעולה — ולומדים יחד, בקבוצה, את מה שקשה להם לבד.',
     accent: 'teal',
     icon: 'users',
-    href: '#contact',
+    href: `${pagesBase}/group-forms`,
+    cta: 'לטפסים ולתנאי ההשתתפות',
   },
 ] as const;
 
@@ -94,7 +107,7 @@ const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } 
                 label still aligns with the card's text column. */}
             <div class="mt-auto -ms-4 pt-8">
               <ButtonV2 href={program.href} variant="ghost" arrow>
-                לפרטים נוספים
+                {'cta' in program ? program.cta : 'לפרטים נוספים'}
               </ButtonV2>
             </div>
           </CardV2>

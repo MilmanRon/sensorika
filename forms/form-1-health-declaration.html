@@ -1,0 +1,132 @@
+<!doctype html>
+<!--
+  Form 1 — הצהרת הורה על מצבו של הילד.
+
+  Print source, not a site page: `npm run forms` renders it to
+  public/forms/sensorika-form-1-health-declaration.pdf.
+
+  Copy is the clinic's, verbatim. Two editorial changes, both about a
+  form being written on by hand rather than read on a screen:
+
+  - it runs to two sheets. Squeezed onto one it fits only at ~10pt with
+    a single line per open question, and the open questions ("what helps
+    the child calm down", "what to do if they can't continue") are the
+    ones a parent actually has something to say to.
+  - each of those questions gets three lines, and the medical note four,
+    where the source drew one.
+
+  One <section class="sheet"> is one printed A4 page; the sheet clips
+  what doesn't fit, so run `node forms/measure.mjs` after a copy change.
+-->
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <title>טופס 1 — הצהרת הורה על מצבו של הילד | Sensorika</title>
+    <link rel="stylesheet" href="assets/fonts.css" />
+    <link rel="stylesheet" href="assets/print.css" />
+  </head>
+  <body>
+    <section class="sheet">
+      <header class="sheet-head">
+        <img src="../src/assets/brand/logo.svg" alt="Sensorika" />
+        <span class="doc-id">פעילויות קבוצתיות התפתחותיות</span>
+      </header>
+
+      <div class="sheet-body">
+        <div class="title-block">
+          <p class="eyebrow">טופס 1</p>
+          <h1>הצהרת הורה על מצבו של הילד</h1>
+          <p class="lede">
+            למילוי על ידי ההורה או האפוטרופוס החוקי לפני תחילת ההשתתפות בפעילויות הקבוצתיות.
+          </p>
+        </div>
+
+        <div class="field-row">
+          <p class="field">
+            <span class="field-label">שם ושם משפחה של הילד</span>
+            <span class="rule"></span>
+          </p>
+          <p class="field is-date">
+            <span class="field-label">תאריך לידה</span>
+            <span class="rule"></span>
+          </p>
+        </div>
+
+        <section>
+          <h2>מצב בריאותי</h2>
+          <p>
+            אני, ההורה / האפוטרופוס החוקי של הילד, מאשר/ת כי מצב בריאותו של הילד, ככל הידוע לי,
+            מאפשר לו להשתתף בפעילויות קבוצתיות הכוללות פעילות גופנית.
+          </p>
+          <p>
+            ידוע לי כי עליי ליידע את מנהלת התוכנית על מצב בריאותי, אבחנות, מאפיינים או מגבלות
+            המגבילים, אינם מומלצים או עשויים להשפיע על העומס הגופני ועל השתתפות הילד בפעילות.
+          </p>
+          <p class="prompt">אם קיימים מאפיינים רפואיים, מגבלות או הנחיות חשובות, יש לציין אותם:</p>
+          <div class="write-lines"><i></i><i></i><i></i><i></i></div>
+        </section>
+
+        <section>
+          <h2>מאפיינים התנהגותיים</h2>
+          <p class="prompt">יש לסמן מאפיינים הנצפים אצל הילד, אם קיימים:</p>
+          <ul class="checks">
+            <li><span class="box"></span><span>מקלל / משתמש במילים פוגעניות</span></li>
+            <li><span class="box"></span><span>מכה אחרים / מפגין תוקפנות פיזית</span></li>
+            <li><span class="box"></span><span>עלול לפגוע בעצמו</span></li>
+            <li><span class="box"></span><span>מופיעים התקפי פאניקה / חרדה משמעותית</span></li>
+            <li><span class="box"></span><span>מופיעים התקפי תוקפנות / תגובה רגשית חזקה</span></li>
+            <li><span class="box"></span><span>אחר:</span><span class="rule"></span></li>
+          </ul>
+        </section>
+      </div>
+
+      <footer class="sheet-foot">
+        <span>Sensorika · טופס 1 — הצהרת הורה על מצבו של הילד</span>
+        <span>עמוד 1 מתוך 2</span>
+      </footer>
+    </section>
+
+    <section class="sheet">
+      <header class="sheet-head">
+        <img src="../src/assets/brand/logo.svg" alt="Sensorika" />
+        <span class="doc-id">פעילויות קבוצתיות התפתחותיות</span>
+      </header>
+
+      <div class="sheet-body">
+        <div class="title-block is-continued">
+          <p class="eyebrow">טופס 1 · המשך</p>
+          <h1>הצהרת הורה על מצבו של הילד</h1>
+        </div>
+
+        <section>
+          <h2>מאפיינים התנהגותיים <span class="cont">המשך</span></h2>
+
+          <p class="prompt">
+            מה בדרך כלל עוזר לילד להירגע, להתאושש או לחזור לאינטראקציה? אילו דרכים כבר עובדות בבית
+            או במסגרות אחרות?
+          </p>
+          <div class="write-lines"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+          <p class="prompt">מה יש לעשות אם הילד אינו יכול להמשיך בפעילות?</p>
+          <div class="write-lines"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </section>
+
+        <div class="signature">
+          <div>
+            <div class="sig-line"></div>
+            <p class="sig-label">חתימת ההורה / האפוטרופוס החוקי</p>
+          </div>
+          <div class="is-date">
+            <div class="sig-line"></div>
+            <p class="sig-label">תאריך</p>
+          </div>
+        </div>
+      </div>
+
+      <footer class="sheet-foot">
+        <span>Sensorika · טופס 1 — הצהרת הורה על מצבו של הילד</span>
+        <span>עמוד 2 מתוך 2</span>
+      </footer>
+    </section>
+  </body>
+</html>

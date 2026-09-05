@@ -23,9 +23,17 @@
  * 2. The logo drops from h-18/h-22 to h-14/h-16. At 88px inside a 112px
  *    bar it fills 79% of the header's height, which reads as an
  *    oversized asset rather than as a brand mark, and leaves the CTA
- *    looking undersized next to it.
- * 3. The CTA is a pill on `teal-700` — see ButtonV2 for why a pastel
- *    petal base can't carry a white label.
+ *    looking undersized next to it. It's also the PETALS ONLY at every
+ *    width, not just below `sm`: the home page's h1 is now the wordmark
+ *    at `text-brand`, so a second, small "Sensorika" in the bar above it
+ *    is the same word twice on one screen — and the mark is what has to
+ *    be recognisable in a sticky bar anyway. `variant="mark"` rather
+ *    than `responsive`, so the desktop bar carries what the phone
+ *    already carried.
+ * 3. The CTA is a pill on `coral-700`, the logo's red square darkened
+ *    until it clears AA — see ButtonV2 for why a pastel petal base
+ *    can't carry a white label, and tokens.css for why the one filled
+ *    button in the bar is the site's single non-teal interactive fill.
  * 4. The bar is FLAT WHITE WITH A PERMANENT SHADOW, at every scroll
  *    position. Three earlier versions are worth recording, because each
  *    was wrong for its own reason:
@@ -52,14 +60,34 @@
  * contract (`data-nav-open` on <html>, `aria-controls="site-nav"`,
  * `nav:close`), so the shipped SideNav.astro works with it as-is and is
  * what should be rendered alongside it.
+ *
+ * THE NAV NOW LEAVES THE PAGE. Its six entries used to be same-page
+ * anchors; each one is a route of its own now (site.ts), which is what
+ * makes this bar the thing that holds the site together rather than a
+ * table of contents for one document. Two consequences here:
+ *
+ *   - the current entry is marked, with `aria-current="page"` and with
+ *     its underline drawn at rest instead of on hover. The underline
+ *     was already the bar's hover affordance, so "you are here" is that
+ *     same mark held down — nothing new to learn, and it can't be
+ *     confused with the CTA the way a filled pill could.
+ *   - the lockup links to `homeHref`, not to `/`. Home is
+ *     /playground/full-page while these pages live under the
+ *     playground; site.ts owns that fact so this component doesn't.
  */
 import ButtonV2 from './ButtonV2.astro';
 import Logo from '../../../components/layout/Logo.astro';
 import WhatsappIcon from '../../../assets/icons/whatsapp.svg';
-import { hasWhatsapp, siteConfig, whatsappHref } from '../../../data/site';
+import { hasWhatsapp, homeHref, siteConfig, whatsappHref } from '../../../data/site';
 
 const ctaLabel = hasWhatsapp ? 'וואטסאפ' : 'צרו קשר';
 const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+
+/* Same comparison Nav.astro makes for the drawer, for the same reason —
+   Astro serves these as directories, so the pathname carries a trailing
+   slash the href in site.ts doesn't have. */
+const trim = (path: string) => path.replace(/\/+$/, '');
+const here = trim(Astro.url.pathname);
 ---
 
 <a
@@ -76,23 +104,30 @@ const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } 
   <div
     class="flex h-header items-center justify-between gap-4 px-gutter lg:h-header-lg lg:px-gutter-lg"
   >
-    <Logo class="h-14 lg:h-16" />
+    <Logo class="h-14 lg:h-16" href={homeHref} variant="mark" />
 
     <!-- Inline nav, 2xl and up. Plain row: the page is dir=rtl, so the
          links already run right-to-left in the order they're written. -->
     <nav aria-label="ניווט ראשי" class="hidden 2xl:block">
       <ul class="flex items-center gap-1">
         {
-          siteConfig.nav.map((item) => (
-            <li>
-              <a
-                href={item.href}
-                class="nav-link rounded-pill px-3 py-2 text-base font-medium whitespace-nowrap text-ink-700 transition-colors duration-[var(--duration-fast)] hover:text-ink-900"
-              >
-                {item.label}
-              </a>
-            </li>
-          ))
+          siteConfig.nav.map((item) => {
+            const current = trim(item.href) === here;
+            return (
+              <li>
+                <a
+                  href={item.href}
+                  aria-current={current ? 'page' : undefined}
+                  class:list={[
+                    'nav-link rounded-pill px-3 py-2 text-base font-medium whitespace-nowrap transition-colors duration-[var(--duration-fast)] hover:text-ink-900',
+                    current ? 'text-ink-900' : 'text-ink-700',
+                  ]}
+                >
+                  {item.label}
+                </a>
+              </li>
+            );
+          })
         }
       </ul>
     </nav>
@@ -152,7 +187,9 @@ const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } 
     --nav-underline-origin: right;
   }
   .nav-link:hover::after,
-  .nav-link:focus-visible::after {
+  .nav-link:focus-visible::after,
+  /* The current page's underline is simply the hover state left on. */
+  .nav-link[aria-current='page']::after {
     transform: scaleX(1);
   }
 

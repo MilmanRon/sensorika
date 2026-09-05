@@ -2,11 +2,12 @@
 /**
  * PROPOSED — copy of src/components/ui/Button.astro. What changed:
  *
- * 1. CONTRAST. The pastel petal bases can't carry a label — the accent
- *    at -500 is 2.32:1 on white. Both variants here sit on `teal-700`
- *    (5.9:1) or write in `teal-800` (9.3:1) instead, so the site's only
- *    conversion action is legible. (The shipped Button now does the
- *    same; this variant differs in shape and depth, not in contrast.)
+ * 1. CONTRAST. The pastel petal bases can't carry a label — coral at
+ *    -500 is 3.0:1 on white, the accent 2.32:1. `primary` here sits on
+ *    `coral-700` (5.2:1) and the quieter variants write in `teal-800`
+ *    (9.3:1) instead, so the site's only conversion action is legible.
+ *    (The shipped Button now does the same; this variant differs in
+ *    shape and depth, not in contrast.)
  * 2. Shape: `rounded-pill`, not `rounded-control`. A 10px radius on a
  *    48px control reads as a form field; a pill reads as a CTA, and the
  *    logo is built entirely from soft round petals.
@@ -15,9 +16,13 @@
  *    on `shadow-card` and lifts 1px to `shadow-lift` on hover — small
  *    enough to stay inside this audience's motion budget.
  * 4. A `secondary` that is a real surface (white, ink text, hairline)
- *    rather than an outline in the same hue as primary — which matters
- *    more, not less, on a single-hue palette: two teal buttons side by
- *    side would read as one control split in half.
+ *    rather than an outline in primary's hue — which matters more, not
+ *    less, on a palette this narrow: two buttons in one hue side by
+ *    side read as one control split in half. With primary now on coral
+ *    — the logo's red square, and the one thing on the page that is
+ *    unambiguously *the* action — that separation is doing even more
+ *    work: coral means "this is the step", teal means everything else
+ *    you can click.
  * 5. `lg` size for hero CTAs, and an optional trailing arrow that nudges
  *    forward on hover — the affordance both reference designs lean on.
  */
@@ -55,7 +60,7 @@ const sizes = {
 };
 
 const variants = {
-  primary: 'bg-teal-700 text-white shadow-card hover:bg-teal-800 hover:shadow-lift',
+  primary: 'bg-coral-700 text-white shadow-card hover:bg-coral-800 hover:shadow-lift',
   secondary:
     'bg-white text-ink-900 shadow-card ring-1 ring-ink-900/10 hover:text-teal-800 hover:shadow-lift hover:ring-teal-500/40',
   ghost: 'text-teal-800 hover:bg-teal-100',

@@ -34,15 +34,24 @@ const sizes = {
   md: 'px-6 py-3',
 };
 /*
- * Both variants sit on teal-700, not the teal-500 logo value: the petal
- * is a pastel (2.32:1 on white), so a filled button in it can't legibly
- * carry its own label and an outlined one can't be read. teal-700 is
- * 5.92:1 both ways — as the fill under white text, and as text on
- * white — and hover just steps one shade deeper rather than changing
- * hue, which is the whole point of a single-hue palette.
+ * Neither variant uses a -500 logo value: the petals are pastels (coral
+ * 3.0:1 on white, teal 2.32:1), so a filled button in one can't legibly
+ * carry its own label and an outlined one can't be read. Both sit on a
+ * darkened step off the exact logo color instead — coral-700 at 5.20:1
+ * and teal-700 at 5.92:1, each of them legible as a fill under white
+ * text and as text on white.
+ *
+ * Primary is coral, the logo's red square: it is the page's one
+ * conversion action, and a page whose every other interactive surface
+ * is teal needs it to separate from them rather than blend in.
+ * Secondary stays in teal — as an outline in the *accent* hue it reads
+ * as the quieter, non-committal action, which is exactly what a second
+ * coral button next to the first would not.
+ *
+ * Hover on either just steps one shade deeper rather than changing hue.
  */
 const variants = {
-  primary: 'bg-teal-700 text-white hover:bg-teal-800',
+  primary: 'bg-coral-700 text-white hover:bg-coral-800',
   secondary: 'border border-teal-700 bg-transparent text-teal-700 hover:bg-teal-50',
 };
 ---

@@ -14,9 +14,14 @@
  *
  * So the things a footer usually accumulates are all gone:
  *
- * - NO SITE MAP. Every nav entry is a same-page anchor, so a footer nav
- *   on this site sends you back up the page you just finished reading —
- *   and the sticky header that would take you there is still on screen.
+ * - NO SITE MAP. The original reason for this is gone — the nav entries
+ *   are six real pages now, not same-page anchors, so a footer nav
+ *   would take you somewhere rather than back up the page you just
+ *   read. The decision stands on a different footing: the header is
+ *   STICKY, so the identical six links are on screen at the moment you
+ *   reach the bottom. A footer sitemap here is a second copy of a menu
+ *   that never left. Revisit it if the header ever stops sticking, or
+ *   if the site grows a tier of pages the nav doesn't carry.
  * - NO CONTACT COLUMN. Phone and email belong to the contact section,
  *   which is a destination with room to say more than a list of facts.
  *   The whatsapp icon is the one shortcut worth keeping down here.
@@ -57,7 +62,7 @@
 import Logo from '../../../components/layout/Logo.astro';
 import FacebookIcon from '../../../assets/icons/facebook.svg';
 import WhatsappIcon from '../../../assets/icons/whatsapp.svg';
-import { hasWhatsapp, siteConfig, whatsappHref } from '../../../data/site';
+import { hasWhatsapp, homeHref, siteConfig, whatsappHref } from '../../../data/site';
 
 /*
  * The icon row. Both icons always render; each one's URL degrades to the
@@ -111,7 +116,7 @@ const year = new Date().getFullYear();
            tokens.css defines as `#243C5A` — the wordmark's own colour,
            so the mono lockup is the artwork's navy applied to all of it
            rather than a new colour. -->
-      <Logo class="h-14 text-ink-900 lg:h-16" variant="responsive" tone="mono" />
+      <Logo class="h-14 text-ink-900 lg:h-16" href={homeHref} variant="responsive" tone="mono" />
 
       <!-- `justify-self-center` centres the list inside the middle
            track; the track itself is what centres it on the band. -->

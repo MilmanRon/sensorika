@@ -13,12 +13,20 @@
  *
  * The logo has four petal colors — #74B7A5 (teal), #FBBE3E (amber),
  * #EC6E59 (coral), #AF98D7 (purple) — plus the wordmark navy (#243C5A).
- * They do two different jobs, and keeping the jobs apart is the whole
- * design:
+ * They do a small number of distinct jobs, and keeping the jobs apart
+ * is the whole design:
  *
- *   TEAL IS THE WORKING ACCENT. Buttons, the CTA, links, active states,
- *   focus, and the tinted section surfaces. One hue does all the UI, so
- *   the page never asks the reader which color means "press me".
+ *   TEAL IS THE WORKING ACCENT. Buttons, links, active states, focus,
+ *   and the tinted section surfaces. One hue does all the standing UI,
+ *   so the page never asks the reader which color means "press me".
+ *
+ *   CORAL IS THE CONVERSION ACTION, and only that. The one filled
+ *   button a page is built around — "צרו קשר" in the header, the form
+ *   download — sits on coral so it separates from a page whose every
+ *   other interactive surface is teal. It is the single exception to
+ *   the ornament rule below, and it stays an exception: a coral fill
+ *   anywhere that isn't the primary action spends the contrast that
+ *   makes the real one stand out.
  *
  *   THE PETALS ARE ORNAMENT. The circles and petal shapes in the
  *   background, the dot grids, a card's accent bar and corner wash, the
@@ -95,8 +103,9 @@
   /* ---------------------------------------------------------------- */
   /* Color — petals: the logo's other three hues. ORNAMENT, NOT UI.    */
   /*                                                                  */
-  /* A petal may never be the fill under a button, a link color, or    */
-  /* the focus ring — those are teal's job, so that "colored" and      */
+  /* With ONE exception — coral-700, the primary CTA's fill, below —   */
+  /* a petal may never be the fill under a button, a link color, or    */
+  /* the focus ring: those are teal's job, so that "colored" and       */
   /* "clickable" never get confused. What a petal is for: the light    */
   /* circles behind a band, a dot grid, a card's accent bar and corner  */
   /* wash, an icon tile, and the small pill that names a section.       */
@@ -109,6 +118,7 @@
   /*   50/100   pill tints, icon tiles, a whole section's wash          */
   /*   200/300  the light circles and petal shapes in the background   */
   /*   500      the exact logo values — ornament at full strength      */
+  /*   700      coral only — the CTA fill (see below)                  */
   /*   800      the only step that may carry text, on its own tint     */
   /* ---------------------------------------------------------------- */
   --color-coral-500: #ec6e59; /* exact logo petal */
@@ -116,6 +126,14 @@
   --color-coral-100: color-mix(in oklch, var(--color-coral-500) 20%, white);
   --color-coral-200: color-mix(in oklch, var(--color-coral-500) 32%, white);
   --color-coral-300: color-mix(in oklch, var(--color-coral-500) 48%, white);
+  /* The CTA fill, and the one place a petal is allowed to be UI. The
+     logo square itself (#ec6e59) can't do this job: at 3.0:1 on white
+     it can't legibly carry a white label at button sizes. This is the
+     lightest step off that exact value that clears AA under white text
+     — 5.20:1 — so the button still reads as the logo's red rather than
+     as a generic brick, and it steps to coral-800 (8.69:1) on hover,
+     the same one-shade-deeper move teal-700 makes. */
+  --color-coral-700: color-mix(in oklch, var(--color-coral-500) 80%, black);
   --color-coral-800: color-mix(in oklch, var(--color-coral-500) 62%, black);
 
   --color-amber-500: #fbbe3e; /* exact logo petal */

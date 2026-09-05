@@ -1,5 +1,5 @@
 ---
-title: ברוכים הבאים
+title: בית
 description: מקום לילדים עם צרכים מיוחדים — אבחון וטיפול בוויסות חושי, עבודה פרטנית ופעילויות קבוצתיות התפתחותיות.
 order: 0
 nav: false
@@ -23,9 +23,14 @@ panels:
 ---
 
 <!--
-  The home page's greeting and method copy, verbatim — it was previously
-  inlined in _proposed/HeroMethod.astro, which had it verbatim from
-  Hero.astro and Method.astro before that.
+  The home page's brand lockup and method copy, verbatim — it was
+  previously inlined in _proposed/HeroMethod.astro, which had it verbatim
+  from Hero.astro and Method.astro before that.
+
+  `title` is the page's name inside the collection, not an h1: the home
+  page's heading is the `brand` word on its own. It used to be the
+  "ברוכים הבאים" kicker over it, and that greeting is gone — see
+  HeroMethod for why.
 
   `nav: false`: this is the one entry in the collection that isn't a nav
   destination, so it gets no route of its own — HeroMethod reads it

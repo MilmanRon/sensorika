@@ -13,19 +13,51 @@
  *
  * These stay under /playground for now rather than shipping at /faq,
  * /about, … because they're built out of _proposed/: promoting them
- * means promoting CardV2 and proposed-tokens.css first.
+ * means promoting CardV2 and proposed-tokens.css first. `pagesBase` in
+ * site.ts is the one place that says so, and it's what every nav href
+ * and the lockup's home link are built from — so the move is an edit
+ * there, not a search for hardcoded paths here.
+ *
+ * THE PAGE IS ASSEMBLED LIKE /playground/full-page, and for the same
+ * reasons — these are the home page's siblings, not a different kind of
+ * document, so they get the same ground and the same floor:
+ *
+ *   PageBackdrop   first in the slot and OUTSIDE <main>: one fixed
+ *                  layer — wash, drifting petal field, dither — behind
+ *                  the header, the panels and the footer alike, not
+ *                  content of any of them. It's also what the panels
+ *                  lift off: ProsePanel is a white CardV2 and a stack
+ *                  of them on flat white is white on white.
+ *   HeaderV2 +
+ *   SideNav        the chrome, and now the way BETWEEN these pages: the
+ *                  nav's six entries are these six routes, and the one
+ *                  you're on is marked. Nothing here has to render a
+ *                  list of the others any more.
+ *   ProsePage      the page's own copy.
+ *   SiteFooter     the floor. It comes with the backdrop rather than as
+ *                  a separate nicety: the fixed ground has no bottom
+ *                  edge of its own, so without a solid band the last
+ *                  panel just stops.
+ *
+ * ProsePage's intro band used to draw its own <Decor> petals; it no
+ * longer does, since the backdrop's field covers the same band — see
+ * the note there.
  *
  * BaseLayout rather than PlaygroundLayout for the same reason
  * /playground/header uses it: HeaderV2 is `sticky top-0` and
  * PlaygroundLayout's own title bar sits at that offset, so the two would
- * overlap on scroll. The back links are inlined below instead.
+ * overlap on scroll. The one back-link is inlined below instead — after
+ * the footer, like full-page's, since the footer now ends the document.
  */
 import { getCollection } from 'astro:content';
 
 import SideNav from '../../components/layout/SideNav.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { siteConfig } from '../../data/site';
 import HeaderV2 from './_proposed/HeaderV2.astro';
+import PageBackdrop from './_proposed/PageBackdrop.astro';
 import ProsePage from './_proposed/ProsePage.astro';
+import SiteFooter from './_proposed/SiteFooter.astro';
 
 export async function getStaticPaths() {
   /* `nav: false` entries (the home page's copy) live in the same
@@ -34,35 +66,43 @@ export async function getStaticPaths() {
     (a, b) => a.data.order - b.data.order,
   );
 
-  /* Each page gets the whole set as siblings so it can render the row of
-     links to the others — these are all under review together, and
-     reviewing them means walking between them. */
-  return pages.map((entry) => ({
-    params: { navpage: entry.id },
-    props: {
-      entry,
-      siblings: pages
-        .filter((other) => other.id !== entry.id)
-        .map((other) => ({ id: other.id, label: other.data.navLabel ?? other.data.title })),
-    },
-  }));
+  /* The nav in site.ts names these pages by slug, and every one of those
+     names has to resolve to a file here or the header renders a link to
+     a 404. Two lists that must agree, in two places that can't see each
+     other — so the build says so rather than the browser. */
+  const built = new Set(pages.map((page) => page.id));
+  const missing = siteConfig.nav.filter((item) => !built.has(item.slug));
+  if (missing.length > 0) {
+    throw new Error(
+      `site.ts nav points at ${missing.map((item) => `"${item.slug}"`).join(', ')}, ` +
+        'which has no matching file in src/content/pages/ (or its frontmatter sets nav: false).',
+    );
+  }
+
+  return pages.map((entry) => ({ params: { navpage: entry.id }, props: { entry } }));
 }
 
-const { entry, siblings } = Astro.props;
+const { entry } = Astro.props;
 ---
 
 <BaseLayout title={`${entry.data.title} · Playground`} description={entry.data.description}>
+  <PageBackdrop />
   <HeaderV2 />
   <SideNav />
 
   <main id="main">
-    <!-- The nav in site.ts still points at same-page anchors, so the
-         section keeps the id it would be linked by. -->
-    <ProsePage page={entry.data} anchor={entry.id} />
+    <ProsePage page={entry.data} />
+  </main>
 
-    <nav
-      class="mx-auto flex max-w-[var(--width-content)] flex-wrap items-center gap-x-6 gap-y-3 px-gutter pb-16 lg:px-gutter-lg"
-      aria-label="ניווט פלייגראונד"
+  <SiteFooter />
+
+  <!-- Playground chrome, after the footer: the only thing on this page
+       that wouldn't ship. It used to also list the five other nav pages,
+       which was the only way to walk between them; the header's nav is
+       that now, so all that's left is the way back out. -->
+  <div class="bg-white">
+    <div
+      class="mx-auto flex max-w-[var(--width-content)] flex-wrap gap-6 border-t border-ink-900/10 px-gutter py-6 lg:px-gutter-lg"
     >
       <a
         href="/playground"
@@ -70,17 +110,6 @@ const { entry, siblings } = Astro.props;
       >
         ← כל הרכיבים
       </a>
-
-      {
-        siblings.map((sibling) => (
-          <a
-            href={`/playground/${sibling.id}`}
-            class="text-sm text-ink-500 transition-colors duration-[var(--duration-fast)] hover:text-ink-900"
-          >
-            {sibling.label}
-          </a>
-        ))
-      }
-    </nav>
-  </main>
+    </div>
+  </div>
 </BaseLayout>

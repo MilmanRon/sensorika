@@ -112,8 +112,11 @@ import Nav from './Nav.astro';
 
   overlay?.addEventListener('click', requestClose);
 
-  /* One-page site: nav links are same-page anchors, so nothing unmounts
-     and nothing else would ever close the drawer behind them. */
+  /* Closing on a link click matters more now that the entries are real
+     routes: the click starts a navigation, and without this the drawer
+     would be the last thing on screen for the whole of it — and would
+     still be open behind the new page's header if the browser restores
+     the document from bfcache on a Back. */
   panel?.addEventListener('click', (event) => {
     if ((event.target as HTMLElement).closest('a')) requestClose();
   });
