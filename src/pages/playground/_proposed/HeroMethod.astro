@@ -20,13 +20,24 @@
  * word at rest is the mark; the navy of the h1 is only the kicker's.
  * Each letter is shaded as an inflated object rather than as flat type —
  * a highlight, an underside and two shadows — so the word reads as nine
- * balloons under one light. That's all rest state: it's built
- * from the letter's `currentColor`, which means the existing timeline
- * animates it without knowing it's there, and it survives with JS off. The section clips on
- * the x-axis because the letter-burst blobs are sized in `em` and grow
- * with it; off the outer letters of a 7.5rem word they would otherwise
- * reach past the viewport. Under it the method runs full width on a
- * tinted panel.
+ * balloons under one light. That's all rest state: it's built from the
+ * letter's `currentColor`, which means the existing timeline animates it
+ * without knowing it's there, and it survives with JS off.
+ *
+ * Its size is solved rather than picked: `--text-brand` divides the
+ * gutter-to-gutter width by the word's own width in em, so on a phone
+ * the mark spans the screen edge to edge and only stops growing when it
+ * reaches its 7.5rem ceiling. See the token for the arithmetic.
+ *
+ * `overflow-x-clip` on the section is what makes that safe. The
+ * letter-burst blobs are sized in `em` and grow with the word, so off
+ * the outer letters they reach past the gutters — at every width now
+ * that the word ends on them, not just at the ceiling. Clipping is the
+ * right answer rather than shrinking the blobs: they are meant to burst
+ * out of the line, and the ones that leave the screen leave it a frame
+ * or two before they've faded anyway.
+ *
+ * Under it the method runs full width on a tinted panel.
  *
  * The panel is a CardV2 in the panel's own accent, the same surface the
  * Programs cards use: white ground, hairline ring, shadow-card. It was a

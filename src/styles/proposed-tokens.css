@@ -38,14 +38,36 @@
    * the h1 tops out at, which is the point — the wordmark is the thing
    * on the page, and the greeting above it is the kicker.
    *
-   * Fluid rather than three breakpoint steps because the word is set
+   * Fluid rather than three breakpoint steps, because the word is set
    * `white-space: nowrap` (see HeroMethod: the letters are individually
-   * animated boxes and must not break mid-drop). "Sensorika" is 9
-   * glyphs, so at a fixed 7.5rem it would run ~37rem — fine inside the
-   * 72rem content column, a horizontal scrollbar on a phone. 11vw
-   * tracks the gutters between the two, and the 2.75rem floor is what
-   * a 320px screen can still hold on one line. */
-  --text-brand: clamp(2.75rem, 11vw, 7.5rem);
+   * animated boxes and must not break mid-drop) — so its width is a
+   * FIXED multiple of its font-size and the only question is which
+   * multiple fits.
+   *
+   * That makes the size solvable rather than tuned. "Sensorika" is nine
+   * glyphs laid out as separate inline-blocks, which suppresses kerning
+   * between them; measured in Rubik 800 that runs 5.155em. Divide the
+   * gutter-to-gutter width by it and the word lands exactly on both
+   * gutters — which is the size it wants to be on a phone, where the
+   * wordmark IS the screen. (It was `clamp(2.75rem, 11vw, 7.5rem)`,
+   * whose comment claimed 11vw "tracks the gutters". It doesn't: 11vw
+   * of a 390px screen is 43px, against the 66px that actually spans it,
+   * so the word sat at two thirds of its width with a band of dead
+   * gutter each side.)
+   *
+   * `--spacing-gutter` and not `-lg`: the ceiling is reached at 666px,
+   * well below the `lg` at which the page's padding widens, so the
+   * mobile gutter is the only one this expression is ever solved with.
+   *
+   * No floor. One was needed under a vw term that kept shrinking; this
+   * expression is derived FROM the line it has to fit, so it holds the
+   * word on one line at every width by construction — 320px included,
+   * where it still resolves larger than the 2.75rem floor it replaces.
+   *
+   * The ceiling stays a ceiling: past 666px the word stops growing and
+   * the gutters open up around it, because 7.5rem is the size the
+   * lockup is drawn to be and a 1400px word is a banner, not a mark. */
+  --text-brand: min(calc((100vw - 2 * var(--spacing-gutter)) / 5.155), 7.5rem);
 }
 
 /**
