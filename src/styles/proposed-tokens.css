@@ -66,6 +66,34 @@
      it as grain rather than as smoothness, it is too high. */
   --backdrop-grain: 0.05;
 
+  /* The brand word's balloon shading — see HeroMethod. Four knobs for
+     one effect: a highlight, an underside, and two shadows.
+
+     They are NEUTRAL on purpose, laid over whatever hue the letter is
+     wearing rather than being four more petal tints. That's what makes
+     the effect one thing instead of four: the same white and the same
+     black shape every letter, so the nine of them read as nine objects
+     under one light rather than as nine differently-shaded letters. */
+
+  /* Top-left highlight — where the light hits. This is the single stop
+     that decides how inflated the letter looks, so it's the one to
+     reach for first: lower it and the letters flatten into tinted type,
+     raise it and they go glossy/plastic. */
+  --brand-word-sheen: oklch(100% 0 0 / 0.5);
+  /* The underside, where the surface turns away from the light. Kept
+     well under the sheen — a balloon's shadow side is still lit. */
+  --brand-word-shade: oklch(22% 0 0 / 0.2);
+  /* Tight and barely offset: the letter touching the page. This is what
+     says "solid object" rather than "text with a shadow", and it's the
+     half of the pair that carries weight — the letter reads as heavier
+     the darker this gets, not the bigger the cast shadow gets. */
+  --brand-word-contact: oklch(22% 0 0 / 0.42);
+  /* Wide and soft, further down: the letter floating above the page.
+     Deliberately kept below the contact shadow. A cast shadow as dark
+     as the contact one stops reading as diffuse light and starts
+     reading as a second, blurry copy of the word. */
+  --brand-word-cast: oklch(22% 0 0 / 0.28);
+
   /* Organic "petal" silhouettes. The logo is four soft-cornered petals,
      so the photo frame and the decorative shapes are cut from the same
      geometry rather than being plain circles. Two variants so a pair of

@@ -10,13 +10,15 @@
  *    inline bar. Here the drawer survives untouched below `2xl` and the
  *    links come inline above it.
  *
- *    CAVEAT, and it's a real one: there are eight labels and they are
- *    long ("מתי אנחנו יכולים לעזור" is 22 characters). At 16px they run
- *    ~1030px, which together with the logo, the CTA and the gutters
- *    needs ~1500px — hence `2xl` (1536px) rather than `xl`. Below that
- *    the drawer is the nav. Pulling the inline bar back down to `xl`
- *    means either shortening the labels in `site.ts` or dropping some
- *    from the bar — a copy decision, not a CSS one.
+ *    CAVEAT, and it's a real one: the labels are long ("מתי אנחנו
+ *    יכולים לעזור" is 22 characters). With the eight original entries
+ *    they ran ~1030px at 16px, which together with the logo, the CTA
+ *    and the gutters needed ~1500px — hence `2xl` (1536px) rather than
+ *    `xl`. `site.ts` is down to six entries since ("יצירת קשר" and
+ *    "הרשמה" are the CTA's job, not the nav's), so the row is narrower
+ *    and `xl` may now fit — but that wants measuring in the browser
+ *    before the breakpoint moves, not arithmetic here. Below whatever
+ *    it ends up being, the drawer is the nav.
  *
  * 2. The logo drops from h-18/h-22 to h-14/h-16. At 88px inside a 112px
  *    bar it fills 79% of the header's height, which reads as an
@@ -72,15 +74,14 @@ const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } 
   class="sticky top-0 z-50 bg-white shadow-card"
 >
   <div
-    class="flex h-header flex-row-reverse items-center justify-between gap-4 px-gutter lg:h-header-lg lg:px-gutter-lg"
+    class="flex h-header items-center justify-between gap-4 px-gutter lg:h-header-lg lg:px-gutter-lg"
   >
     <Logo class="h-14 lg:h-16" />
 
-    <!-- Inline nav, 2xl and up. `flex-row-reverse` for the same reason
-         the bar itself is reversed: DOM order stays the reading order,
-         the row runs left-to-right physically. -->
+    <!-- Inline nav, 2xl and up. Plain row: the page is dir=rtl, so the
+         links already run right-to-left in the order they're written. -->
     <nav aria-label="ניווט ראשי" class="hidden 2xl:block">
-      <ul class="flex flex-row-reverse items-center gap-1">
+      <ul class="flex items-center gap-1">
         {
           siteConfig.nav.map((item) => (
             <li>
@@ -96,7 +97,9 @@ const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } 
       </ul>
     </nav>
 
-    <div class="flex flex-row-reverse items-center gap-2 sm:gap-3">
+    <!-- CTA first, trigger second — under dir=rtl that leaves the
+         trigger outboard at the bar's far left edge. -->
+    <div class="flex items-center gap-2 sm:gap-3">
       <ButtonV2
         href={whatsappHref()}
         size="sm"

@@ -17,7 +17,12 @@
  * own, twice the top of the heading scale — so the wordmark is what you
  * land on and the greeting reads as its lead-in. Its letters are painted
  * in the four logo petals, cycling coral / amber / teal / purple, so the
- * word at rest is the mark; the navy of the h1 is only the kicker's. The section clips on
+ * word at rest is the mark; the navy of the h1 is only the kicker's.
+ * Each letter is shaded as an inflated object rather than as flat type —
+ * a highlight, an underside and two shadows — so the word reads as nine
+ * balloons under one light. That's all rest state: it's built
+ * from the letter's `currentColor`, which means the existing timeline
+ * animates it without knowing it's there, and it survives with JS off. The section clips on
  * the x-axis because the letter-burst blobs are sized in `em` and grow
  * with it; off the outer letters of a 7.5rem word they would otherwise
  * reach past the viewport. Under it the method runs full width on a
@@ -154,7 +159,12 @@ const rules = {
         class="text-center font-display text-4xl leading-heading font-bold text-ink-900 sm:text-5xl lg:text-6xl"
       >
         <span class="block text-3xl font-medium sm:text-4xl lg:text-5xl">{greeting}</span>
-        <span class="block text-brand"
+        <!-- `font-extrabold` overrides the h1's own `font-bold` for this
+             line alone. Volume needs mass to sit in: at 700 the balloon
+             shading has to fit inside a stem barely wider than the rim,
+             and it reads as a bevel rather than as an inflated letter.
+             800 is the top weight in the Rubik import. -->
+        <span class="block text-brand font-extrabold"
           ><span class="brand-word" dir="ltr" data-brand-word
           ><span class="sr-only">{brand}</span><span aria-hidden="true"
             >{
@@ -240,14 +250,43 @@ const rules = {
     position: relative;
     z-index: 0;
     display: inline-block;
+    /*
+     * The letter's two shadows: contact, then cast. Both are `filter`
+     * rather than `text-shadow`, and both live on the PARENT rather
+     * than on the glyph, for two separate reasons:
+     *
+     *   - `text-shadow` paints above the element's own background, and
+     *     the glyph's fill IS a background (clipped to the text, below).
+     *     A shadow offset under the letter would therefore be painted
+     *     over the fill it's meant to sit behind — the letter would go
+     *     flat dark. `drop-shadow` shadows the rendered result instead,
+     *     so it lands where a shadow belongs.
+     *   - `-webkit-background-clip: text` and `filter` on the SAME
+     *     element is a combination Safari has historically rendered as
+     *     invisible text. One property each keeps them apart.
+     *
+     * The filter takes the transformed glyph as its input, so the
+     * shadow squashes and tilts with the letter through the landing
+     * rather than sitting under it as a static blot. It also catches
+     * the blob for the second it's visible, which is invisible in
+     * practice — the blob is already a soft shape behind the letter.
+     */
+    filter: drop-shadow(0 0.022em 0.01em var(--brand-word-contact))
+      drop-shadow(0 0.11em 0.1em var(--brand-word-cast));
   }
 
   /*
    * The resting colour, in the same coral / amber / teal / purple cycle
-   * the script uses. It lives here and not only in the timeline because
-   * this is the state — GSAP just has to not fight it. With JS off, or
-   * under reduced motion where the script never runs, this is the only
-   * thing that paints the word, and it still lands on the logo palette.
+   * the script uses, plus the rim for each. It lives here and not only
+   * in the timeline because this is the state — GSAP just has to not
+   * fight it. With JS off, or under reduced motion where the script
+   * never runs, this is the only thing that paints the word, and it
+   * still lands on the logo palette.
+   *
+   * `color` stays the letter's ONE hue, exactly as before: the shading
+   * below is built on `currentColor`, so GSAP goes on animating this
+   * property and the balloon follows it — the drop-in and the hover
+   * flash needed no change at all.
    */
   .brand-letter:nth-child(4n + 1) .letter-glyph {
     color: var(--color-coral-500);
@@ -273,6 +312,48 @@ const rules = {
      * let the finished word paint first and then snap back to the start.
      */
     opacity: 0;
+  }
+
+  /*
+   * THE BALLOON. Volume is the fill's job, not the shadow's — a shadow
+   * alone only ever says "this text is floating", never "this text is
+   * an inflated object". So the glyph is filled by a background clipped
+   * to its own shape, in three layers:
+   *
+   *   1. a radial highlight up and to the left, where the light hits;
+   *   2. a linear darkening across the bottom, where the surface turns
+   *      away from it;
+   *   3. `currentColor` under both — which is what keeps the whole
+   *      effect hue-agnostic and animatable. The letters stay coral /
+   *      amber / teal / purple; the shading is the same neutral white
+   *      and black over each.
+   *
+   * The highlight is an ellipse, not a band: a linear top-to-bottom
+   * gradient reads as a cylinder (or as a bevel), and the thing that
+   * says "balloon" specifically is a single soft highlight sitting off
+   * to one side of a rounded surface.
+   *
+   * Guarded, because the cost of the guard being wrong is a headline
+   * that renders as nothing: `-webkit-text-fill-color: transparent` is
+   * what lets the background show through the glyph, and on an engine
+   * without background-clip it would simply erase the word. Everything
+   * that makes the letter invisible is inside the @supports; the hue,
+   * the rim and the shadows are outside it, so the fallback is the
+   * flat-coloured word the section had before.
+   */
+  @supports (background-clip: text) or (-webkit-background-clip: text) {
+    .letter-glyph {
+      background-color: currentColor;
+      background-image: radial-gradient(
+          62% 48% at 30% 20%,
+          var(--brand-word-sheen) 0%,
+          transparent 72%
+        ),
+        linear-gradient(to bottom, transparent 46%, var(--brand-word-shade) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
   }
 
   /*

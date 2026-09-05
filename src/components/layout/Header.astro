@@ -3,15 +3,15 @@
  * Sticky site header.
  *
  * Deliberately not logo-only. It carries three things:
- *   1. the brand lockup, linking home — pinned far left;
+ *   1. the brand lockup, linking home — at the inline start;
  *   2. the site's single conversion action — WhatsApp;
- *   3. the side-nav trigger, outboard of the CTA at the far right.
+ *   3. the side-nav trigger, outboard of the CTA at the inline end.
  *
- * That left/right split is a deliberate physical arrangement, not the
- * logical one: under dir=rtl a plain flex row would put the logo at the
- * inline start, i.e. the right. `flex-row-reverse` is what pins it left
- * instead. DOM order stays logo-then-controls, so tab order still
- * follows the visual left-to-right run.
+ * The arrangement is purely logical: the page is dir=rtl, so a plain
+ * flex row already puts the logo on the right and the controls on the
+ * left, which is where a Hebrew reader looks for each. Nothing here is
+ * reversed — DOM order is logo-then-controls, and that reads right-to-
+ * left on screen exactly as it does in the source.
  *
  * The trigger is not mobile-only: the side nav is a drawer at every
  * width, so the hamburger is always present and is the only way in.
@@ -61,17 +61,16 @@ const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } 
   class="sticky top-0 z-50 bg-white shadow-card"
 >
   <div
-    class="flex h-header flex-row-reverse items-center justify-between gap-4 px-gutter lg:h-header-lg lg:px-gutter-lg"
+    class="flex h-header items-center justify-between gap-4 px-gutter lg:h-header-lg lg:px-gutter-lg"
   >
     <Logo class="h-18 lg:h-22" />
 
     <!--
-      Reversed for the same reason as the bar itself: under dir=rtl a
-      plain row would put the CTA (first child) at the right, pushing
-      the trigger inboard. Reversing runs the pair left-to-right, so the
-      trigger lands outboard at the far edge.
+      CTA first, trigger second — under dir=rtl that puts the trigger at
+      the inline end, i.e. outboard at the far left edge of the bar, with
+      the CTA inboard of it.
     -->
-    <div class="flex flex-row-reverse items-center gap-2 sm:gap-3">
+    <div class="flex items-center gap-2 sm:gap-3">
       <Button
         href={whatsappHref()}
         size="sm"

@@ -36,6 +36,12 @@ export const siteConfig = {
    * same-page anchors, not routes. Labels are final copy; hrefs are
    * placeholder slugs (TODO) until each matching section exists and
    * gets a real `id`.
+   *
+   * The two conversion entries — "יצירת קשר" and "הרשמה" — are
+   * deliberately absent. The header carries a standing WhatsApp CTA, so
+   * a nav item pointing at the same act would be a second, weaker route
+   * competing with the site's one conversion action. The nav is for
+   * finding out about the clinic; the CTA is for getting in touch.
    */
   nav: [
     { label: 'מהו ויסות חושי', href: '#sensory-regulation' },
@@ -44,8 +50,6 @@ export const siteConfig = {
     { label: 'פעילות קבוצתית', href: '#groups' },
     { label: 'קצת עליי', href: '#about' },
     { label: 'שאלות נפוצות', href: '#faq' },
-    { label: 'הרשמה', href: '#signup' },
-    { label: 'יצירת קשר', href: '#contact' },
   ] as { label: string; href: string }[],
 };
 
