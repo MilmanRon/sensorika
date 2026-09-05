@@ -1,5 +1,7 @@
 # build output
 dist/
+# wrangler's local miniflare state (caches, KV/R2/D1 emulation)
+.wrangler/
 # generated types
 .astro/
 

@@ -28,7 +28,7 @@ const { orientation = 'horizontal' } = Astro.props;
 const { nav } = siteConfig;
 
 /* Trailing slash trimmed on both sides: Astro serves these routes as
-   directories (`/playground/faq/`) while the href in site.ts has no
+   directories (`/faq/`) while the href in site.ts has no
    slash, and a raw `===` would then never match. */
 const trim = (path: string) => path.replace(/\/+$/, '');
 const here = trim(Astro.url.pathname);

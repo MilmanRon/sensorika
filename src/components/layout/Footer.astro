@@ -1,8 +1,5 @@
 ---
 /**
- * PROPOSED (new — no current counterpart; the site has no footer at all
- * today).
- *
  * The page's floor, and nothing more than that. Three things: the
  * lockup, the social icons, the copyright line.
  *
@@ -37,7 +34,7 @@
  * them would spend two rows of a narrow screen on a mark and two icons.
  * The copyright sits below the rule, centred at every width.
  *
- * SURFACE: WHITE, LIKE THE HEADER, and for the same reason HeaderV2
+ * SURFACE: WHITE, LIKE THE HEADER, and for the same reason Header
  * gives: white is the surface every card on the page already uses, so
  * the two bars read as the topmost and bottommost of them, and the
  * shadow is what says they float over the ground rather than being
@@ -59,10 +56,10 @@
  * (structural chrome shared across pages, next to Header and SideNav) —
  * it's here for now because everything it's built from is.
  */
-import Logo from '../../../components/layout/Logo.astro';
-import FacebookIcon from '../../../assets/icons/facebook.svg';
-import WhatsappIcon from '../../../assets/icons/whatsapp.svg';
-import { hasWhatsapp, homeHref, siteConfig, whatsappHref } from '../../../data/site';
+import Logo from './Logo.astro';
+import FacebookIcon from '../../assets/icons/facebook.svg';
+import WhatsappIcon from '../../assets/icons/whatsapp.svg';
+import { hasWhatsapp, homeHref, siteConfig, whatsappHref } from '../../data/site';
 
 /*
  * The icon row. Both icons always render; each one's URL degrades to the

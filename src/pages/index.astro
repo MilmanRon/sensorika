@@ -1,14 +1,57 @@
 ---
-import SiteLayout from '../layouts/SiteLayout.astro';
+/**
+ * THE HOME PAGE: the chrome, the one section, and the floor.
+ *
+ *   PageBackdrop   the ground. First in the slot and OUTSIDE <main>: one
+ *                  fixed layer behind the header, the section and the
+ *                  footer alike, not content of any of them.
+ *   Header         white, sticky, shadowed.
+ *   SideNav        the drawer the header's hamburger opens.
+ *   HeroMethod     the greeting and the method, from home.md.
+ *   Programs       the two tracks. It follows HeroMethod for the reason
+ *                  HeroMethod ends without a CTA of its own: the section
+ *                  closes on its takeaway line, and the first action a
+ *                  visitor is offered is the one in Programs. That
+ *                  hand-off is the whole argument for the combined hero,
+ *                  and it only exists when the two are adjacent.
+ *   Footer         white and shadowed like the header: the two bars
+ *                  bracket the document.
+ *
+ * NO OTHER SECTIONS. The nav's six destinations are pages of their own
+ * ([navpage].astro), not anchors on this one, so nothing here scrolls.
+ *
+ * WHICH LEAVES `#contact` DANGLING. Programs' closing band and the
+ * footer's WhatsApp icon resolve there, because `whatsappHref()` falls
+ * back to the anchor while `contact.phone` is a TODO in site.ts. There
+ * is no contact section on the page, so both are inert. A number in
+ * site.ts fixes them without touching a component.
+ *
+ * BaseLayout rather than a site-wide shell: the chrome is three
+ * components in a known order, and the one page that varies it (the
+ * prose pages put ProsePage between them) would have had to opt out of
+ * the shell anyway.
+ */
+import Footer from '../components/layout/Footer.astro';
+import Header from '../components/layout/Header.astro';
+import PageBackdrop from '../components/layout/PageBackdrop.astro';
+import SideNav from '../components/layout/SideNav.astro';
+import HeroMethod from '../components/sections/HeroMethod.astro';
+import Programs from '../components/sections/Programs.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<SiteLayout title="בית" description="מקום לילדים עם צרכים מיוחדים לשחק ולגדול.">
-  <!--
-    Sections still to come. `site.ts` nav hrefs are placeholder slugs
-    until each matching section exists here and gets the real `id`, so
-    the rail's links have nothing to land on yet.
-  -->
-  <div class="flex min-h-[50vh] items-center justify-center px-gutter lg:px-gutter-lg">
-    <h1 class="font-display text-4xl font-bold text-ink-900">שאר העמוד בבנייה</h1>
-  </div>
-</SiteLayout>
+<BaseLayout
+  title="בית"
+  description="מקום לילדים עם צרכים מיוחדים — אבחון וטיפול בוויסות חושי, עבודה פרטנית ופעילויות קבוצתיות התפתחותיות."
+>
+  <PageBackdrop />
+  <Header />
+  <SideNav />
+
+  <main id="main">
+    <HeroMethod />
+    <Programs />
+  </main>
+
+  <Footer />
+</BaseLayout>

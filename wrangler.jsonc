@@ -1,0 +1,49 @@
+/**
+ * Cloudflare Workers config — static assets only.
+ *
+ * THERE IS NO WORKER SCRIPT and no `main` field, because there is no
+ * server: every route is pre-rendered at build time, so Cloudflare just
+ * serves ./dist off its edge. That's also why @astrojs/cloudflare isn't
+ * installed — the adapter exists for on-demand rendering (server
+ * islands, actions, sessions), and Astro's own guidance is that a static
+ * site builder needs no adapter at all. If a route ever needs to render
+ * per-request, that's the moment to add it, plus `main`, `nodejs_compat`
+ * and an ASSETS binding.
+ *
+ * Workers rather than Pages: Cloudflare recommends Workers for new
+ * projects, and Pages is in maintenance for them.
+ *
+ * Deploy with `npm run deploy`, which builds first — `wrangler deploy`
+ * on its own would happily ship whatever ./dist already held.
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sensorika",
+  "compatibility_date": "2026-09-05",
+
+  "assets": {
+    "directory": "./dist",
+
+    /**
+     * Serve src/pages/404.astro for any unmatched path, with a 404
+     * status. The default ("none") returns a bare Cloudflare error page,
+     * which drops the visitor out of the site entirely — no header, no
+     * nav, no way back.
+     */
+    "not_found_handling": "404-page",
+
+    /**
+     * Astro emits every route as `<slug>/index.html`, so `/about` and
+     * `/about/` are the same document and one of the two has to be
+     * canonical. "drop-trailing-slash" makes it the bare `/about` —
+     * which is the form site.ts derives every nav href as, so an
+     * internal click resolves in one request. "auto-trailing-slash"
+     * canonicalises the other way and 307s every one of those links.
+     */
+    "html_handling": "drop-trailing-slash"
+  },
+
+  "observability": {
+    "enabled": true
+  }
+}

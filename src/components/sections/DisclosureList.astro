@@ -1,7 +1,5 @@
 ---
 /**
- * PROPOSED (new — no current counterpart).
- *
  * A page's reference matter as closed rows. The clinic asked for exactly
  * this shape — things a parent opens, not things they scroll past —
  * because only one of the four packages is ever the one they're
@@ -53,7 +51,7 @@
  * hairline under the line separates it from the prose. On a narrow
  * screen the run wraps and each pair keeps its own line, still tight.
  */
-import CardV2 from './CardV2.astro';
+import Card from '../ui/Card.astro';
 
 interface Props {
   heading: string;
@@ -130,7 +128,7 @@ const markers = {
   <!-- No accent on the card and no corner petal, as on the FAQ: this is
        one surface holding the whole list, and the accents belong to the
        rows inside it. -->
-  <CardV2 petal={false} class="mt-8 sm:p-4 lg:p-6">
+  <Card petal={false} class="mt-8 sm:p-4 lg:p-6">
     <div class="divide-y divide-ink-900/10">
       {
         items.map((item, i) => {
@@ -249,7 +247,7 @@ const markers = {
         })
       }
     </div>
-  </CardV2>
+  </Card>
 </section>
 
 <style>

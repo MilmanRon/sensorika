@@ -1,9 +1,7 @@
 ---
 /**
- * PROPOSED (new — no current counterpart).
- *
  * The "method panel" extracted so it can be reused. HeroMethod.astro
- * introduced the shape and it's the one that landed: a CardV2 on the
+ * introduced the shape and it's the one that landed: a Card on the
  * page's plain paper ground, spanning --width-content, with a tinted
  * eyebrow pill, a heading, body copy set on --width-prose inside it,
  * and an optional pulled-out takeaway line on an inline-start rule.
@@ -17,7 +15,7 @@
  * reading measure. Four paragraphs across 72rem run past 100 characters
  * a line, and these are pages a parent actually has to read.
  *
- * ONE DELIBERATE DIFFERENCE from HeroMethod's panel: CardV2's decorative
+ * ONE DELIBERATE DIFFERENCE from HeroMethod's panel: Card's decorative
  * corner petal is OFF here by default. HeroMethod shows a single panel,
  * where the shape is a flourish; a nav-item page stacks four or more,
  * and the same blob at the same corner of every one reads as wallpaper
@@ -27,14 +25,14 @@
  * is what they were for. Pass `petal` to bring it back on a panel that
  * stands alone.
  *
- * `accent` keeps CardV2's contract — a petal-hue name, never a raw
+ * `accent` keeps Card's contract — a petal-hue name, never a raw
  * color — so a lookup can only ever resolve to a token.
  *
  * HeroMethod.astro is deliberately NOT refactored onto this: it's the
  * version under review, and rewriting it would invalidate the
  * comparison. Fold it in once the direction is signed off.
  */
-import CardV2 from './CardV2.astro';
+import Card from '../ui/Card.astro';
 
 interface Props {
   /** Small label naming the panel. Omit for a panel that opens cold. */
@@ -60,7 +58,7 @@ interface Props {
   lead?: string;
   /** Takeaway line, pulled out under the body on its own rule. */
   pullout?: string;
-  /** CardV2's corner wash. Off by default — panels stack, see above. */
+  /** Card's corner wash. Off by default — panels stack, see above. */
   petal?: boolean;
   class?: string;
 }
@@ -95,9 +93,9 @@ const rules = {
 };
 ---
 
-<!-- `sm:p-*` / `lg:p-*` rather than a bare `p-*`: CardV2's base sets
+<!-- `sm:p-*` / `lg:p-*` rather than a bare `p-*`: Card's base sets
      `p-8`, and only a variant utility reliably overrides it. -->
-<CardV2 accent={accent} petal={petal} class:list={['sm:p-12 lg:p-16', className]}>
+<Card accent={accent} petal={petal} class:list={['sm:p-12 lg:p-16', className]}>
   <div class="mx-auto max-w-[var(--width-prose)]">
     {
       eyebrow && (
@@ -168,4 +166,4 @@ const rules = {
       )
     }
   </div>
-</CardV2>
+</Card>

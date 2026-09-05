@@ -1,7 +1,5 @@
 ---
 /**
- * PROPOSED (new — no current counterpart).
- *
  * The shared body of a nav-item page: intro band + (on the forms page)
  * its downloads + a stack of accented ProsePanels + (on the individual
  * page) its collapsed packages and terms + (on the FAQ) an accordion.
@@ -22,7 +20,7 @@
  * written twice in one file is how two stacks quietly stop matching.
  *
  * DECORATION: this page draws none of its own, and neither do its
- * panels (ProsePanel turns CardV2's corner petal off). The rule these
+ * panels (ProsePanel turns Card's corner petal off). The rule these
  * pages settled: the ornament belongs to the PAGE, not to each card —
  * repeated down a stack the corner blob became a tile you notice
  * instead of a flourish you don't.
@@ -30,11 +28,11 @@
  * The intro band used to carry a <Decor> — the hero's petals, without
  * the dot grid — back when the route rendered on flat white. It doesn't
  * any more: the route now puts a PageBackdrop under the whole document,
- * exactly as /playground/full-page does, and that runs a petal field
+ * exactly as the home page does, and that runs a petal field
  * (plus the wash and the dither) down the entire page. A second set of
  * shapes in the one band the two would overlap reads as clutter, which
  * is the same call HeroMethod made when the backdrop arrived under it.
- * The panels' white CardV2 surfaces now lift off that ground instead of
+ * The panels' white Card surfaces now lift off that ground instead of
  * sitting white-on-white.
  */
 import type { CollectionEntry } from 'astro:content';

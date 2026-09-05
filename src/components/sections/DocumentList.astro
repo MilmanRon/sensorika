@@ -1,7 +1,5 @@
 ---
 /**
- * PROPOSED (new — no current counterpart).
- *
  * The download block of a nav-item page: the files a parent leaves with,
  * one card each. Today that's the group program's two registration
  * forms, built out of forms/*.html into public/forms/ (see
@@ -11,7 +9,7 @@
  * these pages, so adding a third form is a content edit and never an
  * edit here.
  *
- * The card is NOT `interactive`. CardV2's lift says "this whole surface
+ * The card is NOT `interactive`. Card's lift says "this whole surface
  * is a target", which is true of a program card that wraps one link and
  * false here: the button downloads a file and the rest of the card is
  * the description of what that file is. Hover feedback belongs on the
@@ -23,9 +21,9 @@
  * out of. Browsers that ignore the attribute for cross-origin files are
  * not a concern — these are same-origin.
  */
-import ButtonV2 from './ButtonV2.astro';
-import CardV2 from './CardV2.astro';
-import Icon from './Icon.astro';
+import Button from '../ui/Button.astro';
+import Card from '../ui/Card.astro';
+import Icon from '../ui/Icon.astro';
 
 interface Props {
   heading: string;
@@ -78,7 +76,7 @@ const tiles = {
       items.map((item, i) => {
         const accent = item.accent ?? cycle[i % cycle.length];
         return (
-          <CardV2 accent={accent} class="flex h-full flex-col">
+          <Card accent={accent} class="flex h-full flex-col">
             <span
               class:list={[
                 'flex h-14 w-14 items-center justify-center rounded-card',
@@ -99,12 +97,12 @@ const tiles = {
             )}
 
             <div class="mt-auto pt-8">
-              <ButtonV2 href={item.file} download type="application/pdf">
+              <Button href={item.file} download type="application/pdf">
                 <Icon name="download" class="h-5 w-5" />
                 הורדת הטופס
-              </ButtonV2>
+              </Button>
             </div>
-          </CardV2>
+          </Card>
         );
       })
     }

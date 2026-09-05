@@ -12,6 +12,15 @@ const { title, description } = Astro.props;
 const siteName = 'Sensorika';
 
 /**
+ * Absolute URL of the page being rendered, for the canonical link and
+ * og:url. Both are omitted rather than guessed when `site` isn't set in
+ * astro.config.mjs — a canonical pointing at localhost is worse than no
+ * canonical at all, and this has to keep building before a domain
+ * exists.
+ */
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : undefined;
+
+/**
  * First draft is Hebrew-only, so lang/dir are hardcoded here rather
  * than driven by i18n routing yet. When Russian content is ready,
  * this becomes per-locale (Astro i18n routing + dir="ltr" for /ru/)
@@ -27,8 +36,13 @@ const dir = 'rtl';
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- The four brand petals, straight from src/assets/brand/logo-mark.svg
+         — the same artwork Logo.astro renders in the header and footer.
+         The touch icon is that mark on its own white ground, because iOS
+         composites no transparency and would otherwise back it in
+         black. -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="generator" content={Astro.generator} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -40,11 +54,18 @@ const dir = 'rtl';
 
     <title>{title} · {siteName}</title>
     <meta name="description" content={description} />
+    {canonical && <link rel="canonical" href={canonical.href} />}
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
+    <meta property="og:locale" content="he_IL" />
+    {canonical && <meta property="og:url" content={canonical.href} />}
+    <!-- TODO: og:image. Social previews fall back to a bare text card
+         until there's a 1200x630 share image in public/. -->
+
+    <meta name="twitter:card" content="summary" />
   </head>
   <body>
     <slot />

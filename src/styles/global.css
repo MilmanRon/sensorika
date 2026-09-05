@@ -1,10 +1,6 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 @import './tokens.css';
-/* PROPOSED, additive-only — see src/pages/playground/_proposed/README.md.
-   Defines new token names for the components under review; overrides
-   nothing in tokens.css, so shipped components are unaffected. */
-@import './proposed-tokens.css';
 
 /* Map the `prose` (article) plugin onto our own tokens instead of its
    defaults, so long-form parent content matches the rest of the site. */

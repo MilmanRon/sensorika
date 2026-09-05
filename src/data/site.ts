@@ -6,25 +6,19 @@
  */
 
 /**
- * WHERE THE SITE CURRENTLY LIVES.
+ * WHERE THE SITE LIVES.
  *
- * The real pages are built out of `src/pages/playground/_proposed/`, so
- * the walkable site is under /playground rather than at the root: home
- * is /playground/full-page and each nav destination is
- * /playground/<slug>. Nothing else in the codebase should know that —
- * every href the chrome renders is derived from these two constants, so
- * promoting the proposed components is one edit here (`pagesBase` to
- * `''`, `homeHref` to `'/'`) and not a search for hardcoded paths.
- *
- * They live in site.ts rather than in a playground file because the
- * SHIPPED Header and SideNav read `siteConfig.nav` too, and pointing
- * them at the anchors they used to carry would send a visitor to
- * fragments that no page defines.
+ * Every content page is `/<slug>` and home is `/`. These were
+ * `'/playground'` and `'/playground/full-page'` while the design was
+ * under review, which is the whole reason they're constants: every href
+ * the chrome renders is derived from them, so moving the site was this
+ * one edit rather than a search for hardcoded paths. They stay for the
+ * next such move — a subdirectory deploy, a locale prefix.
  */
-export const pagesBase = '/playground';
+export const pagesBase = '';
 
 /** The brand lockup's destination, in the header and in the footer. */
-export const homeHref = `${pagesBase}/full-page`;
+export const homeHref = '/';
 
 export const siteConfig = {
   name: 'Sensorika',

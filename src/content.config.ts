@@ -195,7 +195,7 @@ const pages = defineCollection({
      * It does NOT decide what the header carries: `siteConfig.nav` names
      * the six nav destinations, and a page can have a route without
      * being one of them (the group program's forms page is reached from
-     * a card on the home page). /playground flags those as "לא בתפריט".
+     * a card on the home page).
      */
     nav: z.boolean().default(true),
     /**
@@ -208,7 +208,7 @@ const pages = defineCollection({
     description: z.string(),
     /** Opening line, centered under the h1 in the intro band. */
     intro: z.string().optional(),
-    /** Order in the nav / on the playground index. */
+    /** Order in the nav. */
     order: z.number(),
     panels: z.array(panel).default([]),
     /**

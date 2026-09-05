@@ -1,24 +1,19 @@
 ---
 /**
- * PROPOSED (new — no current counterpart).
- *
  * The page's ground: one fixed layer behind everything, carrying three
  * things — a wash of colour, a field of drifting petals, and a grain
  * over the top of both.
  *
- * Why it exists. tokens.css says "the page itself is white; nothing
- * tints it edge to edge", and depth comes from tinted section bands.
- * The proposed page doesn't have tinted bands — HeroMethod and
- * ProgramsV2 both paint no background and put their content on white
- * CARDS instead. On a white page that leaves white cards on white,
- * separated only by a hairline ring, and the cards stop reading as
- * lifted. This layer is what they lift off.
+ * Why it exists. The sections paint no background of their own — they
+ * put their content on white CARDS instead. On a white page that
+ * leaves white cards on white, separated only by a hairline ring, and
+ * the cards stop reading as lifted. This layer is what they lift off.
  *
- * ACCEPTING THIS MEANS AMENDING THAT RULE IN tokens.css — the page is
- * no longer flat white. Nothing else changes: sections still paint no
- * background of their own, and a section that wants a band still takes
- * one. It's here in _proposed rather than in global.css for exactly
- * that reason; shipped pages are untouched.
+ * IT SUPERSEDES tokens.css's old "the page itself is white; nothing
+ * tints it edge to edge" rule, under which depth came from tinted
+ * section bands. Nothing else about that rule changes: sections still
+ * paint no background of their own, and a section that wants a band
+ * still takes one.
  *
  * ---------------------------------------------------------------------
  * THE PETAL FIELD

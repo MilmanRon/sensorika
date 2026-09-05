@@ -1,0 +1,71 @@
+---
+/**
+ * Every content page, from the `pages` collection: one route instead of
+ * one .astro file per nav entry, because the pages differ only in their
+ * copy and that copy lives in src/content/pages/.
+ *
+ * Astro matches static routes before dynamic ones, so `/` still wins
+ * over this file — but that also means a content slug colliding with a
+ * static route would be silently unreachable. There is one static route.
+ *
+ * NOT EVERY PAGE HERE IS IN THE NAV. `siteConfig.nav` names six
+ * destinations; this route builds every `pages` entry that asks for one,
+ * which is those six plus the two the home page's program cards land on
+ * (group-forms, individual-packages). A page with `nav: false` — the
+ * home page's copy, which HeroMethod renders — gets no route at all.
+ *
+ * THE PAGE IS ASSEMBLED LIKE THE HOME PAGE, and for the same reasons:
+ * these are its siblings, not a different kind of document, so they get
+ * the same ground and the same floor. PageBackdrop first and outside
+ * <main>, then the chrome, then the page's own copy, then the footer —
+ * which comes with the backdrop rather than as a separate nicety, since
+ * the fixed ground has no bottom edge of its own and without a solid
+ * band the last panel would just stop.
+ */
+import { getCollection } from 'astro:content';
+
+import Footer from '../components/layout/Footer.astro';
+import Header from '../components/layout/Header.astro';
+import PageBackdrop from '../components/layout/PageBackdrop.astro';
+import SideNav from '../components/layout/SideNav.astro';
+import ProsePage from '../components/sections/ProsePage.astro';
+import { siteConfig } from '../data/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  /* `nav: false` entries (the home page's copy) live in the same
+     collection but are rendered by their own section, not by this route. */
+  const pages = (await getCollection('pages', ({ data }) => data.nav)).sort(
+    (a, b) => a.data.order - b.data.order,
+  );
+
+  /* The nav in site.ts names six of these pages by slug, and every one of
+     those names has to resolve to a file here or the header renders a
+     link to a 404. Two lists that must agree, in two places that can't
+     see each other — so the build says so rather than the browser. */
+  const built = new Set(pages.map((page) => page.id));
+  const missing = siteConfig.nav.filter((item) => !built.has(item.slug));
+  if (missing.length > 0) {
+    throw new Error(
+      `site.ts nav points at ${missing.map((item) => `"${item.slug}"`).join(', ')}, ` +
+        'which has no matching file in src/content/pages/ (or its frontmatter sets nav: false).',
+    );
+  }
+
+  return pages.map((entry) => ({ params: { navpage: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.description}>
+  <PageBackdrop />
+  <Header />
+  <SideNav />
+
+  <main id="main">
+    <ProsePage page={entry.data} />
+  </main>
+
+  <Footer />
+</BaseLayout>

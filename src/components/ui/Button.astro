@@ -1,19 +1,39 @@
 ---
 /**
- * Example `ui/` primitive — generic, content-agnostic, reusable
- * anywhere. Styled entirely from design tokens (src/styles/tokens.css),
- * never a one-off color/spacing value. Use this as the template for
- * new primitives (Card, Badge, Input, ...).
+ * The site's one control. What it is, and why:
+ *
+ * 1. CONTRAST. The pastel petal bases can't carry a label — coral at
+ *    -500 is 3.0:1 on white, the accent 2.32:1. `primary` sits on
+ *    `coral-700` (5.2:1) and the quieter variants write in `teal-800`
+ *    (9.3:1) instead, so the site's only conversion action is legible.
+ * 2. Shape: `rounded-pill`, not `rounded-control`. A 10px radius on a
+ *    48px control reads as a form field; a pill reads as a CTA, and the
+ *    logo is built entirely from soft round petals.
+ * 3. Depth + hover. The current button changes background on hover and
+ *    nothing else, so it never reads as pressable at rest. Now it rests
+ *    on `shadow-card` and lifts 1px to `shadow-lift` on hover — small
+ *    enough to stay inside this audience's motion budget.
+ * 4. A `secondary` that is a real surface (white, ink text, hairline)
+ *    rather than an outline in primary's hue — which matters more, not
+ *    less, on a palette this narrow: two buttons in one hue side by
+ *    side read as one control split in half. With primary now on coral
+ *    — the logo's red square, and the one thing on the page that is
+ *    unambiguously *the* action — that separation is doing even more
+ *    work: coral means "this is the step", teal means everything else
+ *    you can click.
+ * 5. `lg` size for hero CTAs, and an optional trailing arrow that nudges
+ *    forward on hover — the affordance both reference designs lean on.
  */
+import Icon from './Icon.astro';
+
 interface Props {
   href?: string;
-  variant?: 'primary' | 'secondary';
-  /**
-   * `md` is the page-level default (hero CTAs, forms). `sm` exists for
-   * dense chrome — the header bar is 4rem tall, so an `md` button in it
-   * would leave almost no breathing room above and below.
-   */
-  size?: 'sm' | 'md';
+  /** `ghost` is the low-commitment third action (inline text + arrow). */
+  variant?: 'primary' | 'secondary' | 'ghost';
+  /** `lg` is new: hero CTAs. `md` page-level, `sm` for dense chrome. */
+  size?: 'sm' | 'md' | 'lg';
+  /** Trailing directional arrow, nudged on hover. */
+  arrow?: boolean;
   class?: string;
   [key: string]: unknown;
 }
@@ -22,40 +42,52 @@ const {
   href,
   variant = 'primary',
   size = 'md',
+  arrow = false,
   class: className = '',
   ...rest
 } = Astro.props;
 const Tag = href ? 'a' : 'button';
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-control font-display font-semibold transition-colors duration-[var(--duration-base)]';
+  'btn group inline-flex items-center justify-center gap-2 rounded-pill font-display font-semibold transition-[background-color,color,box-shadow,transform] duration-[var(--duration-base)] ease-[var(--ease-standard)]';
+
 const sizes = {
   sm: 'px-4 py-2 text-base',
   md: 'px-6 py-3',
+  lg: 'px-8 py-4 text-lg',
 };
-/*
- * Neither variant uses a -500 logo value: the petals are pastels (coral
- * 3.0:1 on white, teal 2.32:1), so a filled button in one can't legibly
- * carry its own label and an outlined one can't be read. Both sit on a
- * darkened step off the exact logo color instead — coral-700 at 5.20:1
- * and teal-700 at 5.92:1, each of them legible as a fill under white
- * text and as text on white.
- *
- * Primary is coral, the logo's red square: it is the page's one
- * conversion action, and a page whose every other interactive surface
- * is teal needs it to separate from them rather than blend in.
- * Secondary stays in teal — as an outline in the *accent* hue it reads
- * as the quieter, non-committal action, which is exactly what a second
- * coral button next to the first would not.
- *
- * Hover on either just steps one shade deeper rather than changing hue.
- */
+
 const variants = {
-  primary: 'bg-coral-700 text-white hover:bg-coral-800',
-  secondary: 'border border-teal-700 bg-transparent text-teal-700 hover:bg-teal-50',
+  primary: 'bg-coral-700 text-white shadow-card hover:bg-coral-800 hover:shadow-lift',
+  secondary:
+    'bg-white text-ink-900 shadow-card ring-1 ring-ink-900/10 hover:text-teal-800 hover:shadow-lift hover:ring-teal-500/40',
+  ghost: 'text-teal-800 hover:bg-teal-100',
 };
 ---
 
 <Tag href={href} class={`${base} ${sizes[size]} ${variants[variant]} ${className}`} {...rest}>
   <slot />
+  {arrow && <Icon name="arrow" class="btn-arrow h-4 w-4" />}
 </Tag>
+
+<style>
+  /* Hover lift. Kept to 1px and on the standard easing — this audience
+     skews sensory-sensitive, so nothing should pop. */
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+
+  /* The arrow nudges *forward*, which is leftward in Hebrew. Written as
+     two physical rules rather than one `translate-x` utility because
+     Tailwind's translate utilities are physical, so a single value would
+     point backwards in the RTL build. */
+  .btn-arrow {
+    transition: transform var(--duration-base) var(--ease-standard);
+  }
+  .btn:hover .btn-arrow {
+    transform: translateX(0.2rem);
+  }
+  :global([dir='rtl']) .btn:hover .btn-arrow {
+    transform: scaleX(-1) translateX(0.2rem);
+  }
+</style>

@@ -61,8 +61,8 @@ panels:
   It has a route but is NOT in the header nav — `siteConfig.nav` names
   the six nav destinations and this isn't one of them. It's reached from
   the "פעילויות קבוצתיות התפתחותיות" card on the home page
-  (ProgramsV2.astro), which is the moment a parent is choosing a track.
-  /playground marks it "לא בתפריט".
+  (sections/Programs.astro), which is the moment a parent is choosing a
+  track.
 
   THE FOUR PANELS ARE FORM 2's ANNEX, VERBATIM — the same block that
   prints as page 2 of sensorika-form-2-participation-terms.pdf. That
@@ -73,11 +73,11 @@ panels:
   here and in forms/form-2-participation-terms.html (then `npm run
   forms`).
 
-  `order: 4.5` puts it directly after "פעילות קבוצתית" (4) on the
-  playground index, next to the program it belongs to.
+  `order: 4.5` puts it directly after "פעילות קבוצתית" (4), next to the
+  program it belongs to.
 
   COPY NOTE: everything in the panels and the two form titles is the
   clinic's own. `title`, `description`, `intro`, the download heading and
-  the two one-line descriptions under the form titles are PROPOSED NEW
-  COPY and need sign-off.
+  the two one-line descriptions under the form titles are NEW COPY and
+  still await sign-off.
 -->

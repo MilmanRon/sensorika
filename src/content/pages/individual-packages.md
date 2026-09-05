@@ -192,9 +192,9 @@ terms:
 
   It has a route but is NOT in the header nav — `siteConfig.nav` names
   the six nav destinations and this isn't one of them. It's reached from
-  the "אבחון וטיפול פרטניים" card on the home page (ProgramsV2.astro),
-  which is the moment a parent is choosing a track. /playground marks it
-  "לא בתפריט". This is the same split the group program already has:
+  the "אבחון וטיפול פרטניים" card on the home page
+  (sections/Programs.astro), which is the moment a parent is choosing a
+  track. This is the same split the group program already has:
   "פעילות קבוצתית" explains, group-forms.md hands over the paperwork.
 
   WHY IT ISN'T ON individual.md. That page is the nav destination, and it
@@ -205,8 +205,8 @@ terms:
   cancellation / refund rules are what they need AFTER that decision, and
   they're long enough to bury the explanation if they sit under it.
 
-  `order: 3.5` puts it directly after "אבחון וטיפול פרטני" (3) on the
-  playground index, next to the program it belongs to.
+  `order: 3.5` puts it directly after "אבחון וטיפול פרטני" (3), next to
+  the program it belongs to.
 
   TWO SECTIONS, ALL OF IT THE CLINIC'S OWN COPY, VERBATIM.
 
@@ -243,6 +243,6 @@ terms:
   opening sentence of the "מסגרות העבודה הפרטנית" section on
   individual.md, which is where these packages were summarized.
   `navLabel`, `description`, the two block headings ("ארבע החבילות",
-  "תנאי ההשתתפות") and the terms block's one-line intro are PROPOSED NEW
-  COPY and need sign-off.
+  "תנאי ההשתתפות") and the terms block's one-line intro are NEW COPY and
+  still await sign-off.
 -->

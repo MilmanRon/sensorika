@@ -1,52 +1,90 @@
 ---
 /**
- * Sticky site header.
+ * The site's bar. What it does, and why:
  *
- * Deliberately not logo-only. It carries three things:
- *   1. the brand lockup, linking home — at the inline start;
- *   2. the site's single conversion action — WhatsApp;
- *   3. the side-nav trigger, outboard of the CTA at the inline end.
+ * 1. THE NAV IS VISIBLE ON DESKTOP. Behind a hamburger at every width —
+ *    including 1440px, where there is roughly 900px of empty bar — it
+ *    costs a marketing site the one thing its header is for: showing a
+ *    first-time visitor what's on the page. So the drawer survives
+ *    untouched below `2xl` and the links come inline above it.
  *
- * The arrangement is purely logical: the page is dir=rtl, so a plain
- * flex row already puts the logo on the right and the controls on the
- * left, which is where a Hebrew reader looks for each. Nothing here is
- * reversed — DOM order is logo-then-controls, and that reads right-to-
- * left on screen exactly as it does in the source.
+ *    CAVEAT, and it's a real one: the labels are long ("מתי אנחנו
+ *    יכולים לעזור" is 22 characters). With the eight original entries
+ *    they ran ~1030px at 16px, which together with the logo, the CTA
+ *    and the gutters needed ~1500px — hence `2xl` (1536px) rather than
+ *    `xl`. `site.ts` is down to six entries since ("יצירת קשר" and
+ *    "הרשמה" are the CTA's job, not the nav's), so the row is narrower
+ *    and `xl` may now fit — but that wants measuring in the browser
+ *    before the breakpoint moves, not arithmetic here. Below whatever
+ *    it ends up being, the drawer is the nav.
  *
- * The trigger is not mobile-only: the side nav is a drawer at every
- * width, so the hamburger is always present and is the only way in.
+ * 2. The logo drops from h-18/h-22 to h-14/h-16. At 88px inside a 112px
+ *    bar it fills 79% of the header's height, which reads as an
+ *    oversized asset rather than as a brand mark, and leaves the CTA
+ *    looking undersized next to it. It's also the PETALS ONLY at every
+ *    width, not just below `sm`: the home page's h1 is now the wordmark
+ *    at `text-brand`, so a second, small "Sensorika" in the bar above it
+ *    is the same word twice on one screen — and the mark is what has to
+ *    be recognisable in a sticky bar anyway. `variant="mark"` rather
+ *    than `responsive`, so the desktop bar carries what the phone
+ *    already carried.
+ * 3. The CTA is a pill on `coral-700`, the logo's red square darkened
+ *    until it clears AA — see Button for why a pastel petal base
+ *    can't carry a white label, and tokens.css for why the one filled
+ *    button in the bar is the site's single non-teal interactive fill.
+ * 4. The bar is FLAT WHITE WITH A PERMANENT SHADOW, at every scroll
+ *    position. Three earlier versions are worth recording, because each
+ *    was wrong for its own reason:
  *
- * Header does not own the nav's markup. It owns one piece of shared
- * state — `data-nav-open` on <html> — and points at the nav by id via
- * `aria-controls`. SideNav renders `id="site-nav"`, styles itself off
- * that attribute, and requests closes with a `nav:close` event. Header
- * is the only writer; the two never touch each other's DOM.
+ *    - transparent until the first scroll, then `teal-100/85` with a
+ *      blur. Translucency over a busy hero is where sticky headers go
+ *      to become unreadable, and the blur cost a compositing layer on
+ *      scroll for a difference nobody could see.
+ *    - opaque `teal-100` always, shadow on scroll. That fixed the
+ *      readability, but a tinted bar reads as part of the ground rather
+ *      than as chrome sitting above it.
+ *    - white, shadow on scroll. The header then had two looks, and the
+ *      flat one — the one you meet first — was the weaker.
  *
- * The bar is flat white with a permanent shadow, at every scroll
- * position. It used to be transparent until the first scroll, which
- * made it read as an overlay floating on the hero rather than as the
- * site's own chrome and left the logo and CTA sitting on whatever
- * happened to be behind them; then tinted `paper-100`, which read as
- * part of the ground rather than as chrome above it. White is the
- * surface the page's cards use, so the header reads as the topmost of
- * them, and the shadow is what says it floats rather than being painted
- * on. Neither fact depends on scroll, so nothing here is scroll-driven
- * any more — no listener, no rAF guard, no scrolled-state attribute.
+ *    White is the surface every card on the page already uses, so the
+ *    header reads as the topmost of them; the shadow is what says it
+ *    floats over the ground rather than being painted onto it. Neither
+ *    fact depends on scroll position, so neither is animated any more,
+ *    which takes the scroll listener, the rAF guard and the scrolled-
+ *    state attribute out of this component entirely.
  *
- * Requires the page to give its <main> `id="main"` for the skip link.
+ * The drawer's state machine, focus handling and skip link are COPIED
+ * UNCHANGED from Header.astro — this component keeps the exact same
+ * contract (`data-nav-open` on <html>, `aria-controls="site-nav"`,
+ * `nav:close`), so the shipped SideNav.astro works with it as-is and is
+ * what should be rendered alongside it.
+ *
+ * THE NAV NOW LEAVES THE PAGE. Its six entries used to be same-page
+ * anchors; each one is a route of its own now (site.ts), which is what
+ * makes this bar the thing that holds the site together rather than a
+ * table of contents for one document. Two consequences here:
+ *
+ *   - the current entry is marked, with `aria-current="page"` and with
+ *     its underline drawn at rest instead of on hover. The underline
+ *     was already the bar's hover affordance, so "you are here" is that
+ *     same mark held down — nothing new to learn, and it can't be
+ *     confused with the CTA the way a filled pill could.
+ *   - the lockup links to `homeHref` rather than a literal `/`, so
+ *     site.ts owns where home is and this component doesn't.
  */
-import Logo from './Logo.astro';
 import Button from '../ui/Button.astro';
+import Logo from './Logo.astro';
 import WhatsappIcon from '../../assets/icons/whatsapp.svg';
-import { hasWhatsapp, whatsappHref } from '../../data/site';
+import { hasWhatsapp, homeHref, siteConfig, whatsappHref } from '../../data/site';
 
-/**
- * While `contact.phone` is a TODO the CTA scrolls to the contact
- * section instead, so the label has to follow the destination — a
- * button reading "וואטסאפ" that doesn't open WhatsApp is a lie.
- */
 const ctaLabel = hasWhatsapp ? 'וואטסאפ' : 'צרו קשר';
 const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+
+/* Same comparison Nav.astro makes for the drawer, for the same reason —
+   Astro serves these as directories, so the pathname carries a trailing
+   slash the href in site.ts doesn't have. */
+const trim = (path: string) => path.replace(/\/+$/, '');
+const here = trim(Astro.url.pathname);
 ---
 
 <a
@@ -63,13 +101,36 @@ const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } 
   <div
     class="flex h-header items-center justify-between gap-4 px-gutter lg:h-header-lg lg:px-gutter-lg"
   >
-    <Logo class="h-18 lg:h-22" />
+    <Logo class="h-14 lg:h-16" href={homeHref} variant="mark" />
 
-    <!--
-      CTA first, trigger second — under dir=rtl that puts the trigger at
-      the inline end, i.e. outboard at the far left edge of the bar, with
-      the CTA inboard of it.
-    -->
+    <!-- Inline nav, 2xl and up. Plain row: the page is dir=rtl, so the
+         links already run right-to-left in the order they're written. -->
+    <nav aria-label="ניווט ראשי" class="hidden 2xl:block">
+      <ul class="flex items-center gap-1">
+        {
+          siteConfig.nav.map((item) => {
+            const current = trim(item.href) === here;
+            return (
+              <li>
+                <a
+                  href={item.href}
+                  aria-current={current ? 'page' : undefined}
+                  class:list={[
+                    'nav-link rounded-pill px-3 py-2 text-base font-medium whitespace-nowrap transition-colors duration-[var(--duration-fast)] hover:text-ink-900',
+                    current ? 'text-ink-900' : 'text-ink-700',
+                  ]}
+                >
+                  {item.label}
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </nav>
+
+    <!-- CTA first, trigger second — under dir=rtl that leaves the
+         trigger outboard at the bar's far left edge. -->
     <div class="flex items-center gap-2 sm:gap-3">
       <Button
         href={whatsappHref()}
@@ -79,20 +140,17 @@ const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } 
         {...external}
       >
         <WhatsappIcon class="h-4 w-4 max-sm:h-5 max-sm:w-5" aria-hidden="true" />
-        {/*
-          `sr-only`, not `hidden`: below `sm` the button is icon-only, but
-          the label still has to reach the accessibility tree or the CTA
-          becomes a nameless button for screen-reader users.
-        */}
         <span class="sr-only sm:not-sr-only">{ctaLabel}</span>
       </Button>
 
+      <!-- Drawer trigger. Hidden once the inline nav appears — leaving
+           both would give the same links two entry points. -->
       <button
         type="button"
         data-nav-toggle
         aria-controls="site-nav"
         aria-expanded="false"
-        class="inline-flex h-10 w-10 items-center justify-center rounded-control text-ink-800 transition-colors duration-[var(--duration-fast)] hover:bg-paper-200"
+        class="inline-flex h-10 w-10 items-center justify-center rounded-pill text-ink-800 ring-1 ring-ink-900/10 transition-colors duration-[var(--duration-fast)] hover:bg-paper-100 2xl:hidden"
       >
         <span class="sr-only">תפריט</span>
         <span class="toggle-bars" aria-hidden="true">
@@ -104,21 +162,46 @@ const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } 
 </header>
 
 <style>
-  /* The header used to drop its shadow while the drawer was open: both
-     were `paper-100`, so a shadow across the join broke up what was
-     meant to read as one continuous surface. A white header above a
-     `paper-100` drawer is two surfaces, and the shadow between them is
-     the truth rather than a seam — so that override is gone. */
+  /* Underline that grows from the inline start, instead of a background
+     pill — a pill per link would put eight competing surfaces in a bar
+     that already has a filled CTA in it. */
+  .nav-link {
+    position: relative;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    inset-block-end: 0.35rem;
+    inset-inline: 0.75rem;
+    height: 2px;
+    border-radius: var(--radius-pill);
+    background: var(--color-teal-700);
+    transform: scaleX(0);
+    transform-origin: var(--nav-underline-origin, left);
+    transition: transform var(--duration-base) var(--ease-standard);
+  }
+  :global([dir='rtl']) .nav-link::after {
+    --nav-underline-origin: right;
+  }
+  .nav-link:hover::after,
+  .nav-link:focus-visible::after,
+  /* The current page's underline is simply the hover state left on. */
+  .nav-link[aria-current='page']::after {
+    transform: scaleX(1);
+  }
 
-  /* Three bars that fold into an X. Bars are 2px on a 4px gap, so their
-     centers sit 6px apart — hence the 6px translate to collapse the
-     outer two onto the middle before rotating. */
+  /* The header used to drop its shadow while the drawer was open:
+     both were `teal-100`, so a shadow across the join broke up what
+     was meant to read as one continuous surface. That reasoning died
+     with the tinted bar — a white header above a `paper-100` drawer is
+     two surfaces, and the shadow between them is the truth rather than
+     a seam. Hence no nav-open override here at all now. */
+
   .toggle-bars {
     display: grid;
     gap: 4px;
     width: 1.25rem;
   }
-
   .toggle-bars > span {
     display: block;
     height: 2px;
@@ -128,8 +211,6 @@ const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } 
       transform var(--duration-base) var(--ease-standard),
       opacity var(--duration-fast) var(--ease-standard);
   }
-
-  /* `data-nav-open` lives on <html>, outside this component's scope. */
   :global(html[data-nav-open]) .toggle-bars > span:nth-child(1) {
     transform: translateY(6px) rotate(45deg);
   }
@@ -142,13 +223,15 @@ const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } 
 </style>
 
 <script>
+  /* Copied verbatim from src/components/layout/Header.astro — the state
+     machine isn't what's under review here, only the bar's look. Same
+     contract, so the shipped SideNav.astro pairs with this unchanged. */
   const html = document.documentElement;
   const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
 
   function setNavOpen(open: boolean) {
     html.toggleAttribute('data-nav-open', open);
     toggle?.setAttribute('aria-expanded', String(open));
-    // Stop the page behind the drawer from scrolling under it.
     html.style.overflow = open ? 'hidden' : '';
   }
 
@@ -159,14 +242,8 @@ const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } 
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape' || !html.hasAttribute('data-nav-open')) return;
     setNavOpen(false);
-    // Never strand focus inside a panel that just closed.
     toggle?.focus();
   });
 
-  /* Anything that wants the drawer shut asks for it this way — SideNav
-     fires this when you tap a link or the overlay. Header stays the only
-     writer of `data-nav-open`, and neither component reaches into the
-     other's markup. */
   document.addEventListener('nav:close', () => setNavOpen(false));
-
 </script>

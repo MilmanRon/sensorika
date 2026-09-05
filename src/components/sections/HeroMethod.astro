@@ -1,9 +1,6 @@
 ---
 /**
- * PROPOSED (new — it replaces two shipped sections rather than
- * revising one, so no V2 suffix; see this folder's README).
- *
- * One section that does the job of Hero + Method together.
+ * One section that does the job of a hero and a method block together.
  *
  * The idea: a visitor shouldn't have to read a marketing preamble and
  * then scroll to find out what actually happens here. So the top of the
@@ -41,7 +38,7 @@
  *
  * Under it the method runs full width on a tinted panel.
  *
- * The panel is a CardV2 in the panel's own accent, the same surface the
+ * The panel is a Card in the panel's own accent, the same surface the
  * Programs cards use: white ground, hairline ring, shadow-card. It was a
  * flat tinted field, which made the method the one block on the page
  * that didn't share the card language. The section itself paints no
@@ -56,7 +53,7 @@
  * nav-item content pages, which have no CTA to compete with.
  *
  * DECORATION: this section draws none of its own. The panel carries
- * `petal={false}` — CardV2's corner blob was drawn for the Programs
+ * `petal={false}` — Card's corner blob was drawn for the Programs
  * cards, which are small and sit side by side; on a panel this size
  * it's a large shape competing with the heading, and the same shape
  * then repeats on every panel of every nav-item page built from this
@@ -67,9 +64,8 @@
  * and a second set of shapes in the one band they'd overlap read as
  * clutter. That's the rule these pages settled on, finally applied —
  * the ornament belongs to the PAGE and happens once. ProsePage dropped
- * its Decor for the same reason once the nav-item route picked up the
- * backdrop too; HeroV2 is the only thing still using Decor, and it has
- * no PageBackdrop under it
+ * its Decor for the same reason once the content route picked up the
+ * backdrop too, and with nothing left using it, Decor is gone.
  *
  * The panel spans the content width, but the copy inside it sits on
  * --width-prose. Four paragraphs set across a 72rem measure would run
@@ -91,14 +87,11 @@
  * down the page. The other editorial change is that the hero's supporting
  * paragraph ("מקום לילדים עם צרכים מיוחדים...") is dropped, because
  * the method's own lead says the same thing with more substance.
- *
- * Not wired into any page yet — it lives in the playground only, next
- * to the Hero and Method it would replace.
  */
 
 import { getEntry } from 'astro:content';
 
-import CardV2 from './CardV2.astro';
+import Card from '../ui/Card.astro';
 
 /*
  * All of the copy, from the one file that holds it. Thrown rather than
@@ -186,9 +179,9 @@ const rules = {
       >
     </div>
 
-    <!-- `sm:p-*` / `lg:p-*` rather than a bare `p-*`: CardV2's base sets
+    <!-- `sm:p-*` / `lg:p-*` rather than a bare `p-*`: Card's base sets
          `p-8`, and only a variant utility reliably overrides it. -->
-    <CardV2 accent={accent} petal={false} class="sm:p-12 lg:p-16">
+    <Card accent={accent} petal={false} class="sm:p-12 lg:p-16">
       <div class="mx-auto max-w-[var(--width-prose)]">
         <!-- Tinted pill, not colored text: same reasoning as
              SectionHeading — a petal hue needs its own -100 tint under
@@ -226,7 +219,7 @@ const rules = {
           {closing}
         </p>
       </div>
-    </CardV2>
+    </Card>
   </div>
 </section>
 

@@ -1,0 +1,56 @@
+---
+/**
+ * The not-found page. Built like every other route — same backdrop, same
+ * chrome, same floor — because the most useful thing a wrong URL can do
+ * is put the reader back in the site rather than on a bare error screen:
+ * the header's nav is right there, and so is the way home.
+ *
+ * Cloudflare serves this for any unmatched path on a static deploy
+ * (`assets.not_found_handling: "404-page"` in wrangler.jsonc), so it has
+ * to be a real page and not a fragment.
+ */
+import Button from '../components/ui/Button.astro';
+import Footer from '../components/layout/Footer.astro';
+import Header from '../components/layout/Header.astro';
+import PageBackdrop from '../components/layout/PageBackdrop.astro';
+import SideNav from '../components/layout/SideNav.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { homeHref } from '../data/site';
+---
+
+<BaseLayout
+  title="הדף לא נמצא"
+  description="הדף שחיפשתם לא קיים. אפשר לחזור לעמוד הבית או לבחור מהתפריט."
+>
+  <PageBackdrop />
+  <Header />
+  <SideNav />
+
+  <main id="main">
+    <section class="py-section lg:py-section-lg">
+      <div
+        class="mx-auto flex max-w-[var(--width-content)] flex-col items-center px-gutter text-center lg:px-gutter-lg"
+      >
+        <p class="font-display text-6xl leading-heading font-bold text-teal-600 sm:text-7xl">404</p>
+
+        <h1
+          class="mt-6 font-display text-3xl leading-heading font-bold text-balance text-ink-900 sm:text-4xl"
+        >
+          הדף הזה לא נמצא
+        </h1>
+
+        <p
+          class="mt-5 max-w-[var(--width-prose)] text-lg leading-body text-pretty text-ink-700"
+        >
+          יכול להיות שהקישור השתנה או שנפלה טעות בכתובת. אפשר לחזור לעמוד הבית, או לבחור מה שחיפשתם מהתפריט למעלה.
+        </p>
+
+        <div class="mt-10">
+          <Button href={homeHref} variant="primary" size="lg" arrow>לעמוד הבית</Button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>

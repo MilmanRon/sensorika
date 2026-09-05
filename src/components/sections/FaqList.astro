@@ -1,7 +1,5 @@
 ---
 /**
- * PROPOSED (new — no current counterpart).
- *
  * The FAQ page's body: fifteen questions as a single card of
  * accordions, rather than as fifteen stacked ProsePanels.
  *
@@ -23,7 +21,7 @@
  * invented here. Their tint cycles through the four petal hues purely
  * so a long list has some rhythm down its inline start.
  */
-import CardV2 from './CardV2.astro';
+import Card from '../ui/Card.astro';
 
 interface Props {
   items: readonly { question: string; answer: string }[];
@@ -44,7 +42,7 @@ const badges = [
 
 <!-- No accent on the card and no corner petal: this is one long surface
      holding the whole list, not one of the accented panels. -->
-<CardV2 petal={false} class="p-2 sm:p-4 lg:p-6">
+<Card petal={false} class="p-2 sm:p-4 lg:p-6">
   <div class="divide-y divide-ink-900/10">
     {
       items.map((item, i) => (
@@ -91,7 +89,7 @@ const badges = [
       ))
     }
   </div>
-</CardV2>
+</Card>
 
 <style>
   /* `list-none` covers Firefox; WebKit needs its own pseudo-element

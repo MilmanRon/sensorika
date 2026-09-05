@@ -24,7 +24,7 @@ panels:
 
 <!--
   The home page's brand lockup and method copy, verbatim — it was
-  previously inlined in _proposed/HeroMethod.astro, which had it verbatim
+  previously inlined in sections/HeroMethod.astro, which had it verbatim
   from Hero.astro and Method.astro before that.
 
   `title` is the page's name inside the collection, not an h1: the home

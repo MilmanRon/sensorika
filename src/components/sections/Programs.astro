@@ -1,75 +1,160 @@
 ---
 /**
- * "התוכניות שלנו" — the two ways a family can work with the clinic,
- * side by side as a pair of cards.
+ * The two tracks, as a chooser. What it does, and why:
  *
- * Two columns from `md` up, stacked below. The cards are equal in
- * weight on purpose: neither track is the "real" one, they're two
- * entry points, so they get the same size, the same CTA, and differ
- * only in the petal hue of their accent bar. The bars are ornament, not
- * a signal — both cards carry the same CTA in the same teal.
+ * 1. Each card gets an icon tile in its accent hue. Two white
+ *    rectangles differing only in the color of a 4px rule on one edge
+ *    are identical at a glance, which is the opposite of what a
+ *    two-option chooser should do.
+ * 2. The card is the target, not just the button inside it. Hover lifts
+ *    the whole card and brightens its ring (Card `interactive`), and
+ *    the CTA is a ghost link with an arrow rather than a second
+ *    bordered control competing with the hero's.
+ * 3. A section heading with an eyebrow and a lead, like every other
+ *    section on the site.
+ * 4. A closing contact band. The page's whole job is to produce a
+ *    WhatsApp message, so the last thing on it asks for that action
+ *    once, at full size.
  *
- * Each card's body is deliberately short — enough to tell the two apart
- * and answer "is this the one for us?", with the detail living behind
- * the CTA rather than in the card.
+ * COPY NOTE: the two card titles and bodies are the clinic's, verbatim.
+ * The heading ("שתי דרכים להתחיל"), the lead, and the contact band's
+ * copy are NEW COPY still awaiting sign-off.
  */
-import Card from '../ui/Card.astro';
 import Button from '../ui/Button.astro';
+import Card from '../ui/Card.astro';
+import Icon from '../ui/Icon.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { hasWhatsapp, pagesBase, whatsappHref } from '../../data/site';
 
 /**
- * `href` is a placeholder: there's no per-program page or section yet,
- * so both CTAs land on contact. Point each at its own target once it
- * exists — TODO.
+ * `href` per card. NEITHER CARD POINTS AT ITS NAV PAGE. Both tracks have
+ * a second, off-menu destination — the thing a parent needs once they've
+ * chosen that track — and the card is where they've just chosen it:
+ *
+ *   group      → src/content/pages/group-forms.md, the two registration
+ *                forms and the terms that come with them.
+ *   individual → src/content/pages/individual-packages.md, the four
+ *                packages with their prices and the payment /
+ *                interruption / cancellation rules.
+ *
+ * The nav's "פעילות קבוצתית" and "אבחון וטיפול פרטני" still go to
+ * groups.md and individual.md, which explain the two tracks; these two
+ * pages are what follows the explanation. Both hrefs are built off
+ * `pagesBase` like every other page link, so they move with the site
+ * when the prototype is promoted.
+ *
+ * `cta` overrides the default "לפרטים נוספים" on both, since neither
+ * destination is "more about this program" — a card that lands a parent
+ * on forms or on a price list should say which. NEW COPY — still
+ * awaiting sign-off with the rest.
  */
 const programs = [
   {
     title: 'אבחון וטיפול פרטניים',
     body: 'מפגש אחד-על-אחד שמתחיל בהיכרות ובאבחון חושי-תפקודי, וממשיך בתוכנית טיפול שנבנית סביב הילד הזה — הקצב שלו, החוזקות שלו ומה שקשה לו.',
     accent: 'coral',
-    href: '#contact',
+    icon: 'user',
+    href: `${pagesBase}/individual-packages`,
+    cta: 'למסגרות, למחירים ולתנאים',
   },
   {
     title: 'פעילויות קבוצתיות התפתחותיות',
     body: 'קבוצות קטנות לפי גיל ורמה, שבהן ילדים מתנסים בתנועה, במשחק ובשיתוף פעולה — ולומדים יחד, בקבוצה, את מה שקשה להם לבד.',
     accent: 'teal',
-    href: '#contact',
+    icon: 'users',
+    href: `${pagesBase}/group-forms`,
+    cta: 'לטפסים ולתנאי ההשתתפות',
   },
 ] as const;
+
+/* A petal each, so the two tracks are told apart by color while their
+   CTAs stay identical — the hue is ornament, not a ranking. */
+const tiles = {
+  coral: 'bg-coral-100 text-coral-800',
+  teal: 'bg-teal-100 text-teal-800',
+};
+
+/* Same guard the header uses: while `contact.phone` is a TODO the CTA
+   scrolls to the contact section, so the label has to follow it. */
+const ctaLabel = hasWhatsapp ? 'שלחו הודעה בוואטסאפ' : 'צרו קשר';
+const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 ---
 
-<!--
-  The one tinted band on the page. Sections alternate white / teal-50 so
-  the eye gets a break between blocks without any of them turning into a
-  colored panel; the cards stay bg-white, which is what lifts them off
-  the tint.
--->
-<section id="programs" class="bg-teal-50 py-section lg:py-section-lg">
+<section id="programs" class="py-section lg:py-section-lg">
   <div class="mx-auto max-w-[var(--width-content)] px-gutter lg:px-gutter-lg">
-    <h2 class="font-display text-3xl leading-heading font-bold text-ink-900 sm:text-4xl">
-      התוכניות שלנו
-    </h2>
+    <SectionHeading
+      eyebrow="התוכניות שלנו"
+      accent="teal"
+      lead="שתי נקודות כניסה שוות ערך — פרטני או קבוצתי. אפשר להתחיל מכל אחת מהן, ואפשר גם לשלב."
+    >
+      שתי דרכים להתחיל
+    </SectionHeading>
 
-    <div class="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8">
+    <div class="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8">
       {
         programs.map((program) => (
-          /*
-           * `h-full` + column flex so both cards match the taller one's
-           * height and their buttons still line up: `mt-auto` pushes the
-           * CTA to the bottom regardless of how long the body runs.
-           */
-          <Card accent={program.accent} class="flex h-full flex-col">
-            <h3 class="font-display text-xl leading-heading font-semibold text-ink-900 sm:text-2xl">
+          <Card accent={program.accent} interactive class="flex h-full flex-col">
+            <span
+              class:list={[
+                'flex h-14 w-14 items-center justify-center rounded-card',
+                tiles[program.accent],
+              ]}
+            >
+              <Icon name={program.icon} class="h-7 w-7" />
+            </span>
+
+            <h3 class="mt-6 font-display text-xl leading-heading font-semibold text-ink-900 sm:text-2xl">
               {program.title}
             </h3>
-            <p class="mt-4 leading-body text-ink-700">{program.body}</p>
-            <div class="mt-auto pt-8">
-              <Button href={program.href} variant="secondary">
-                לפרטים נוספים
+            <p class="mt-4 leading-body text-pretty text-ink-700">{program.body}</p>
+
+            {/* `-ms-4` pulls the ghost button's own padding back so its
+                label still aligns with the card's text column. */}
+            <div class="mt-auto -ms-4 pt-8">
+              <Button href={program.href} variant="ghost" arrow>
+                {'cta' in program ? program.cta : 'לפרטים נוספים'}
               </Button>
             </div>
           </Card>
         ))
       }
     </div>
+
+    <!--
+      Closing band. Deliberately the only place on the page besides the
+      header where the WhatsApp action appears at full size.
+    -->
+    <div
+      class="relative mt-12 overflow-hidden rounded-card bg-purple-50 p-8 ring-1 ring-purple-500/20 sm:p-10"
+    >
+      <span class="band-petal" aria-hidden="true"></span>
+      <div
+        class="relative flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div>
+          <p class="font-display text-2xl leading-heading font-bold text-balance text-ink-900">
+            לא בטוחים איזו מסגרת מתאימה?
+          </p>
+          <p class="mt-2 max-w-xl leading-body text-pretty text-ink-700">
+            כתבו לי מה קורה אצלכם בבית, ונחשוב יחד מאיפה נכון להתחיל.
+          </p>
+        </div>
+        <Button href={whatsappHref()} variant="primary" size="lg" arrow {...external}>
+          {ctaLabel}
+        </Button>
+      </div>
+    </div>
   </div>
 </section>
+
+<style>
+  .band-petal {
+    position: absolute;
+    inset-block-start: -6rem;
+    inset-inline-start: -4rem;
+    width: 18rem;
+    height: 18rem;
+    border-radius: var(--radius-blob-alt);
+    background: color-mix(in oklch, var(--color-purple-500) 14%, transparent);
+  }
+</style>
