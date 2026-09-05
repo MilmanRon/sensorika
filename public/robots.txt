@@ -5,3 +5,5 @@ Allow: /
 # The registration forms are linked from /group-forms and are meant to be
 # reachable; they're listed here only so the path is explicit.
 Allow: /forms/
+
+Sitemap: https://sensorika.co.il/sitemap-index.xml
