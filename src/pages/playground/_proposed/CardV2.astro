@@ -1,0 +1,97 @@
+---
+/**
+ * PROPOSED — copy of src/components/ui/Card.astro. What changed:
+ *
+ * 1. The accent moves from a 4px bar on the inline start to an icon
+ *    tile + a hairline ring in the same hue. The current bar reads as a
+ *    stray rule rather than as the card's identity, and it can't carry
+ *    a glyph — so a row of cards is distinguishable only by a colored
+ *    line most readers won't register.
+ * 2. A hover state, which the current card has none of. Every card in
+ *    both reference designs is a target; this one contains a CTA and
+ *    gives no feedback until you reach the button itself.
+ * 3. A large, very faint petal of the accent hue bleeding out of the
+ *    top corner, so a card is a *surface* with something on it rather
+ *    than a white rectangle. It's clipped by the card and sits behind
+ *    the content.
+ *
+ * The `accent` prop keeps its contract: a petal-hue name, never a raw
+ * color, so it can still only resolve to a token. Ring and corner wash
+ * are both ornament, which is why they may take a petal at all — the
+ * card's button stays teal like every other control on the site.
+ *
+ * The corner petal is opt-OUT (`petal={false}`) rather than opt-in, so
+ * every card that existed before this prop looks exactly as it did. It
+ * was drawn for a GRID of cards, where you see one or two at a time; in
+ * a tall stack of full-width panels the same shape at the same corner
+ * at the same size stops being a flourish and becomes a repeating tile.
+ * See ProsePanel, which turns it off for that reason.
+ */
+interface Props {
+  accent?: 'coral' | 'teal' | 'amber' | 'purple';
+  /** Adds hover lift + ring. Off for cards that aren't a target. */
+  interactive?: boolean;
+  /** Decorative corner wash. Turn off where cards stack and it repeats. */
+  petal?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  accent,
+  interactive = false,
+  petal = true,
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+/* Ring at rest / on hover, and the wash for the corner petal. One row
+   per hue so a lookup can never produce an untokenized value. */
+const accents = {
+  coral: 'ring-coral-500/25 hover:ring-coral-500/60 [--petal:var(--color-coral-50)]',
+  teal: 'ring-teal-500/25 hover:ring-teal-500/60 [--petal:var(--color-teal-50)]',
+  amber: 'ring-amber-500/25 hover:ring-amber-500/60 [--petal:var(--color-amber-50)]',
+  purple: 'ring-purple-500/25 hover:ring-purple-500/60 [--petal:var(--color-purple-50)]',
+};
+
+const base = 'card relative overflow-hidden rounded-card bg-white p-8 shadow-card ring-1';
+const ring = accent ? accents[accent] : 'ring-ink-900/10 [--petal:var(--color-teal-50)]';
+---
+
+<div
+  class:list={[base, ring, interactive && 'card-interactive', className]}
+  {...rest}
+>
+  {petal && <span class="petal" aria-hidden="true" />}
+  <div class="relative">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .card {
+    /* Tailwind v4 draws `ring-*` as a box-shadow, so one box-shadow
+       transition covers both the elevation and the ring's hue change. */
+    transition:
+      box-shadow var(--duration-base) var(--ease-standard),
+      transform var(--duration-base) var(--ease-standard);
+  }
+
+  .card-interactive:hover,
+  .card-interactive:focus-within {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lift);
+  }
+
+  /* Decorative wash, bled off the block-start inline-end corner. Sized
+     in rem off the card's own padding so it scales with the card. */
+  .petal {
+    position: absolute;
+    inset-block-start: -5rem;
+    inset-inline-end: -5rem;
+    width: 14rem;
+    height: 14rem;
+    border-radius: var(--radius-blob);
+    background: var(--petal);
+  }
+</style>

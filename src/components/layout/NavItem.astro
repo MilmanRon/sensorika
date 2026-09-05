@@ -1,19 +1,29 @@
 ---
 /**
- * One link inside Nav.astro. Always a single line — `whitespace-nowrap`,
- * not wrapping/truncating — so a long label just stays as wide as it
- * needs to be rather than breaking the nav's rhythm.
+ * One link inside Nav.astro.
+ *
+ * Defaults to a single line (`whitespace-nowrap`), which is what a
+ * horizontal bar needs — a long label there should widen, never wrap
+ * mid-row. A vertical rail is the opposite case: the column is a fixed
+ * 17rem and "אבחון וטיפול פרטניים" would overflow it, so Nav
+ * passes `whitespace-normal` in that orientation — along with a step up
+ * in size, since the drawer is the site's primary nav surface rather
+ * than a secondary bar.
  */
 interface Props {
   href: string;
+  class?: string;
 }
 
-const { href } = Astro.props;
+const { href, class: className = '' } = Astro.props;
 ---
 
 <a
   href={href}
-  class="block rounded-control bg-paper-100 px-5 py-3 text-sm leading-snug font-medium whitespace-nowrap text-ink-700 transition-colors duration-[var(--duration-fast)] hover:bg-white hover:text-ink-900 focus-visible:bg-white focus-visible:text-ink-900"
+  class:list={[
+    'block rounded-control bg-paper-100 px-5 py-3 text-base leading-snug font-medium whitespace-nowrap text-ink-700 transition-colors duration-[var(--duration-fast)] hover:bg-white hover:text-ink-900 focus-visible:bg-white focus-visible:text-ink-900',
+    className,
+  ]}
 >
   <slot />
 </a>

@@ -1,0 +1,160 @@
+---
+/**
+ * The site's primary navigation surface: an off-canvas drawer over the
+ * page, at every width. It's opened by Header's trigger and closed by
+ * tapping a link, the overlay, or Esc.
+ *
+ * There is deliberately no always-visible desktop rail. The nav is one
+ * behavior everywhere — hamburger, drawer, overlay — so wide screens
+ * give the content the full measure and the nav stays something you
+ * summon rather than something you navigate around. The drawer starts
+ * below the header and takes the header's own surface tone, so while
+ * it's open the two read as one continuous piece of chrome.
+ *
+ * Header owns the open/closed state, because Header owns the trigger.
+ * SideNav only *reads* it (in CSS, off `html[data-nav-open]`) and asks
+ * for a close by dispatching `nav:close` — it never writes the
+ * attribute or touches the header's DOM. That keeps one writer.
+ */
+import Nav from './Nav.astro';
+---
+
+<div class="overlay" data-nav-overlay aria-hidden="true"></div>
+
+<div id="site-nav" class="rail">
+  <div class="p-3">
+    <Nav orientation="vertical" />
+  </div>
+</div>
+
+<style>
+  /* Starts below the header rather than under it, so the header — and
+     with it the trigger, now showing an X — stays reachable while the
+     drawer is open. */
+  .rail {
+    position: fixed;
+    inset-inline-start: 0;
+    inset-block: var(--spacing-header) 0;
+    z-index: 40;
+    width: min(var(--spacing-rail), 82vw);
+    overflow-y: auto;
+    /* One step deeper than the page (paper-50), and the same surface the
+       header takes when it isn't flat — so the two read as one piece of
+       chrome rather than two panels that happen to touch. This tone is
+       what separates the rail from the page; it doesn't need a stroke to
+       do it, which is why there's no border anywhere below. */
+    background: var(--color-paper-100);
+    box-shadow: var(--shadow-elevated);
+    /* `visibility` does double duty: it animates, and it pulls the
+       closed drawer's links out of the tab order — otherwise keyboard
+       users would tab into an off-screen panel. */
+    visibility: hidden;
+    transform: translateX(-100%);
+    transition:
+      transform var(--duration-base) var(--ease-standard),
+      visibility var(--duration-base) var(--ease-standard);
+  }
+
+  /* Inline start is the right under RTL, so the drawer has to leave in
+     the opposite direction. `transform` has no logical equivalent. */
+  :global([dir='rtl']) .rail {
+    transform: translateX(100%);
+  }
+
+  /* Listed after both rest states so it wins on source order. Media
+     queries add no specificity, so a base `[dir=rtl] .rail` (0,3,0)
+     would outrank a plain `.rail` (0,2,0) — hence the extra
+     `html[data-nav-open]` here rather than a bare class. */
+  :global(html[data-nav-open]) .rail {
+    visibility: visible;
+    transform: translateX(0);
+  }
+
+  .overlay {
+    position: fixed;
+    /* Stops at the header for the same reason the drawer does: the
+       header stays live while the drawer is open, and scrimming a
+       transparent header just makes the scrim show through it. */
+    inset-block: var(--spacing-header) 0;
+    inset-inline: 0;
+    z-index: 30;
+    background: color-mix(in oklch, var(--color-ink-900) 45%, transparent);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity var(--duration-base) var(--ease-standard),
+      visibility var(--duration-base) var(--ease-standard);
+  }
+
+  :global(html[data-nav-open]) .overlay {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* The header is taller from lg up, so both panels start lower. */
+  @media (width >= 64rem) {
+    .rail,
+    .overlay {
+      inset-block: var(--spacing-header-lg) 0;
+    }
+  }
+</style>
+
+<script>
+  const html = document.documentElement;
+  const panel = document.getElementById('site-nav');
+  const overlay = document.querySelector<HTMLElement>('[data-nav-overlay]');
+  const toggle = document.querySelector<HTMLElement>('[data-nav-toggle]');
+
+  /* Ask Header to close rather than writing `data-nav-open` here — one
+     writer for the state, however many components request a change. */
+  const requestClose = () => document.dispatchEvent(new CustomEvent('nav:close'));
+
+  overlay?.addEventListener('click', requestClose);
+
+  /* One-page site: nav links are same-page anchors, so nothing unmounts
+     and nothing else would ever close the drawer behind them. */
+  panel?.addEventListener('click', (event) => {
+    if ((event.target as HTMLElement).closest('a')) requestClose();
+  });
+
+  /* ---- focus management ---------------------------------------------
+     The drawer is a panel over the page at every width, so the focus
+     trap applies at every width too. */
+  const FOCUSABLE = 'a[href], button:not([disabled])';
+
+  function drawerStops(): HTMLElement[] {
+    /* The trigger is in the header, outside the panel, but it's the X
+       that closes the drawer — leaving it out of the cycle would make
+       the close button unreachable by keyboard. */
+    const links = Array.from(panel?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? []);
+    return toggle ? [toggle, ...links] : links;
+  }
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Tab') return;
+    if (!html.hasAttribute('data-nav-open')) return;
+
+    const stops = drawerStops();
+    if (stops.length === 0) return;
+
+    const first = stops[0];
+    const last = stops[stops.length - 1];
+    const active = document.activeElement;
+
+    if (event.shiftKey && active === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && active === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  /* Move focus into the drawer as it opens, so the next Tab continues
+     from the nav rather than from wherever the page had left it. */
+  new MutationObserver(() => {
+    if (!html.hasAttribute('data-nav-open')) return;
+    panel?.querySelector<HTMLElement>(FOCUSABLE)?.focus();
+  }).observe(html, { attributeFilter: ['data-nav-open'] });
+</script>

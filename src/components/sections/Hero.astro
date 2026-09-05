@@ -1,0 +1,66 @@
+---
+/**
+ * Homepage hero: copy + CTAs on one side, portrait on the other.
+ * Columns aren't equal width — the image is a portrait crop, so it
+ * needs less horizontal space than the text block.
+ */
+import { Image } from 'astro:assets';
+import Button from '../ui/Button.astro';
+import heroPortrait from '../../assets/hero/hero-portrait.png';
+---
+
+<section class="relative overflow-hidden py-section">
+  <div class="hero-pattern pointer-events-none absolute inset-0" aria-hidden="true"></div>
+
+  <div
+    class="relative mx-auto grid max-w-[var(--width-content)] grid-cols-1 items-center gap-10 px-gutter lg:grid-cols-[3fr_2fr] lg:gap-16 lg:px-gutter-lg"
+  >
+    <div class="flex flex-col gap-6">
+      <h1 class="font-display text-4xl leading-heading font-bold text-ink-900 sm:text-5xl">
+        ברוכים הבאים ל-Sensorika
+      </h1>
+      <p class="max-w-md text-lg leading-body text-ink-700">
+        מקום לילדים עם צרכים מיוחדים לשחק, להתנסות ולגדול - חוג שבועי לפי
+        גיל ורמה, וספרייה של תוכן מקצועי להורים.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-4">
+        <Button href="#contact" variant="primary">צרו קשר</Button>
+        <Button href="#about" variant="secondary">קצת עליי</Button>
+      </div>
+    </div>
+
+    <div class="justify-self-center">
+      <Image
+        src={heroPortrait}
+        alt="TODO: תיאור נגיש לתמונה"
+        width={640}
+        class="w-full max-w-sm rounded-card"
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  /*
+   * Decorative dot grid, four petal hues offset into a checker. Set at
+   * the -300 tints rather than the -500 bases: at 1.5px on white the
+   * full-strength petals read as speckle, and the point is a soft
+   * colored ground, not confetti. Faded out over the text column
+   * (right, in RTL) so it stays a background texture near the image and
+   * never fights legibility.
+   *
+   * Four offset passes on the same 28px cell, each a quarter-step
+   * along, so the hues rotate rather than pairing up into a checker.
+   */
+  .hero-pattern {
+    background-image:
+      radial-gradient(circle, var(--color-coral-300) 1.5px, transparent 1.5px),
+      radial-gradient(circle, var(--color-teal-300) 1.5px, transparent 1.5px),
+      radial-gradient(circle, var(--color-amber-300) 1.5px, transparent 1.5px),
+      radial-gradient(circle, var(--color-purple-300) 1.5px, transparent 1.5px);
+    background-size: 28px 28px;
+    background-position: 0 0, 14px 14px, 14px 0, 0 14px;
+    mask-image: linear-gradient(to right, black, transparent 65%);
+    -webkit-mask-image: linear-gradient(to right, black, transparent 65%);
+  }
+</style>

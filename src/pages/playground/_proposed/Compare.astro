@@ -1,0 +1,43 @@
+---
+/**
+ * Playground-only wrapper that labels one half of a current/proposed
+ * pair and lists what changed, so the two can be read against each
+ * other without cross-referencing the component's own comments.
+ */
+interface Props {
+  /** `current` renders the shipped component, `proposed` the copy. */
+  side: 'current' | 'proposed';
+  /** Bullet list of what changed. Only meaningful on the proposed side. */
+  notes?: string[];
+}
+
+const { side, notes = [] } = Astro.props;
+
+const label = side === 'current' ? 'Current — נשלח כמו שהוא' : 'Proposed — הצעה לשיפור';
+const chip =
+  side === 'current'
+    ? 'bg-ink-100 text-ink-700'
+    : 'bg-teal-100 text-teal-800';
+---
+
+<section class="flex flex-col gap-3">
+  <div class="flex flex-wrap items-center gap-3">
+    <span class:list={['rounded-pill px-3 py-1 font-display text-xs font-semibold', chip]}>
+      {label}
+    </span>
+  </div>
+
+  {
+    notes.length > 0 && (
+      <ul class="flex list-disc flex-col gap-1.5 ps-5 text-sm text-ink-600">
+        {notes.map((note) => (
+          <li set:html={note} />
+        ))}
+      </ul>
+    )
+  }
+
+  <div class="overflow-hidden rounded-card ring-1 ring-ink-900/10">
+    <slot />
+  </div>
+</section>

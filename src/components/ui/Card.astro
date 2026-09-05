@@ -1,0 +1,38 @@
+---
+/**
+ * Generic surface primitive: a padded, rounded panel that lifts content
+ * off the page background. Content-agnostic — whatever goes inside is
+ * the caller's business.
+ *
+ * `accent` paints a bar along the card's inline start. It's the one bit
+ * of brand color a card carries, so a row of cards can be told apart at
+ * a glance without each one inventing its own treatment.
+ *
+ * The bar is ornament, so it's a petal hue rather than the working
+ * teal — this is one of the places the logo's other three colors are
+ * allowed to show. It never carries text, so the -500 bases are fine
+ * here. The value is a petal-hue name, not a raw color, so it can only
+ * ever resolve to a token.
+ */
+interface Props {
+  /** Petal hue for the inline-start accent bar. Omit for no accent. */
+  accent?: 'coral' | 'teal' | 'amber' | 'purple';
+  class?: string;
+  [key: string]: unknown;
+}
+
+const { accent, class: className = '', ...rest } = Astro.props;
+
+const accents = {
+  coral: 'border-s-4 border-s-coral-500',
+  teal: 'border-s-4 border-s-teal-500',
+  amber: 'border-s-4 border-s-amber-500',
+  purple: 'border-s-4 border-s-purple-500',
+};
+
+const base = 'rounded-card bg-white p-8 shadow-card';
+---
+
+<div class={`${base} ${accent ? accents[accent] : ''} ${className}`} {...rest}>
+  <slot />
+</div>

@@ -1,0 +1,67 @@
+---
+/**
+ * PROPOSED (new — no current counterpart).
+ *
+ * A tiny inline icon set. Neither the current sections nor the current
+ * cards use any iconography, which is a large part of why the page reads
+ * as an undifferentiated wall of text: there is no non-textual way to
+ * tell one program, one benefit or one symptom from another.
+ *
+ * Inline rather than files in `assets/icons/` on purpose — these are
+ * 24px stroke glyphs that must inherit `currentColor` and the caller's
+ * stroke weight. Fold them into assets/icons/ + astro:assets if the
+ * direction is accepted and the set grows past a handful.
+ */
+interface Props {
+  name:
+    | 'arrow'
+    | 'check'
+    | 'user'
+    | 'users'
+    | 'clipboard'
+    | 'sparkle'
+    | 'quote'
+    | 'menu';
+  class?: string;
+}
+
+const { name, class: className = 'h-5 w-5' } = Astro.props;
+
+/* 24x24, stroke-only, round joins — matches the logo's soft geometry. */
+const paths: Record<Props['name'], string> = {
+  arrow: '<path d="M4 12h15m0 0-6-6m6 6-6 6"/>',
+  check: '<path d="m5 13 4 4 10-10"/>',
+  user: '<circle cx="12" cy="8" r="3.5"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/>',
+  users:
+    '<circle cx="9" cy="8.5" r="3"/><path d="M3 19.5a6 6 0 0 1 12 0"/><path d="M16 6.2a3 3 0 0 1 0 5.6"/><path d="M17.5 15.2a6 6 0 0 1 3.5 4.3"/>',
+  clipboard:
+    '<path d="M9 4.5h6v2H9z"/><path d="M9 5.5H7.5A1.5 1.5 0 0 0 6 7v12a1.5 1.5 0 0 0 1.5 1.5h9A1.5 1.5 0 0 0 18 19V7a1.5 1.5 0 0 0-1.5-1.5H15"/><path d="m9.5 13 2 2 3.5-4"/>',
+  sparkle:
+    '<path d="M12 3.5c.9 4 2.6 5.7 6.5 6.5-3.9.8-5.6 2.5-6.5 6.5-.9-4-2.6-5.7-6.5-6.5 3.9-.8 5.6-2.5 6.5-6.5Z"/><path d="M17.5 16.5c.4 1.8 1.2 2.6 3 3-1.8.4-2.6 1.2-3 3-.4-1.8-1.2-2.6-3-3 1.8-.4 2.6-1.2 3-3Z"/>',
+  quote:
+    '<path d="M9.5 6.5C6.9 7.9 5.5 10.1 5.5 13v4.5h5V13H8c0-1.9.7-3.3 2.4-4.3ZM19 6.5c-2.6 1.4-4 3.6-4 6.5v4.5h5V13h-2.5c0-1.9.7-3.3 2.4-4.3Z"/>',
+  menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+};
+
+/* `arrow` points in the reading direction, so it has to flip under RTL —
+   it's the one glyph in the set that carries direction. */
+const directional = name === 'arrow';
+---
+
+<svg
+  class:list={[className, directional && 'icon-directional']}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.75"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  set:html={paths[name]}
+/>
+
+<style>
+  :global([dir='rtl']) .icon-directional {
+    transform: scaleX(-1);
+  }
+</style>

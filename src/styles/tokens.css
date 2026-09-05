@@ -9,12 +9,29 @@
  * generated from here before writing a one-off value. If a value is
  * needed twice, it belongs in this file, not in a component.
  *
- * Palette source: the logo (src/assets/brand/logo.svg) and the brand
- * colors given directly — #74B7A5 (teal), #FBBE3E (amber), #EC6E59
- * (coral), #AF98D7 (purple), plus the logo wordmark's navy (#243C5A).
- * Every shade below is derived from exactly one of those five values
- * via color-mix(), so the whole palette traces back to one real
- * source per hue instead of hand-picked approximations.
+ * Palette: the site is teal-run and petal-decorated.
+ *
+ * The logo has four petal colors — #74B7A5 (teal), #FBBE3E (amber),
+ * #EC6E59 (coral), #AF98D7 (purple) — plus the wordmark navy (#243C5A).
+ * They do two different jobs, and keeping the jobs apart is the whole
+ * design:
+ *
+ *   TEAL IS THE WORKING ACCENT. Buttons, the CTA, links, active states,
+ *   focus, and the tinted section surfaces. One hue does all the UI, so
+ *   the page never asks the reader which color means "press me".
+ *
+ *   THE PETALS ARE ORNAMENT. The circles and petal shapes in the
+ *   background, the dot grids, a card's accent bar and corner wash, the
+ *   small pills that name a section. This is what makes the page feel
+ *   like the logo instead of like one tinted template.
+ *
+ *   INK IS TYPE. The wordmark navy carries body copy and headings.
+ *
+ * The page itself is white; nothing tints it edge to edge.
+ *
+ * Every shade is a color-mix() off one of those five real values, so
+ * the palette traces back to a source color rather than hand-picked
+ * approximations.
  */
 
 @theme {
@@ -34,50 +51,109 @@
   --color-ink-50: color-mix(in oklch, var(--color-ink-900) 3%, white);
 
   /* ---------------------------------------------------------------- */
-  /* Color — paper: warm cream surfaces (the nav-pill background,     */
-  /* section backgrounds), tinted from the coral petal                */
+  /* Color — teal: the site's ONE accent hue.                         */
+  /*                                                                  */
+  /* Every step is a color-mix() off the single logo value (#74B7A5):  */
+  /* lighter steps toward white for surfaces and section bands, darker */
+  /* steps toward black for anything that carries or is text.          */
+  /*                                                                  */
+  /* What each step is for:                                            */
+  /*   50/100/200  section bands and chrome surfaces (see paper-*)     */
+  /*   300/400     dividers, decorative fills, dot patterns            */
+  /*   500         the exact logo value — DECORATION ONLY. It is       */
+  /*               2.32:1 on white, so it never carries or is text.    */
+  /*   600         quiet fills, icon glyphs sitting on a light band    */
+  /*   700         the working accent — buttons, links, active nav.    */
+  /*               5.92:1 both ways against white, so it can be the    */
+  /*               fill under white text *and* text on white.          */
+  /*   800/900     the hover/active step above 700, accent headings    */
   /* ---------------------------------------------------------------- */
-  --color-paper-50: color-mix(in oklch, var(--color-coral-500) 2%, white);
-  --color-paper-100: color-mix(in oklch, var(--color-coral-500) 7%, white);
-  --color-paper-200: color-mix(in oklch, var(--color-coral-500) 13%, white);
-  --color-paper-300: color-mix(in oklch, var(--color-coral-500) 20%, white);
+  --color-teal-500: #74b7a5; /* exact logo petal */
+  --color-teal-50: color-mix(in oklch, var(--color-teal-500) 5%, white);
+  --color-teal-100: color-mix(in oklch, var(--color-teal-500) 12%, white);
+  --color-teal-200: color-mix(in oklch, var(--color-teal-500) 22%, white);
+  --color-teal-300: color-mix(in oklch, var(--color-teal-500) 40%, white);
+  --color-teal-400: color-mix(in oklch, var(--color-teal-500) 68%, white);
+  --color-teal-600: color-mix(in oklch, var(--color-teal-500) 84%, black);
+  --color-teal-700: color-mix(in oklch, var(--color-teal-500) 68%, black);
+  --color-teal-800: color-mix(in oklch, var(--color-teal-500) 54%, black);
+  --color-teal-900: color-mix(in oklch, var(--color-teal-500) 42%, black);
 
   /* ---------------------------------------------------------------- */
-  /* Color — petals: the four brand accent hues from the logo.        */
-  /* Used for CTAs, section theming, and small decorative moments —   */
-  /* not full UI ramps, so each only gets a tint/base/shade.          */
+  /* Color — paper: role names for the surfaces the chrome sits on.    */
+  /*                                                                  */
+  /* These are the teal tints under a second name, not a second ramp:  */
+  /* `paper-*` says "a surface", `teal-*` says "the accent hue". The   */
+  /* page itself is plain white; paper-* is what lifts a band, a nav   */
+  /* pill or the drawer off it.                                        */
   /* ---------------------------------------------------------------- */
-  --color-coral-500: #ec6e59;
-  --color-coral-100: color-mix(in oklch, var(--color-coral-500) 25%, white);
-  --color-coral-700: color-mix(in oklch, var(--color-coral-500) 78%, black);
-
-  --color-purple-500: #af98d7;
-  --color-purple-100: color-mix(in oklch, var(--color-purple-500) 25%, white);
-  --color-purple-700: color-mix(in oklch, var(--color-purple-500) 78%, black);
-
-  --color-teal-500: #74b7a5;
-  --color-teal-100: color-mix(in oklch, var(--color-teal-500) 25%, white);
-  --color-teal-700: color-mix(in oklch, var(--color-teal-500) 78%, black);
-
-  --color-amber-500: #fbbe3e;
-  --color-amber-100: color-mix(in oklch, var(--color-amber-500) 25%, white);
-  --color-amber-700: color-mix(in oklch, var(--color-amber-500) 78%, black);
+  --color-paper-50: var(--color-teal-50);
+  --color-paper-100: var(--color-teal-100);
+  --color-paper-200: var(--color-teal-200);
+  --color-paper-300: var(--color-teal-300);
 
   /* ---------------------------------------------------------------- */
-  /* Color — semantic (status, feedback, form validation)             */
-  /* Reuses petal hues instead of introducing unrelated colors.       */
+  /* Color — petals: the logo's other three hues. ORNAMENT, NOT UI.    */
+  /*                                                                  */
+  /* A petal may never be the fill under a button, a link color, or    */
+  /* the focus ring — those are teal's job, so that "colored" and      */
+  /* "clickable" never get confused. What a petal is for: the light    */
+  /* circles behind a band, a dot grid, a card's accent bar and corner  */
+  /* wash, an icon tile, and the small pill that names a section.       */
+  /*                                                                  */
+  /* If a petal has to carry type it is ALWAYS the -800 step on its    */
+  /* own -100 tint — 5.1:1 or better for all three. The -500 bases are */
+  /* pastels (coral is 3.0:1 on white, amber 1.7:1) and can only ever  */
+  /* be a shape.                                                       */
+  /*                                                                  */
+  /*   50/100   pill tints, icon tiles, a whole section's wash          */
+  /*   200/300  the light circles and petal shapes in the background   */
+  /*   500      the exact logo values — ornament at full strength      */
+  /*   800      the only step that may carry text, on its own tint     */
+  /* ---------------------------------------------------------------- */
+  --color-coral-500: #ec6e59; /* exact logo petal */
+  --color-coral-50: color-mix(in oklch, var(--color-coral-500) 8%, white);
+  --color-coral-100: color-mix(in oklch, var(--color-coral-500) 20%, white);
+  --color-coral-200: color-mix(in oklch, var(--color-coral-500) 32%, white);
+  --color-coral-300: color-mix(in oklch, var(--color-coral-500) 48%, white);
+  --color-coral-800: color-mix(in oklch, var(--color-coral-500) 62%, black);
+
+  --color-amber-500: #fbbe3e; /* exact logo petal */
+  --color-amber-50: color-mix(in oklch, var(--color-amber-500) 8%, white);
+  --color-amber-100: color-mix(in oklch, var(--color-amber-500) 20%, white);
+  --color-amber-200: color-mix(in oklch, var(--color-amber-500) 32%, white);
+  --color-amber-300: color-mix(in oklch, var(--color-amber-500) 48%, white);
+  --color-amber-800: color-mix(in oklch, var(--color-amber-500) 62%, black);
+
+  --color-purple-500: #af98d7; /* exact logo petal */
+  --color-purple-50: color-mix(in oklch, var(--color-purple-500) 8%, white);
+  --color-purple-100: color-mix(in oklch, var(--color-purple-500) 20%, white);
+  --color-purple-200: color-mix(in oklch, var(--color-purple-500) 32%, white);
+  --color-purple-300: color-mix(in oklch, var(--color-purple-500) 48%, white);
+  --color-purple-800: color-mix(in oklch, var(--color-purple-500) 62%, black);
+
+  /* ---------------------------------------------------------------- */
+  /* Color — semantic (status, feedback, form validation)              */
+  /*                                                                  */
+  /* Success rides the accent. Danger and warning deliberately do not: */
+  /* a field error that reads as "the brand color" reads as nothing at */
+  /* all. They keep the logo's coral and amber so even the warning     */
+  /* states come from the mark — but they are functional signals, not  */
+  /* accents, and may only ever appear on validation/status UI.        */
   /* ---------------------------------------------------------------- */
   --color-success-500: var(--color-teal-500);
   --color-success-700: var(--color-teal-700);
   --color-warning-500: var(--color-amber-500);
-  --color-warning-700: var(--color-amber-700);
+  --color-warning-700: var(--color-amber-800);
   --color-danger-500: var(--color-coral-500);
-  --color-danger-700: var(--color-coral-700);
+  --color-danger-700: var(--color-coral-800);
 
   /* Accessible, high-contrast focus indicator — never remove outlines,
      only ever restyle them with this token (ring-focus / outline-focus).
-     Purple-700, not the pastel base, so it has real contrast on cream/white. */
-  --color-focus: var(--color-purple-700);
+     The wordmark navy, not the accent: the ring sits 2px *outside* its
+     control, so on a teal-700 button it would otherwise be a same-hue
+     halo. Navy is 11.24:1 on white and reads as a ring everywhere. */
+  --color-focus: var(--color-ink-900);
 
   /* ---------------------------------------------------------------- */
   /* Typography                                                        */
@@ -101,6 +177,18 @@
   --spacing-gutter-lg: 3rem;     /* page-edge horizontal padding, desktop */
   --spacing-section: 5rem;       /* vertical rhythm between page sections */
   --spacing-section-lg: 8rem;
+
+  /* Sticky-header height. A real token rather than a magic number
+     because anything that has to sit clear of the header needs the
+     same value: the side nav's top offset, scroll-margin on anchor
+     targets, the drawer's height. */
+  --spacing-header: 6rem;
+  --spacing-header-lg: 7rem;
+
+  /* Pinned side-nav width. Two things must agree on it and they live in
+     different components — the rail itself, and the inset SiteLayout
+     gives <main> so content doesn't run underneath. */
+  --spacing-rail: 17rem;
 
   /* ---------------------------------------------------------------- */
   /* Radius                                                            */

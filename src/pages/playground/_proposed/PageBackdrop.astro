@@ -1,0 +1,321 @@
+---
+/**
+ * PROPOSED (new — no current counterpart).
+ *
+ * The page's ground: one fixed layer behind everything, carrying three
+ * things — a wash of colour, a field of drifting petals, and a grain
+ * over the top of both.
+ *
+ * Why it exists. tokens.css says "the page itself is white; nothing
+ * tints it edge to edge", and depth comes from tinted section bands.
+ * The proposed page doesn't have tinted bands — HeroMethod and
+ * ProgramsV2 both paint no background and put their content on white
+ * CARDS instead. On a white page that leaves white cards on white,
+ * separated only by a hairline ring, and the cards stop reading as
+ * lifted. This layer is what they lift off.
+ *
+ * ACCEPTING THIS MEANS AMENDING THAT RULE IN tokens.css — the page is
+ * no longer flat white. Nothing else changes: sections still paint no
+ * background of their own, and a section that wants a band still takes
+ * one. It's here in _proposed rather than in global.css for exactly
+ * that reason; shipped pages are untouched.
+ *
+ * ---------------------------------------------------------------------
+ * THE PETAL FIELD
+ *
+ * The petals used to be Decor's, scoped to the ~250px band behind the
+ * h1. That band is a sixth of a screen tall, so four shapes inside it
+ * could only ever drift a few pixels before the band's own
+ * `overflow-hidden` sheared them — the parallax was technically running
+ * and effectively invisible.
+ *
+ * They belong to the PAGE, so they live here now: eight shapes spread
+ * down a full viewport height (and past it — the last two start below
+ * the fold and arrive as you scroll), on a `fixed` layer, drifting
+ * upward against the scroll. Fixed is what makes them a ground rather
+ * than a decoration on one section: they're always on screen, always
+ * moving, and the content slides over them.
+ *
+ * DEPTH IS A REAL MODEL HERE, not decoration-by-eye. Each petal is
+ * consistently one of two things:
+ *
+ *   FAR   large, pale (-200), heavily blurred, drifts LEAST (~40vh)
+ *   NEAR  small, saturated (-300), barely blurred, drifts MOST (~100vh)
+ *
+ * That's how parallax actually works — near things move more — and
+ * keeping size, tint, blur and speed all agreeing is what stops eight
+ * blobs from reading as clutter.
+ *
+ * ---------------------------------------------------------------------
+ * THE WASH — rebuilt from a reference the client supplied: broad
+ * diagonal wave bands, each a soft blend, with the hue travelling
+ * corner to corner across the canvas. The reference is fully saturated
+ * (yellow → magenta → deep blue); ours is the same STRUCTURE at a
+ * fraction of the strength, in the logo's four hues and nothing else.
+ *
+ * The hue journey is teal → amber → coral → purple, top-left to
+ * bottom-right. Teal starts it because the header is `teal-100` and the
+ * ground should continue that bar rather than meet it at a colour
+ * change; it warms through the middle and cools again into the corner,
+ * which is the reference's warm-to-cool sweep with our palette's own
+ * range.
+ *
+ * It's SVG, not layered CSS gradients, for one reason: the thing that
+ * makes the reference read the way it does is the S-CURVE boundARY
+ * between bands. CSS gradients can blend two colours softly but can't
+ * put a curve between them; a path can. Three bands, each a closed
+ * shape with a wavy top edge filled down to the bottom, so they stack
+ * and deepen toward the corner exactly as the reference's do.
+ *
+ * `preserveAspectRatio="none"` — the curves stretch to whatever the
+ * viewport is rather than letterboxing, which is fine and intended for
+ * shapes this soft. The paths deliberately overshoot the viewBox on
+ * every side: the blur is computed before the viewBox clips, so
+ * geometry that stopped at the edge would fade there and draw a visible
+ * soft border around the page.
+ *
+ * Strength is one number, `--backdrop-wash`. Every stop inside is
+ * relative to it, so the whole composition dims and brightens together
+ * and there is exactly one knob to turn.
+ *
+ * THE GRAIN survives at a fifth of its old strength, and its job has
+ * changed completely. It is no longer the texture — the reference has
+ * no tooth and that's now the wash's job. It is DITHER: wide, low
+ * contrast, pastel gradients are exactly the case where 8-bit displays
+ * show stair-step banding, and a few percent of noise is the standard
+ * fix. If it's ever visible as texture, it's turned up too far.
+ *
+ * Decoration only: `aria-hidden`, `pointer-events-none`. Under
+ * `prefers-reduced-motion` the drift is never built and the petals sit
+ * exactly where the CSS puts them. Render once per page, as the first
+ * child inside the layout.
+ */
+
+/*
+ * The field. Placement is physical (`left`, `top`), never logical:
+ * these are shapes in a composition and should stay put if the document
+ * flips to LTR for the Russian locale rather than mirroring with the
+ * text.
+ *
+ * `top` is a percentage of the VIEWPORT, not the page — the layer is
+ * fixed — so values past 100% start below the fold and drift up into
+ * view. `drift` is in vh and always negative: everything rises against
+ * the scroll. `spin` is degrees over the same range; the shapes are
+ * irregular blobs, so a few degrees of rotation reads as the shape
+ * turning rather than as a circle doing nothing.
+ *
+ * `left` KEEPS THE CENTRE COLUMN CLEAR. The page's headings are
+ * centred and its prose sits on a 42rem measure, so roughly 27%-73% is
+ * where type lives. Only the two palest, most blurred shapes are
+ * allowed to cross it; every saturated one is pushed to an edge. The
+ * first draft had a purple -300 at 44% and it landed squarely behind
+ * "שתי דרכים להתחיל" and its eyebrow pill.
+ *
+ * The drift figures are a fraction of the VIEWPORT spread over the
+ * WHOLE page, so the field always travels the same absolute distance
+ * however long the page is — it just travels it more slowly on a long
+ * one. On this page (~1500px of scroll) the fastest petal moves at
+ * about half the speed of the content, which is the top of the range
+ * before parallax stops reading as depth and starts reading as a
+ * second thing scrolling.
+ */
+const petals = [
+  { tint: 'bg-amber-300/75',  size: '6rem',  left: '6%',  top: '14%',  drift: -78, spin: 14,  blur: '0.5px' },
+  { tint: 'bg-teal-200/85',   size: '14rem', left: '76%', top: '6%',   drift: -32, spin: 8,   blur: '3px' },
+  { tint: 'bg-purple-300/75', size: '7rem',  left: '88%', top: '38%',  drift: -72, spin: -12, blur: '0.5px' },
+  { tint: 'bg-coral-200/85',  size: '12rem', left: '-5%', top: '52%',  drift: -38, spin: 9,   blur: '2.5px' },
+  { tint: 'bg-teal-300/75',   size: '5rem',  left: '20%', top: '70%',  drift: -88, spin: -15, blur: '0.5px' },
+  { tint: 'bg-amber-200/85',  size: '16rem', left: '62%', top: '84%',  drift: -30, spin: 6,   blur: '3px' },
+  { tint: 'bg-purple-300/75', size: '8rem',  left: '15%', top: '112%', drift: -82, spin: 11,  blur: '1px' },
+  { tint: 'bg-coral-300/75',  size: '6rem',  left: '84%', top: '124%', drift: -76, spin: -13, blur: '0.5px' },
+];
+---
+
+<div class="page-backdrop pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
+  <!--
+    Stop colours are the logo values straight off the tokens, never
+    literals — the palette traces back to the same five sources every
+    other surface on the site does.
+  -->
+  <svg class="wash" viewBox="0 0 1440 900" preserveAspectRatio="none">
+    <defs>
+      <!-- The hue journey, corner to corner. -->
+      <linearGradient id="wash-base" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="var(--color-teal-500)" stop-opacity="0.5" />
+        <stop offset="34%" stop-color="var(--color-amber-500)" stop-opacity="0.45" />
+        <stop offset="68%" stop-color="var(--color-coral-500)" stop-opacity="0.45" />
+        <stop offset="100%" stop-color="var(--color-purple-500)" stop-opacity="0.6" />
+      </linearGradient>
+
+      <!-- One gradient per band, each picking up where the last left
+           off, so a band never introduces a hue the base isn't already
+           moving through at that point on the diagonal. -->
+      <linearGradient id="wash-a" x1="0" y1="0" x2="1" y2="0.4">
+        <stop offset="0%" stop-color="var(--color-amber-500)" stop-opacity="0.58" />
+        <stop offset="100%" stop-color="var(--color-coral-500)" stop-opacity="0.44" />
+      </linearGradient>
+      <linearGradient id="wash-b" x1="0" y1="0" x2="1" y2="0.6">
+        <stop offset="0%" stop-color="var(--color-coral-500)" stop-opacity="0.5" />
+        <stop offset="100%" stop-color="var(--color-purple-500)" stop-opacity="0.66" />
+      </linearGradient>
+      <linearGradient id="wash-c" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="var(--color-purple-500)" stop-opacity="0.7" />
+        <stop offset="100%" stop-color="var(--color-purple-500)" stop-opacity="0.42" />
+      </linearGradient>
+
+      <!-- Softens the band edges WITHOUT dissolving them. This was 34
+           first, and at this opacity that erased the curves entirely —
+           the page became one diffuse gradient with no structure, which
+           is the thing the reference is not. The edge has to stay
+           findable; 15 is soft enough to have no line in it and hard
+           enough to still be a boundary.
+
+           The filter region is widened because the default -10%/+10%
+           would clip the blur of shapes this large. -->
+      <filter id="wash-soften" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="15" />
+      </filter>
+    </defs>
+
+    <rect x="-160" y="-160" width="1760" height="1220" fill="url(#wash-base)" />
+
+    <g filter="url(#wash-soften)">
+      <path d="M-160,540 C220,486 480,300 760,296 C1020,292 1280,196 1600,128 L1600,1060 L-160,1060 Z" fill="url(#wash-a)" />
+      <path d="M-160,800 C200,778 450,610 700,524 C960,434 1300,404 1600,326 L1600,1060 L-160,1060 Z" fill="url(#wash-b)" />
+      <path d="M240,1060 C600,880 900,742 1140,646 C1290,586 1440,548 1600,504 L1600,1060 Z" fill="url(#wash-c)" />
+    </g>
+  </svg>
+
+  {
+    petals.map((petal) => (
+      <span
+        class:list={['petal', petal.tint]}
+        style={{
+          '--petal-size': petal.size,
+          '--petal-left': petal.left,
+          '--petal-top': petal.top,
+          '--petal-blur': petal.blur,
+        }}
+        data-petal
+        data-drift={petal.drift}
+        data-spin={petal.spin}
+      />
+    ))
+  }
+</div>
+
+<style>
+  .page-backdrop {
+    background-color: white;
+  }
+
+  /* Stretched to the viewport rather than fitted to it — see the
+     `preserveAspectRatio` note above. One opacity for the whole
+     composition is the single strength knob. */
+  .wash {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: var(--backdrop-wash);
+  }
+
+  .petal {
+    position: absolute;
+    display: block;
+    width: var(--petal-size);
+    height: var(--petal-size);
+    left: var(--petal-left);
+    top: var(--petal-top);
+    /* Same irregular silhouettes as Decor's petals and the wordmark's
+       letter blooms — the logo is four soft-cornered petals, so every
+       decorative shape on the page is cut from that geometry rather
+       than being a plain circle. Two variants, alternating, so
+       neighbours don't trace each other. */
+    border-radius: var(--radius-blob);
+    filter: blur(var(--petal-blur));
+    /* These eight are the only things on the page animated on scroll,
+       so they are exactly what the hint is for. */
+    will-change: transform;
+  }
+
+  .petal:nth-child(even) {
+    border-radius: var(--radius-blob-alt);
+  }
+
+  /* Thin the field on a phone. The three dropped are mid-depth: the
+     largest pale shapes still carry the ground, and the smallest sharp
+     ones still carry the movement. */
+  @media (width < 48rem) {
+    .petal:nth-child(4),
+    .petal:nth-child(6),
+    .petal:nth-child(8) {
+      display: none;
+    }
+  }
+
+  /*
+   * The dither, on ::after so it paints above the wash and the petals
+   * alike — banding is a property of the whole composited ground, so
+   * the noise has to sit on top of all of it to break it up.
+   */
+  .page-backdrop::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.055' numOctaves='5' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 400px 400px;
+    opacity: var(--backdrop-grain);
+    mix-blend-mode: multiply;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  /**
+   * The petals drift upward against the page for the ENTIRE length of
+   * the scroll — `start: 0, end: 'max'` is the whole document, not one
+   * section's slice of it. That's the fix for the first version, where
+   * the range was a 250px band and the movement was real but too small
+   * to notice.
+   *
+   * `scrub`, not `toggleActions`: the reader drives it, and it stops
+   * when they stop. The 0.9 of catch-up is most of what sells the
+   * depth — the shapes lag a beat behind the scroll rather than being
+   * nailed to it.
+   *
+   * Drift is read per element off `data-drift` (vh) so the field's
+   * configuration stays in ONE place, the array in the frontmatter,
+   * next to the size and tint it has to agree with. `y` in pixels
+   * resolved from the viewport, with `invalidateOnRefresh` so the
+   * functions re-run and the distances rescale when the window does.
+   */
+  const mm = gsap.matchMedia();
+
+  mm.add('(prefers-reduced-motion: no-preference)', () => {
+    const petals = gsap.utils.toArray<HTMLElement>('.page-backdrop [data-petal]');
+    if (!petals.length) return;
+
+    /* One tween for all eight with function-based values, rather than a
+       tween and a ScrollTrigger each. */
+    gsap.to(petals, {
+      y: (_i: number, el: HTMLElement) =>
+        (Number(el.dataset.drift) / 100) * window.innerHeight,
+      rotation: (_i: number, el: HTMLElement) => Number(el.dataset.spin),
+      /* Linear, always: any other ease would put a petal somewhere
+         other than where the scroll position says it is. */
+      ease: 'none',
+      scrollTrigger: {
+        trigger: document.body,
+        start: 0,
+        end: 'max',
+        scrub: 0.9,
+        invalidateOnRefresh: true,
+      },
+    });
+  });
+</script>

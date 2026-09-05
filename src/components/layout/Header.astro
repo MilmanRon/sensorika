@@ -1,0 +1,173 @@
+---
+/**
+ * Sticky site header.
+ *
+ * Deliberately not logo-only. It carries three things:
+ *   1. the brand lockup, linking home — pinned far left;
+ *   2. the site's single conversion action — WhatsApp;
+ *   3. the side-nav trigger, outboard of the CTA at the far right.
+ *
+ * That left/right split is a deliberate physical arrangement, not the
+ * logical one: under dir=rtl a plain flex row would put the logo at the
+ * inline start, i.e. the right. `flex-row-reverse` is what pins it left
+ * instead. DOM order stays logo-then-controls, so tab order still
+ * follows the visual left-to-right run.
+ *
+ * The trigger is not mobile-only: the side nav is a drawer at every
+ * width, so the hamburger is always present and is the only way in.
+ *
+ * Header does not own the nav's markup. It owns one piece of shared
+ * state — `data-nav-open` on <html> — and points at the nav by id via
+ * `aria-controls`. SideNav renders `id="site-nav"`, styles itself off
+ * that attribute, and requests closes with a `nav:close` event. Header
+ * is the only writer; the two never touch each other's DOM.
+ *
+ * The bar is flat white with a permanent shadow, at every scroll
+ * position. It used to be transparent until the first scroll, which
+ * made it read as an overlay floating on the hero rather than as the
+ * site's own chrome and left the logo and CTA sitting on whatever
+ * happened to be behind them; then tinted `paper-100`, which read as
+ * part of the ground rather than as chrome above it. White is the
+ * surface the page's cards use, so the header reads as the topmost of
+ * them, and the shadow is what says it floats rather than being painted
+ * on. Neither fact depends on scroll, so nothing here is scroll-driven
+ * any more — no listener, no rAF guard, no scrolled-state attribute.
+ *
+ * Requires the page to give its <main> `id="main"` for the skip link.
+ */
+import Logo from './Logo.astro';
+import Button from '../ui/Button.astro';
+import WhatsappIcon from '../../assets/icons/whatsapp.svg';
+import { hasWhatsapp, whatsappHref } from '../../data/site';
+
+/**
+ * While `contact.phone` is a TODO the CTA scrolls to the contact
+ * section instead, so the label has to follow the destination — a
+ * button reading "וואטסאפ" that doesn't open WhatsApp is a lie.
+ */
+const ctaLabel = hasWhatsapp ? 'וואטסאפ' : 'צרו קשר';
+const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+---
+
+<a
+  href="#main"
+  class="sr-only focus-visible:not-sr-only focus-visible:absolute focus-visible:top-3 focus-visible:start-3 focus-visible:z-[60] focus-visible:rounded-control focus-visible:bg-white focus-visible:px-4 focus-visible:py-2 focus-visible:text-sm focus-visible:font-medium focus-visible:text-ink-900 focus-visible:shadow-elevated"
+>
+  דלגו לתוכן הראשי
+</a>
+
+<header
+  data-site-header
+  class="sticky top-0 z-50 bg-white shadow-card"
+>
+  <div
+    class="flex h-header flex-row-reverse items-center justify-between gap-4 px-gutter lg:h-header-lg lg:px-gutter-lg"
+  >
+    <Logo class="h-18 lg:h-22" />
+
+    <!--
+      Reversed for the same reason as the bar itself: under dir=rtl a
+      plain row would put the CTA (first child) at the right, pushing
+      the trigger inboard. Reversing runs the pair left-to-right, so the
+      trigger lands outboard at the far edge.
+    -->
+    <div class="flex flex-row-reverse items-center gap-2 sm:gap-3">
+      <Button
+        href={whatsappHref()}
+        size="sm"
+        variant="primary"
+        class="max-sm:size-10 max-sm:gap-0 max-sm:px-0"
+        {...external}
+      >
+        <WhatsappIcon class="h-4 w-4 max-sm:h-5 max-sm:w-5" aria-hidden="true" />
+        {/*
+          `sr-only`, not `hidden`: below `sm` the button is icon-only, but
+          the label still has to reach the accessibility tree or the CTA
+          becomes a nameless button for screen-reader users.
+        */}
+        <span class="sr-only sm:not-sr-only">{ctaLabel}</span>
+      </Button>
+
+      <button
+        type="button"
+        data-nav-toggle
+        aria-controls="site-nav"
+        aria-expanded="false"
+        class="inline-flex h-10 w-10 items-center justify-center rounded-control text-ink-800 transition-colors duration-[var(--duration-fast)] hover:bg-paper-200"
+      >
+        <span class="sr-only">תפריט</span>
+        <span class="toggle-bars" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  /* The header used to drop its shadow while the drawer was open: both
+     were `paper-100`, so a shadow across the join broke up what was
+     meant to read as one continuous surface. A white header above a
+     `paper-100` drawer is two surfaces, and the shadow between them is
+     the truth rather than a seam — so that override is gone. */
+
+  /* Three bars that fold into an X. Bars are 2px on a 4px gap, so their
+     centers sit 6px apart — hence the 6px translate to collapse the
+     outer two onto the middle before rotating. */
+  .toggle-bars {
+    display: grid;
+    gap: 4px;
+    width: 1.25rem;
+  }
+
+  .toggle-bars > span {
+    display: block;
+    height: 2px;
+    border-radius: var(--radius-pill);
+    background: currentColor;
+    transition:
+      transform var(--duration-base) var(--ease-standard),
+      opacity var(--duration-fast) var(--ease-standard);
+  }
+
+  /* `data-nav-open` lives on <html>, outside this component's scope. */
+  :global(html[data-nav-open]) .toggle-bars > span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+  :global(html[data-nav-open]) .toggle-bars > span:nth-child(2) {
+    opacity: 0;
+  }
+  :global(html[data-nav-open]) .toggle-bars > span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+</style>
+
+<script>
+  const html = document.documentElement;
+  const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+
+  function setNavOpen(open: boolean) {
+    html.toggleAttribute('data-nav-open', open);
+    toggle?.setAttribute('aria-expanded', String(open));
+    // Stop the page behind the drawer from scrolling under it.
+    html.style.overflow = open ? 'hidden' : '';
+  }
+
+  toggle?.addEventListener('click', () => {
+    setNavOpen(!html.hasAttribute('data-nav-open'));
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !html.hasAttribute('data-nav-open')) return;
+    setNavOpen(false);
+    // Never strand focus inside a panel that just closed.
+    toggle?.focus();
+  });
+
+  /* Anything that wants the drawer shut asks for it this way — SideNav
+     fires this when you tap a link or the overlay. Header stays the only
+     writer of `data-nav-open`, and neither component reaches into the
+     other's markup. */
+  document.addEventListener('nav:close', () => setNavOpen(false));
+
+</script>

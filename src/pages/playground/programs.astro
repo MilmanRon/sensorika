@@ -1,0 +1,34 @@
+---
+/**
+ * The two-up/stacked switch is a viewport breakpoint, not a container
+ * one, so there's no useful "narrow" variant to render side by side
+ * here — resize the window to see the stacked case.
+ */
+import PlaygroundLayout from '../../layouts/PlaygroundLayout.astro';
+import Programs from '../../components/sections/Programs.astro';
+import Compare from './_proposed/Compare.astro';
+import ProgramsV2 from './_proposed/ProgramsV2.astro';
+---
+
+<PlaygroundLayout title="Programs">
+  <div class="flex flex-col gap-12">
+    <Compare side="current">
+      <div class="bg-paper-50">
+        <Programs />
+      </div>
+    </Compare>
+
+    <Compare
+      side="proposed"
+      notes={[
+        'לכל כרטיס אייקון בגוון שלו — היום שני הכרטיסים נבדלים רק בקו בעובי 4px בקצה.',
+        'הכרטיס כולו הוא היעד: הוא מתרומם ב־hover, וה־CTA הפך לקישור עם חץ במקום כפתור מסגרת שני.',
+        'כותרת מקטע עם תווית ומשפט פתיחה, במקום h2 בודד.',
+        'רצועת סיום אחת עם פעולת הוואטסאפ — כרגע הדבר האחרון בעמוד הוא CTA כפול לאותו עוגן.',
+        'קופי חדש שדורש אישור: כותרת המקטע, משפט הפתיחה, וטקסט רצועת הסיום.',
+      ]}
+    >
+      <ProgramsV2 />
+    </Compare>
+  </div>
+</PlaygroundLayout>

@@ -1,20 +1,39 @@
 ---
 /**
- * Primary nav — links only (logo lives in Header.astro). First pass:
- * a plain horizontal row, no mobile toggle yet.
+ * Primary nav — links only (the logo lives in Header.astro, the rail
+ * chrome in SideNav.astro). This renders the list and nothing else, so
+ * the same items can appear in a horizontal bar, a vertical rail, or a
+ * footer without duplicating `site.ts`.
  */
 import { siteConfig } from '../../data/site';
 import NavItem from './NavItem.astro';
 
+interface Props {
+  /**
+   * `vertical` is what SideNav's rail and drawer use — items stretch to
+   * the full column width. `horizontal` is a wrapping row for bar-style
+   * placements.
+   */
+  orientation?: 'horizontal' | 'vertical';
+}
+
+const { orientation = 'horizontal' } = Astro.props;
 const { nav } = siteConfig;
+
+const layouts = {
+  horizontal: 'flex flex-wrap items-center justify-center gap-1 rounded-card bg-paper-200 p-2',
+  vertical: 'flex flex-col gap-1',
+};
 ---
 
 <nav aria-label="ניווט ראשי">
-  <ul class="flex flex-wrap items-center gap-1 rounded-card bg-paper-200 p-2">
+  <ul class={layouts[orientation]}>
     {
       nav.map((item) => (
         <li>
-          <NavItem href={item.href}>{item.label}</NavItem>
+          <NavItem href={item.href} class={orientation === 'vertical' ? 'text-lg whitespace-normal' : ''}>
+            {item.label}
+          </NavItem>
         </li>
       ))
     }

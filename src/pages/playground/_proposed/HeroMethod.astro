@@ -1,0 +1,499 @@
+---
+/**
+ * PROPOSED (new — it replaces two shipped sections rather than
+ * revising one, so no V2 suffix; see this folder's README).
+ *
+ * One section that does the job of Hero + Method together.
+ *
+ * The idea: a visitor shouldn't have to read a marketing preamble and
+ * then scroll to find out what actually happens here. So the greeting
+ * is reduced to a single banner line, and immediately under it the
+ * method — the real substance — is what fills the screen.
+ *
+ * Shape: `ברוכים הבאים ל-Sensorika` is the page's h1 and gets a row to
+ * itself, which is what lets it carry the whole greeting. It's set as a
+ * two-line lockup — `ברוכים הבאים` as a smaller, lighter kicker centered
+ * over `ל-Sensorika`. The brand line takes `text-brand` — a step of its
+ * own, twice the top of the heading scale — so the wordmark is what you
+ * land on and the greeting reads as its lead-in. Its letters are painted
+ * in the four logo petals, cycling coral / amber / teal / purple, so the
+ * word at rest is the mark; the navy of the h1 is only the kicker's. The section clips on
+ * the x-axis because the letter-burst blobs are sized in `em` and grow
+ * with it; off the outer letters of a 7.5rem word they would otherwise
+ * reach past the viewport. Under it the method runs full width on a
+ * tinted panel.
+ *
+ * The panel is a CardV2 in the panel's own accent, the same surface the
+ * Programs cards use: white ground, hairline ring, shadow-card. It was a
+ * flat tinted field, which made the method the one block on the page
+ * that didn't share the card language. The section itself paints no
+ * background — the page's ground comes from PageBackdrop, one fixed
+ * layer behind everything — so it sits on exactly the ground Programs
+ * sits on.
+ *
+ * The accent comes from home.md rather than being fixed here. It reads
+ * teal, not a petal: the home page is where the CTA lives, and the whole
+ * point of teal owning the controls is that the page a visitor lands on
+ * says "this color is the one you press". The petal cycle is for the
+ * nav-item content pages, which have no CTA to compete with.
+ *
+ * DECORATION: this section draws none of its own. The panel carries
+ * `petal={false}` — CardV2's corner blob was drawn for the Programs
+ * cards, which are small and sit side by side; on a panel this size
+ * it's a large shape competing with the heading, and the same shape
+ * then repeats on every panel of every nav-item page built from this
+ * one. The corner blob stays a small-card device.
+ *
+ * The band behind the h1 used to carry a <Decor> as well. It doesn't
+ * any more: PageBackdrop now runs a petal field down the whole page,
+ * and a second set of shapes in the one band they'd overlap read as
+ * clutter. That's the rule these pages settled on, finally applied —
+ * the ornament belongs to the PAGE and happens once. HeroV2 and
+ * ProsePage still use Decor; neither of them has a PageBackdrop under
+ * it.
+ *
+ * The panel spans the content width, but the copy inside it sits on
+ * --width-prose. Four paragraphs set across a 72rem measure would run
+ * past 100 characters a line — unreadable, and this is the block a
+ * parent actually has to read. The panel is what goes full width; the
+ * text still gets a reading measure.
+ *
+ * The copy is verbatim from Hero.astro and Method.astro — heading,
+ * lead, four body paragraphs, closing line. Nothing is reworded. It now
+ * comes from src/content/pages/home.md rather than from consts in this
+ * file, like every other page's copy does: a wording change is a content
+ * edit, not a component edit. The shipped Hero.astro and Method.astro
+ * keep their own copies, because they're the "current" half of the
+ * comparison and rewriting them would invalidate it.
+ *
+ * No CTAs: the section ends on the closing line, which is the sentence
+ * the whole thing exists to land, and a pair of buttons under it would
+ * be the first thing the eye goes to instead. Contact lives further
+ * down the page. The other editorial change is that the hero's supporting
+ * paragraph ("מקום לילדים עם צרכים מיוחדים...") is dropped, because
+ * the method's own lead says the same thing with more substance.
+ *
+ * Not wired into any page yet — it lives in the playground only, next
+ * to the Hero and Method it would replace.
+ */
+
+import { getEntry } from 'astro:content';
+
+import CardV2 from './CardV2.astro';
+
+/*
+ * All of the copy, from the one file that holds it. Thrown rather than
+ * defaulted: a missing home.md means the page would render an empty
+ * greeting and an empty panel, which is worse at build time than a
+ * failed build.
+ */
+const home = await getEntry('pages', 'home');
+if (!home?.data.brand || home.data.panels.length === 0) {
+  throw new Error(
+    'HeroMethod needs src/content/pages/home.md with a `brand` lockup and one panel.',
+  );
+}
+
+/*
+ * The greeting is a two-line lockup: a smaller, lighter kicker centered
+ * over the brand line.
+ *
+ * `ל-` stays on the brand line and keeps its hyphen — it's the prefix
+ * the word is attached to, and leaving it there means the LTR box that
+ * follows contains nothing but the word itself.
+ */
+const greeting = home.data.title;
+const { prefix: brandPrefix, word: brand } = home.data.brand;
+const brandLetters = [...brand];
+
+const method = home.data.panels[0];
+const { eyebrow, heading: lead, body, pullout: closing } = method;
+
+/* The panel's accent is content, not markup — same contract as
+   ProsePanel, so the home panel and a nav-item panel are configured the
+   same way. Defaults to teal for the reason in the header comment. */
+const accent = method.accent ?? 'teal';
+
+const eyebrows = {
+  coral: 'bg-coral-100 text-coral-800',
+  teal: 'bg-teal-100 text-teal-800',
+  amber: 'bg-amber-100 text-amber-800',
+  purple: 'bg-purple-100 text-purple-800',
+};
+
+/* The rule is a shape, not type, so it takes the -500 base. */
+const rules = {
+  coral: 'border-s-coral-500',
+  teal: 'border-s-teal-500',
+  amber: 'border-s-amber-500',
+  purple: 'border-s-purple-500',
+};
+---
+
+<section id="method" class="overflow-x-clip py-section lg:py-section-lg">
+  <div class="mx-auto max-w-[var(--width-content)] px-gutter lg:px-gutter-lg">
+    <!--
+      The greeting band. The `pb-*` is the gap down to the panel, which
+      is why the panel carries no top margin of its own.
+    -->
+    <div class="pt-2 pb-14 lg:pb-20">
+      <!--
+        `dir="ltr"` is load-bearing, not cosmetic: the letter spans are
+        inline boxes, so on this RTL line the paragraph direction would
+        lay them out right-to-left and render the word as "akirosneS".
+        The attribute makes the word its own bidi isolate.
+
+        The letters are `aria-hidden` with the whole word repeated in an
+        `sr-only` span beside them, so a screen reader says "Sensorika"
+        instead of spelling out nine one-character elements. The tags are
+        jammed together with no line breaks between them on purpose —
+        whitespace here would become a real space inside the LTR box and
+        push the word off the hyphen.
+
+        Each letter carries an empty `.letter-pop` span: the blob that
+        bursts behind it on landing. It's a sibling of the glyph rather
+        than a background on the letter itself because it has to outgrow
+        its letter and fade on its own timing.
+      -->
+      <h1
+        class="text-center font-display text-4xl leading-heading font-bold text-ink-900 sm:text-5xl lg:text-6xl"
+      >
+        <span class="block text-3xl font-medium sm:text-4xl lg:text-5xl">{greeting}</span>
+        <span class="block text-brand"
+          >{brandPrefix}<span class="brand-word" dir="ltr" data-brand-word
+          ><span class="sr-only">{brand}</span><span aria-hidden="true"
+            >{
+              brandLetters.map((letter) => <span class="brand-letter" data-brand-letter><span class="letter-pop" data-letter-pop /><span class="letter-glyph" data-letter-glyph>{letter}</span></span>)
+            }</span
+          ></span
+        ></span
+        >
+      </h1>
+    </div>
+
+    <!-- `sm:p-*` / `lg:p-*` rather than a bare `p-*`: CardV2's base sets
+         `p-8`, and only a variant utility reliably overrides it. -->
+    <CardV2 accent={accent} petal={false} class="sm:p-12 lg:p-16">
+      <div class="mx-auto max-w-[var(--width-prose)]">
+        <!-- Tinted pill, not colored text: same reasoning as
+             SectionHeading — a petal hue needs its own -100 tint under
+             it before the -800 step clears contrast at this size. -->
+        <p
+          class:list={[
+            'inline-flex items-center rounded-pill px-4 py-1.5 font-display text-sm font-semibold',
+            eyebrows[accent],
+          ]}
+        >
+          {eyebrow}
+        </p>
+
+        <h2
+          class="mt-5 font-display text-2xl leading-heading font-bold text-ink-900 sm:text-3xl"
+        >
+          {lead}
+        </h2>
+
+        <div class="mt-6 flex flex-col gap-4 text-lg leading-body text-ink-800">
+          {body.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+
+        <!--
+          The takeaway line, kept as its own beat the way Method.astro
+          has it. `border-s` is logical, so the rule lands on the right
+          under dir=rtl without a direction-specific override.
+        -->
+        <p
+          class:list={[
+            'mt-8 border-s-4 ps-5 font-display text-lg leading-body font-semibold text-ink-900 sm:text-xl',
+            rules[accent],
+          ]}
+        >
+          {closing}
+        </p>
+      </div>
+    </CardV2>
+  </div>
+</section>
+
+<style>
+  /*
+   * The word is one inline-block box on the RTL line — it has to be a
+   * box for `dir="ltr"` to isolate it and for the letters inside to lay
+   * out left-to-right. `nowrap` keeps the nine letters from breaking
+   * across two lines mid-animation at narrow widths.
+   */
+  .brand-word {
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  /*
+   * Three nested boxes per letter, and the split matters:
+   *
+   *   .brand-letter  never moves. It's the positioning box, so the blob
+   *                  inside it has something fixed to burst out of.
+   *   .letter-glyph  is what actually animates — drop, spin, squash.
+   *   .letter-pop    animates on its own clock. If it were a child of
+   *                  the glyph it would inherit the glyph's transform
+   *                  and ride in with the letter instead of bursting
+   *                  where the letter lands.
+   *
+   * `z-index: 0` on the letter opens a stacking context so the blob's
+   * `z-index: -1` puts it behind the glyph rather than behind the page.
+   */
+  .brand-letter {
+    position: relative;
+    z-index: 0;
+    display: inline-block;
+  }
+
+  /*
+   * The resting colour, in the same coral / amber / teal / purple cycle
+   * the script uses. It lives here and not only in the timeline because
+   * this is the state — GSAP just has to not fight it. With JS off, or
+   * under reduced motion where the script never runs, this is the only
+   * thing that paints the word, and it still lands on the logo palette.
+   */
+  .brand-letter:nth-child(4n + 1) .letter-glyph {
+    color: var(--color-coral-500);
+  }
+
+  .brand-letter:nth-child(4n + 2) .letter-glyph {
+    color: var(--color-amber-500);
+  }
+
+  .brand-letter:nth-child(4n + 3) .letter-glyph {
+    color: var(--color-teal-500);
+  }
+
+  .brand-letter:nth-child(4n + 4) .letter-glyph {
+    color: var(--color-purple-500);
+  }
+
+  .letter-glyph {
+    display: inline-block;
+    /*
+     * The animation's start state lives here rather than in the script
+     * because the script is a deferred module: setting it in JS would
+     * let the finished word paint first and then snap back to the start.
+     */
+    opacity: 0;
+  }
+
+  /*
+   * Centered on the letter with negative margins, NOT with the CSS
+   * `translate` property — GSAP writes `translate: none` on anything it
+   * animates, which would silently drop the centering mid-burst.
+   *
+   * Same irregular blob radius as Decor's petals, so the bursts read as
+   * the page's ornament arriving rather than as generic confetti.
+   */
+  .letter-pop {
+    position: absolute;
+    z-index: -1;
+    top: 50%;
+    left: 50%;
+    width: 1.15em;
+    height: 1.15em;
+    margin-top: -0.575em;
+    margin-left: -0.575em;
+    border-radius: var(--radius-blob);
+    opacity: 0;
+  }
+
+  .brand-letter:nth-child(even) .letter-pop {
+    border-radius: var(--radius-blob-alt);
+  }
+
+  /*
+   * Reduced motion gets the word as plain painted text and the script
+   * never runs, so nothing else would ever set the opacity back. The
+   * blobs stay at opacity 0 — they're purely the burst, and there's no
+   * burst without motion.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .letter-glyph {
+      opacity: 1;
+    }
+  }
+</style>
+
+<!-- The opacity above is the animation's start state, so without JS it
+     would hide the word for good. `!important` because the rule above is
+     scoped (and so more specific) once Astro compiles it. -->
+<noscript>
+  <style is:inline>
+    .letter-glyph {
+      opacity: 1 !important;
+    }
+  </style>
+</noscript>
+
+<script>
+  import { gsap } from 'gsap';
+
+  /**
+   * The brand word bounces in a letter at a time — each one dropping in
+   * its own brand hue, bursting a petal-shaped blob as it lands, and
+   * STAYING in that hue: the word rests painted in the four logo petals
+   * rather than resolving to the heading's navy. Hovering replays a
+   * colored wave through it.
+   *
+   * Toned down from the first pass, which read as an explosion: the
+   * letters fell most of a viewport, snapped in on `back.out(2.4)`,
+   * squashed 28% on impact and threw a blob to 2.1x. All of that was
+   * drawn at 3.75rem type and got twice as loud when the word did.
+   *
+   * What stayed is what makes it playful — a per-letter hue that
+   * resolves to the wordmark's navy, an overshooting landing, a
+   * coloured bloom behind each glyph, and the hover wave. What went is
+   * the amplitude: the travel, the spin, the squash and the burst are
+   * all a fraction of what they were, so the effect now reads as the
+   * word assembling in colour rather than as confetti.
+   *
+   * It still bends the motion rule in tokens.css ("nothing should feel
+   * abrupt or bouncy") — `back.out` is an overshoot by definition — but
+   * far less than it did, and everything still collapses to nothing
+   * under prefers-reduced-motion, which is the part of that rule that
+   * protects the audience it was written for.
+   */
+  const word = document.querySelector<HTMLElement>('[data-brand-word]');
+  const glyphs = word ? gsap.utils.toArray<HTMLElement>('[data-letter-glyph]', word) : [];
+  const pops = word ? gsap.utils.toArray<HTMLElement>('[data-letter-pop]', word) : [];
+
+  if (word && glyphs.length) {
+    /* The palette is read off the tokens rather than written here. Only
+       the -500 bases work for this: they're plain hex in tokens.css, so
+       they come back as a hex GSAP can interpolate. Every derived step
+       is a color-mix() expression, which getComputedStyle hands back
+       with its var()s substituted but the mix itself unevaluated — so
+       reading e.g. --color-coral-800 here would silently break the
+       animation rather than error. */
+    const root = getComputedStyle(document.documentElement);
+    const token = (name: string) => root.getPropertyValue(name).trim();
+
+    const HUES = ['--color-coral-500', '--color-amber-500', '--color-teal-500', '--color-purple-500'].map(token);
+    /* Letter i's own hue — now its RESTING colour, not just the colour
+       it falls in wearing. The cycle runs coral / amber / teal / purple,
+       the four logo petals, so the word ends up painted in the mark. */
+    const hueOf = (i: number) => HUES[i % HUES.length];
+    /* The hover flash borrows the NEXT petal along. It used to flash the
+       letter's own hue over navy, which no longer reads now that the hue
+       is where the letter already sits — this keeps the same wave, the
+       same timings, and still returns every letter to its own colour. */
+    const flashOf = (i: number) => HUES[(i + 1) % HUES.length];
+
+    /* Letter i lands at LAND + i * STEP; the blob bloom and the colour
+       settle are both hung off that, so the three stay locked together
+       if any one duration is retuned. */
+    const STEP = 0.07;
+    const DROP = 0.9;
+    /* Impact is before the drop tween ends: `back.out` sails past the
+       resting line around here and then eases back up to it. */
+    const LAND = DROP - 0.3;
+
+    /* matchMedia rather than a one-off query: it reverts everything it
+       created if the user turns reduced motion on while the page is up. */
+    const mm = gsap.matchMedia();
+
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.set(pops, { backgroundColor: (i: number) => hueOf(i) });
+
+      const intro = gsap.timeline({ delay: 0.2 });
+
+      /* fromTo, not from: the CSS start state is opacity only, so `from`
+         would read that 0 as the value to animate BACK to. */
+      intro
+        /* A short rise, not a plunge. -34% is about a third of a letter,
+           so each glyph arrives from just under its own line rather than
+           from off the top of the band — at 7.5rem type the old -160%
+           was most of a viewport of travel per letter. `back.out(1.1)`
+           still overshoots, so the landing keeps its hop; it just no
+           longer snaps. */
+        .fromTo(
+          glyphs,
+          {
+            yPercent: -34,
+            rotation: (i: number) => (i % 2 ? 7 : -7),
+            autoAlpha: 0,
+            color: (i: number) => hueOf(i),
+          },
+          {
+            yPercent: 0,
+            rotation: 0,
+            autoAlpha: 1,
+            /* Named in BOTH halves on purpose: a `from` value with no
+               matching `to` tweens back to the element's current colour,
+               which here is the heading's inherited navy. Pinning it
+               holds each letter on its petal for the whole drop. */
+            color: (i: number) => hueOf(i),
+            duration: DROP,
+            ease: 'back.out(1.1)',
+            stagger: STEP,
+          },
+          0
+        )
+        /* The blob blooms at the moment of impact and fades just past
+           the letter's own width — a halo settling behind the glyph,
+           not a splash thrown off it. It reads as colour arriving with
+           the letter, which is the whole job; at 2.1x on a 7.5rem word
+           it was a 280px shape flying out of a heading. */
+        .fromTo(
+          pops,
+          { scale: 0.3, autoAlpha: 0.55 },
+          { scale: 1.25, autoAlpha: 0, duration: 0.9, ease: 'power2.out', stagger: STEP },
+          LAND
+        )
+        /* Squash and stretch on impact, at a tenth of its old depth —
+           enough to feel weight in the landing, not enough to read as a
+           letter deforming. The drop deliberately animates no scale at
+           all, so this tween owns scaleX/scaleY outright and can overlap
+           the tail of the drop without the two fighting over the same
+           property. */
+        .to(
+          glyphs,
+          { keyframes: { scaleY: [0.94, 1.02, 1], scaleX: [1.05, 0.99, 1] }, duration: 0.55, ease: 'sine.out', stagger: STEP },
+          LAND
+        );
+      /* There is no settle-to-navy beat any more. The word used to
+         resolve to ink-900 a letter at a time; it now stays in the
+         four petal hues it lands in, so the rest state IS the logo. */
+
+      /* Hover replays the whole idea in miniature — hop, flash, burst.
+         Built once and restarted rather than rebuilt per hover. */
+      const wave = gsap.timeline({ paused: true });
+
+      wave
+        .to(
+          glyphs,
+          { keyframes: { yPercent: [0, -13, 0], rotation: [0, 3, 0], scale: [1, 1.05, 1] }, duration: 0.7, ease: 'sine.inOut', stagger: 0.045 },
+          0
+        )
+        /* The colour is the loudest thing in the wave now, and that's
+           deliberate — it's what makes the hover playful rather than
+           the size of the hop. Same two tweens, same clock: each letter
+           borrows its neighbour's petal and hands it back. */
+        .to(glyphs, { color: (i: number) => flashOf(i), duration: 0.2, stagger: 0.045 }, 0)
+        .to(glyphs, { color: (i: number) => hueOf(i), duration: 0.6, stagger: 0.045 }, 0.34)
+        .fromTo(
+          pops,
+          { scale: 0.3, autoAlpha: 0.45 },
+          { scale: 1.15, autoAlpha: 0, duration: 0.7, ease: 'power2.out', stagger: 0.045 },
+          0.08
+        );
+
+      /* The wave is a reward for pointing at the word, not part of the
+         entrance — so it stays out of the way until the letters have
+         landed, and a re-hover mid-wave is ignored rather than snapping
+         the letters back to the start of the hop. */
+      const replay = () => {
+        if (intro.isActive() || wave.isActive()) return;
+        wave.restart();
+      };
+
+      word.addEventListener('mouseenter', replay);
+
+      return () => word.removeEventListener('mouseenter', replay);
+    });
+  }
+</script>

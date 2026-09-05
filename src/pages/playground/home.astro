@@ -1,0 +1,42 @@
+---
+/**
+ * Composition preview: the homepage as it stands — chrome (Header +
+ * SideNav), Hero, Method, Programs — in the order and on the shell
+ * they'll actually ship in.
+ *
+ * Unlike the single-component pages, this one builds on SiteLayout
+ * rather than PlaygroundLayout. The point here is precisely the real
+ * assembly — the sticky header over the hero, the drawer opening across
+ * all of it, the vertical rhythm between sections — so swapping in a
+ * different shell would test something other than what ships.
+ *
+ * That leaves nowhere for PlaygroundLayout's title bar, so the back
+ * link is inlined at the end instead of sitting above the header, where
+ * it would break the very seam this page exists to check.
+ */
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import Hero from '../../components/sections/Hero.astro';
+import Method from '../../components/sections/Method.astro';
+import Programs from '../../components/sections/Programs.astro';
+---
+
+<SiteLayout title="Home · Playground" description="Component playground">
+  <Hero />
+  <Method />
+  <Programs />
+
+  <div class="mx-auto flex max-w-[var(--width-content)] gap-6 px-gutter pb-16 lg:px-gutter-lg">
+    <a
+      href="/playground"
+      class="text-sm font-medium text-ink-600 transition-colors duration-[var(--duration-fast)] hover:text-ink-900"
+    >
+      ← כל הרכיבים
+    </a>
+    <a
+      href="/playground/home-v2"
+      class="text-sm font-medium text-ink-600 transition-colors duration-[var(--duration-fast)] hover:text-ink-900"
+    >
+      ↔ להשוואה: ההצעה
+    </a>
+  </div>
+</SiteLayout>

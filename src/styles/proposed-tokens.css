@@ -1,0 +1,68 @@
+/**
+ * PROPOSED tokens — additive only.
+ *
+ * Everything here is a *new* name; nothing in tokens.css is redefined,
+ * so importing this file cannot change how any shipped component looks.
+ * It exists so the proposed components under
+ * src/pages/playground/_proposed/ can obey the project's "no hardcoded
+ * values in a component" rule while they're still under review.
+ *
+ * If the proposed look is accepted, fold this file into tokens.css and
+ * delete it (plus its @import in global.css). If it's rejected, delete
+ * it outright — nothing shipped depends on it.
+ *
+ * This file used to carry a -50/-600/-800 step for each of the four
+ * petal hues. The site runs on one accent now, and teal owns a full
+ * 50-900 ramp in tokens.css, so all of that is gone: the proposed
+ * components read the real palette. What's left is the two things that
+ * are genuinely new rather than a second copy of a color.
+ */
+
+@theme {
+  /* The hover step above --shadow-card. Cards and buttons in tokens.css
+     have no hover elevation at all, so nothing on the page reads as
+     pressable. */
+  --shadow-lift: 0 2px 6px oklch(20% 0 0 / 0.06), 0 14px 34px oklch(20% 0 0 / 0.12);
+
+  /* The brand word in the home lockup — `text-brand`.
+   *
+   * A step of its own, not a rung on the heading scale: at its ceiling
+   * it is 7.5rem, exactly twice the `text-6xl` (3.75rem) the rest of
+   * the h1 tops out at, which is the point — the wordmark is the thing
+   * on the page, and the greeting above it is the kicker.
+   *
+   * Fluid rather than three breakpoint steps because the word is set
+   * `white-space: nowrap` (see HeroMethod: the letters are individually
+   * animated boxes and must not break mid-drop). "ל-Sensorika" is 11
+   * glyphs, so at a fixed 7.5rem it would run ~45rem — fine inside the
+   * 72rem content column, a horizontal scrollbar on a phone. 11vw
+   * tracks the gutters between the two, and the 2.75rem floor is what
+   * a 320px screen can still hold on one line. */
+  --text-brand: clamp(2.75rem, 11vw, 7.5rem);
+}
+
+/**
+ * Plain vars, not `@theme` — consumed with var() inside component
+ * <style> blocks rather than through a Tailwind utility namespace
+ * (same reasoning as --width-content / --duration-* in tokens.css).
+ */
+:root {
+  /* Strength of PageBackdrop's wave wash — the opacity of the whole SVG
+     composition, so every band and the base ramp under them dim and
+     brighten together. The stops inside are set relative to this, which
+     makes it the one knob for "how much colour is on the page". */
+  --backdrop-wash: 0.15;
+
+  /* Strength of the noise laid over that wash. This is DITHER, not
+     texture: wide pastel gradients band on 8-bit displays and a few
+     percent of noise is what breaks the stair-steps up. If you can see
+     it as grain rather than as smoothness, it is too high. */
+  --backdrop-grain: 0.05;
+
+  /* Organic "petal" silhouettes. The logo is four soft-cornered petals,
+     so the photo frame and the decorative shapes are cut from the same
+     geometry rather than being plain circles. Two variants so a pair of
+     stacked shapes don't trace each other. */
+  --radius-blob: 58% 42% 47% 53% / 46% 44% 56% 54%;
+  --radius-blob-alt: 43% 57% 62% 38% / 51% 61% 39% 49%;
+}

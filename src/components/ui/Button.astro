@@ -8,19 +8,45 @@
 interface Props {
   href?: string;
   variant?: 'primary' | 'secondary';
+  /**
+   * `md` is the page-level default (hero CTAs, forms). `sm` exists for
+   * dense chrome — the header bar is 4rem tall, so an `md` button in it
+   * would leave almost no breathing room above and below.
+   */
+  size?: 'sm' | 'md';
+  class?: string;
+  [key: string]: unknown;
 }
 
-const { href, variant = 'primary' } = Astro.props;
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  class: className = '',
+  ...rest
+} = Astro.props;
 const Tag = href ? 'a' : 'button';
 
 const base =
-  'inline-flex items-center justify-center rounded-control px-6 py-3 font-display font-semibold transition-colors duration-[var(--duration-base)]';
+  'inline-flex items-center justify-center gap-2 rounded-control font-display font-semibold transition-colors duration-[var(--duration-base)]';
+const sizes = {
+  sm: 'px-4 py-2 text-base',
+  md: 'px-6 py-3',
+};
+/*
+ * Both variants sit on teal-700, not the teal-500 logo value: the petal
+ * is a pastel (2.32:1 on white), so a filled button in it can't legibly
+ * carry its own label and an outlined one can't be read. teal-700 is
+ * 5.92:1 both ways — as the fill under white text, and as text on
+ * white — and hover just steps one shade deeper rather than changing
+ * hue, which is the whole point of a single-hue palette.
+ */
 const variants = {
-  primary: 'bg-brand-600 text-white hover:bg-brand-700',
-  secondary: 'bg-accent-100 text-accent-800 hover:bg-accent-200',
+  primary: 'bg-teal-700 text-white hover:bg-teal-800',
+  secondary: 'border border-teal-700 bg-transparent text-teal-700 hover:bg-teal-50',
 };
 ---
 
-<Tag href={href} class={`${base} ${variants[variant]}`}>
+<Tag href={href} class={`${base} ${sizes[size]} ${variants[variant]} ${className}`} {...rest}>
   <slot />
 </Tag>

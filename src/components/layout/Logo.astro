@@ -1,0 +1,66 @@
+---
+/**
+ * The Sensorika brand lockup — four petals plus the wordmark, straight
+ * from src/assets/brand/logo.svg.
+ *
+ * Lives in `layout/` rather than `ui/` because it isn't generic: it's
+ * structural chrome that Header and Footer both need to agree on. Sized
+ * by height only — width follows each artwork's own aspect ratio, so a
+ * caller never has to know it (the lockup is 2.76:1, the mark 1.05:1).
+ *
+ * The wordmark is vector paths, not text, so screen readers get nothing
+ * from the artwork itself. The link carries the accessible name and the
+ * SVGs are hidden from the tree entirely — which is also why `responsive`
+ * can render both without the name being announced twice.
+ */
+import LogoLockup from '../../assets/brand/logo.svg';
+import LogoMark from '../../assets/brand/logo-mark.svg';
+import { siteConfig } from '../../data/site';
+
+interface Props {
+  /** Utilities controlling rendered height, e.g. `h-18 lg:h-22`. */
+  class?: string;
+  /** Where the lockup links. `null` renders it as a static mark. */
+  href?: string | null;
+  /**
+   * `responsive` drops the wordmark below `sm`, leaving just the petals —
+   * the same breakpoint at which the header's CTA goes icon-only, so the
+   * whole bar sheds its labels at once. `lockup` and `mark` pin it.
+   */
+  variant?: 'responsive' | 'lockup' | 'mark';
+}
+
+const { class: className = 'h-18 lg:h-22', href = '/', variant = 'responsive' } = Astro.props;
+
+/* Both artworks are sized by the caller's height utilities; only their
+   visibility differs, so `display: none` keeps the unused one free of
+   layout cost. */
+const lockupClass = variant === 'responsive' ? 'max-sm:hidden' : '';
+const markClass = variant === 'responsive' ? 'sm:hidden' : '';
+---
+
+{
+  href === null ? (
+    <span class="inline-flex shrink-0 items-center">
+      {variant !== 'mark' && (
+        <LogoLockup class={`w-auto ${className} ${lockupClass}`} aria-hidden="true" />
+      )}
+      {variant !== 'lockup' && (
+        <LogoMark class={`w-auto ${className} ${markClass}`} aria-hidden="true" />
+      )}
+    </span>
+  ) : (
+    <a
+      href={href}
+      aria-label={`${siteConfig.name} — לעמוד הבית`}
+      class="inline-flex shrink-0 items-center rounded-control transition-opacity duration-[var(--duration-fast)] hover:opacity-80"
+    >
+      {variant !== 'mark' && (
+        <LogoLockup class={`w-auto ${className} ${lockupClass}`} aria-hidden="true" />
+      )}
+      {variant !== 'lockup' && (
+        <LogoMark class={`w-auto ${className} ${markClass}`} aria-hidden="true" />
+      )}
+    </a>
+  )
+}

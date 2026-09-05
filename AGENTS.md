@@ -17,7 +17,11 @@ src/
   content/
     articles/   long-form parent material (.md/.mdx, schema in content.config.ts)
     schedule/   one data file per class (.yaml, schema in content.config.ts)
-  content.config.ts   schemas for the two collections above
+    pages/      one .md per nav-item page (מהו ויסות חושי, שאלות נפוצות, ...):
+                title, intro and the panels/FAQ the page is built from, all
+                in frontmatter. Copy changes are edits here, never in a
+                component.
+  content.config.ts   schemas for the three collections above
   data/
     site.ts     non-visual site-wide facts: nav links, contact info, socials
   layouts/
@@ -53,10 +57,15 @@ Tailwind CSS v4, configured CSS-first — there is no `tailwind.config.js`.
 
 ### Content
 
-- `articles` and `schedule` are Astro content collections
-  (`src/content.config.ts`) — add new parent material or classes as new
-  files under `src/content/articles/` or `src/content/schedule/`, not
-  as hardcoded markup in a page/component.
+- `articles`, `schedule` and `pages` are Astro content collections
+  (`src/content.config.ts`) — add new parent material, classes or
+  nav-item pages as new files under `src/content/articles/`,
+  `src/content/schedule/` or `src/content/pages/`, not as hardcoded
+  markup in a page/component.
+- A `pages` entry keeps its copy in frontmatter rather than in the
+  markdown body: these pages are a stack of accented panels, not one
+  flowing document, and that structure has to survive into the layout.
+  One route renders all of them.
 - `src/data/site.ts` holds the one copy of nav links / contact info /
   socials — components read from it, they don't hardcode these values.
 

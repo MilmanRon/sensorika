@@ -1,0 +1,29 @@
+---
+import PlaygroundLayout from '../../layouts/PlaygroundLayout.astro';
+import Hero from '../../components/sections/Hero.astro';
+import Compare from './_proposed/Compare.astro';
+import HeroV2 from './_proposed/HeroV2.astro';
+---
+
+<PlaygroundLayout title="Hero">
+  <div class="flex flex-col gap-12">
+    <Compare side="current">
+      <div class="bg-paper-50">
+        <Hero />
+      </div>
+    </Compare>
+
+    <Compare
+      side="proposed"
+      notes={[
+        'הדיוקן ממוסגר בצורת עלה־כותרת עם רקע מדורג — במקום קאט־אאוט שמרחף על קרם ריק.',
+        'הכותרת הראשית היא ההבטחה ולא הברכה. הטקסט זהה — רק הסדר השתנה (דורש אישור קופי).',
+        'שורת אמון עם שלושה אייקונים מתחת לכפתורים, בנוסח שתי הרפרנסים.',
+        'רצועת רקע בגוון טיל עם קישוט וגל מעבר לחלק הבא — במקום שדה קרם אחיד.',
+        'כפתורים בצורת גלולה, בגודל lg, עם חץ — ורקע <code>teal-700</code> שעובר 4.5:1 מול לבן.',
+      ]}
+    >
+      <HeroV2 />
+    </Compare>
+  </div>
+</PlaygroundLayout>

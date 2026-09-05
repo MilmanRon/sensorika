@@ -1,0 +1,110 @@
+---
+/**
+ * PROPOSED (new — no current counterpart).
+ *
+ * The FAQ page's body: fifteen questions as a single card of
+ * accordions, rather than as fifteen stacked ProsePanels.
+ *
+ * Why not panels, when every other nav-item page is a stack of them:
+ * the panels exist to break a long argument into a few readable chunks
+ * a parent scrolls through, and there are four or five of them. Fifteen
+ * full-width cards, each holding two sentences, would be a page you
+ * scroll past rather than one you read — and the answers are the part a
+ * reader wants exactly one of. Collapsed, the whole FAQ is a list of
+ * fifteen questions you can scan in one screen; that's what a FAQ is for.
+ *
+ * `<details>`/`<summary>` rather than JS: it's open/close state the
+ * browser already owns — keyboard-operable, findable by the browser's
+ * own in-page search in browsers that expand for it, and it works
+ * before hydration because there is none.
+ *
+ * The numbers are the clinic's own — the source copy numbers its
+ * questions 1–15 — so they're rendered rather than being decoration
+ * invented here. Their tint cycles through the four petal hues purely
+ * so a long list has some rhythm down its inline start.
+ */
+import CardV2 from './CardV2.astro';
+
+interface Props {
+  items: readonly { question: string; answer: string }[];
+}
+
+const { items } = Astro.props;
+
+/* Same tinted-pill table as ProsePanel's eyebrow: a petal base at this
+   size is under 4.5:1 on white, but the -800 step on its own -100 tint
+   clears 5:1. Cycled down the list so a long FAQ has some color in it. */
+const badges = [
+  'bg-coral-100 text-coral-800',
+  'bg-teal-100 text-teal-800',
+  'bg-purple-100 text-purple-800',
+  'bg-amber-100 text-amber-800',
+];
+---
+
+<!-- No accent on the card and no corner petal: this is one long surface
+     holding the whole list, not one of the accented panels. -->
+<CardV2 petal={false} class="p-2 sm:p-4 lg:p-6">
+  <div class="divide-y divide-ink-900/10">
+    {
+      items.map((item, i) => (
+        <details class="faq group">
+          <summary class="flex cursor-pointer list-none items-start gap-4 rounded-card px-4 py-5 transition-colors duration-[var(--duration-fast)] hover:bg-teal-50">
+            <span
+              class:list={[
+                'mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-pill font-display text-sm font-semibold',
+                badges[i % badges.length],
+              ]}
+              aria-hidden="true"
+            >
+              {i + 1}
+            </span>
+
+            <span class="flex-1 font-display text-lg leading-heading font-semibold text-pretty text-ink-900">
+              {item.question}
+            </span>
+
+            {/* Decorative: the summary itself is the control, and the
+                browser announces its expanded state. */}
+            <svg
+              class="chevron mt-1.5 size-4 shrink-0 text-ink-500"
+              viewBox="0 0 16 16"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M3 6l5 5 5-5"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </summary>
+
+          {/* `ps-15` lines the answer up with the question text, past
+              the number badge (size-7 + gap-4 + the summary's px-4). */}
+          <p class="px-4 pb-6 ps-15 text-lg leading-body text-pretty text-ink-800">
+            {item.answer}
+          </p>
+        </details>
+      ))
+    }
+  </div>
+</CardV2>
+
+<style>
+  /* `list-none` covers Firefox; WebKit needs its own pseudo-element
+     turned off or the disclosure triangle stays. */
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .chevron {
+    transition: transform var(--duration-base) var(--ease-standard);
+  }
+
+  .faq[open] .chevron {
+    transform: rotate(180deg);
+  }
+</style>

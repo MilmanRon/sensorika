@@ -1,0 +1,177 @@
+---
+/**
+ * PROPOSED — copy of src/components/sections/Method.astro. What changed:
+ *
+ * 1. THE SYMPTOM LIST IS RENDERED AS A LIST. This is the important one.
+ *    Paragraphs 3 and 4 of the current section are, grammatically, one
+ *    long comma-separated list of eleven infinitives — "להתעייף מעומס
+ *    במהירות, להתקשות להתרכז..." — set as running prose. That is the
+ *    single densest block on the page, and it's also the block a parent
+ *    is actually scanning: they are looking for their own child in it.
+ *    Prose makes that scan impossible. Split into two labelled groups of
+ *    scannable rows, each keeping its own framing clause.
+ *
+ *    COPY NOTE: every item below is a verbatim fragment of the current
+ *    paragraphs, split on the commas already in the copy. The two group
+ *    labels ("הילד יכול", "יכול להיות לו קשה") are the original
+ *    sentences' own opening clauses. Nothing is reworded — but the split
+ *    still needs a copy sign-off.
+ *
+ * 2. The heading carries the promise. The current h2 is the filing label
+ *    "השיטה שלנו" and the actual claim sits below it in a `<p>`. Swapped:
+ *    the label becomes the eyebrow, the claim becomes the h2.
+ * 3. The closing line becomes a real pull-quote — a tinted panel with a
+ *    quote mark. It is the sentence the whole section exists to land,
+ *    and today it's differentiated by a 4px rule.
+ * 4. The section takes its own surface (teal-100 band + wave joins) so
+ *    it separates from the hero and Programs. Today all three sections
+ *    share one flat field.
+ * 5. Prose measure kept at --width-prose for the running text; the list
+ *    grid is allowed the full content width, because rows that short on
+ *    a 42rem measure would waste two thirds of the screen.
+ *
+ * Divider ownership: a section paints the crest into the section that
+ * *follows* it, and never one above itself — two adjacent dividers read
+ * as a ripple rather than as a join. So this section emits only its
+ * closing crest (into white), and the crest above it belongs to
+ * HeroV2. Standalone, it opens on a flat edge; that's the intended
+ * standalone look, not a missing piece.
+ */
+import Icon from './Icon.astro';
+import SectionHeading from './SectionHeading.astro';
+import WaveDivider from './WaveDivider.astro';
+
+const lead = 'אנחנו עוזרים להבין מה בדיוק מקשה על הילד להתמודד';
+
+/* Paragraphs 1-2 of the current copy, unchanged. */
+const body = [
+  'באמצעות תנועה וחוויה חושית המאורגנת באופן מותאם, אנחנו יוצרים תנאים שבהם הילד יכול לרכוש את מה שקשה לו היום, לצבור חוויות של הצלחה, להיות פחות ופחות תלוי בעזרת מבוגר ובהדרגה להפוך לעצמאי יותר.',
+  'לעיתים קרובות, מאחורי הקשיים שאנחנו רואים בחיי היומיום עומדים מאפיינים של עיבוד חושי ושל הארגון התפקודי של מערכת העצבים.',
+];
+
+/* Paragraphs 3-4, split on their own commas. Each group's label takes
+   its own petal so a long list doesn't read as one grey block. */
+const signGroups = [
+  {
+    label: 'הילד יכול',
+    accent: 'teal',
+    items: [
+      'להיות כל הזמן בתנועה — או להפך, להימנע מפעילות',
+      'להתעייף מעומס במהירות',
+      'להתקשות להתרכז ולעבור מפעילות אחת לאחרת',
+      'להתקשות לווסת את עוצמת הכוח',
+      'לנוע בצורה מסורבלת',
+      'להתקשות ברכישת דברים חדשים',
+      'להגיב בעוצמה לרעש, למגע או לתנועה',
+      'לוותר על הניסיון עוד לפני שהתחיל',
+    ],
+  },
+  {
+    label: 'יכול להיות לו קשה',
+    accent: 'purple',
+    items: [
+      'להתמודד עם תגובות רגשיות חזקות',
+      'לפעול לפי כללים משותפים',
+      'ליצור אינטראקציה עם ילדים אחרים',
+    ],
+  },
+] as const;
+
+const closing = 'לפעמים מה שנראה כמו ״לא רוצה״, בעצם אומר ״קשה לו״.';
+
+/* The row marks take the group's own hue, so the two groups stay
+   readable as groups when the long one flows into two sub-columns. */
+const groupAccents = {
+  teal: { pill: 'bg-teal-100 text-teal-800', mark: 'bg-teal-100 text-teal-800' },
+  purple: { pill: 'bg-purple-100 text-purple-800', mark: 'bg-purple-100 text-purple-800' },
+};
+---
+
+<section id="method" class="bg-teal-100 py-section lg:py-section-lg">
+  <div class="mx-auto max-w-[var(--width-content)] px-gutter lg:px-gutter-lg">
+    <SectionHeading eyebrow="השיטה שלנו" accent="teal">{lead}</SectionHeading>
+
+    <div
+      class="mx-auto mt-8 flex max-w-[var(--width-prose)] flex-col gap-5 text-lg leading-body text-pretty text-ink-700"
+    >
+      {body.map((paragraph) => <p>{paragraph}</p>)}
+    </div>
+
+    <!--
+      The scannable half. One white panel holding both groups, rather
+      than a card per row: eleven separate cards would read as eleven
+      separate offers, and these are symptoms, not features.
+    -->
+    <div class="mt-12 rounded-card bg-white p-6 shadow-card ring-1 ring-ink-900/5 sm:p-10">
+      <!--
+        3-up, with the long group spanning two of them and flowing its
+        own items into two columns. An even 2-up split puts 8 rows beside
+        3 and leaves a third of the panel blank.
+      -->
+      <div class="grid gap-x-10 gap-y-10 md:grid-cols-3">
+        {
+          signGroups.map((group, index) => (
+            /* Rule between the groups, not around them: the long group
+               flows into two sub-columns, so without it the reader can't
+               tell which header the middle column belongs to. */
+            <div
+              class:list={[
+                group.items.length > 4 && 'md:col-span-2',
+                index > 0 && 'md:border-s md:border-s-ink-900/10 md:ps-10',
+              ]}
+            >
+              <p
+                class:list={[
+                  'inline-flex rounded-pill px-4 py-1.5 font-display text-sm font-semibold',
+                  groupAccents[group.accent].pill,
+                ]}
+              >
+                {group.label}
+              </p>
+              <ul
+                class:list={[
+                  'mt-5 grid gap-x-8 gap-y-3',
+                  group.items.length > 4 && 'sm:grid-cols-2',
+                ]}
+              >
+                {group.items.map((item) => (
+                  <li class="flex items-start gap-3">
+                    <span
+                      class:list={[
+                        'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-pill',
+                        groupAccents[group.accent].mark,
+                      ]}
+                    >
+                      <Icon name="check" class="h-3.5 w-3.5" />
+                    </span>
+                    <span class="leading-snug text-ink-700">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <!--
+      The takeaway. Amber wash because it's the one warm, hopeful beat in
+      a section that is otherwise a list of difficulties — and amber is
+      the petal that can do least elsewhere (1.7:1 on white, so it can
+      never carry a label), which makes a tint like this the one place it
+      genuinely earns its keep.
+    -->
+    <figure
+      class="relative mx-auto mt-12 max-w-3xl overflow-hidden rounded-card bg-amber-50 p-8 text-center ring-1 ring-amber-500/25 sm:p-12"
+    >
+      <Icon name="quote" class="mx-auto h-9 w-9 text-amber-800" />
+      <blockquote
+        class="mt-4 font-display text-2xl leading-heading font-semibold text-balance text-ink-900 sm:text-3xl"
+      >
+        {closing}
+      </blockquote>
+    </figure>
+  </div>
+</section>
+
+<WaveDivider fill="white" direction="up" class="-mt-px bg-teal-100" />

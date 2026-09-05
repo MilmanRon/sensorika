@@ -1,0 +1,28 @@
+---
+import PlaygroundLayout from '../../layouts/PlaygroundLayout.astro';
+import Method from '../../components/sections/Method.astro';
+import Compare from './_proposed/Compare.astro';
+import MethodV2 from './_proposed/MethodV2.astro';
+---
+
+<PlaygroundLayout title="Method">
+  <div class="flex flex-col gap-12">
+    <Compare side="current">
+      <div class="bg-paper-50">
+        <Method />
+      </div>
+    </Compare>
+
+    <Compare
+      side="proposed"
+      notes={[
+        'הפסקאות השלישית והרביעית הן למעשה רשימה של אחד־עשר סימנים — כאן הן מוצגות כרשימה סרוקה בשתי קבוצות, במקום כפרוזה רצה. כל פריט הוא ציטוט מילולי מהקופי הקיים.',
+        'הכותרת היא ההבטחה (<span dir="rtl">״אנחנו עוזרים להבין…״</span>) ו־<span dir="rtl">״השיטה שלנו״</span> יורדת לתווית מעל.',
+        'שורת הסיום הופכת לציטוט מובלט על רקע ענבר, במקום קו בעובי 4px.',
+        'למקטע יש משטח משלו (teal-100) עם גלי מעבר, כדי שייפרד מהחלקים שסביבו.',
+      ]}
+    >
+      <MethodV2 />
+    </Compare>
+  </div>
+</PlaygroundLayout>

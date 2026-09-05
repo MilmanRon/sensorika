@@ -1,0 +1,212 @@
+---
+/**
+ * PROPOSED — copy of src/components/layout/Header.astro. What changed:
+ *
+ * 1. THE NAV IS VISIBLE ON DESKTOP. Today the nav is behind a hamburger
+ *    at every width, including 1440px where there is roughly 900px of
+ *    empty bar. That's a deliberate, documented decision — but it costs
+ *    a marketing site the one thing its header is for: showing a
+ *    first-time visitor what's on the page. Both references keep an
+ *    inline bar. Here the drawer survives untouched below `2xl` and the
+ *    links come inline above it.
+ *
+ *    CAVEAT, and it's a real one: there are eight labels and they are
+ *    long ("מתי אנחנו יכולים לעזור" is 22 characters). At 16px they run
+ *    ~1030px, which together with the logo, the CTA and the gutters
+ *    needs ~1500px — hence `2xl` (1536px) rather than `xl`. Below that
+ *    the drawer is the nav. Pulling the inline bar back down to `xl`
+ *    means either shortening the labels in `site.ts` or dropping some
+ *    from the bar — a copy decision, not a CSS one.
+ *
+ * 2. The logo drops from h-18/h-22 to h-14/h-16. At 88px inside a 112px
+ *    bar it fills 79% of the header's height, which reads as an
+ *    oversized asset rather than as a brand mark, and leaves the CTA
+ *    looking undersized next to it.
+ * 3. The CTA is a pill on `teal-700` — see ButtonV2 for why a pastel
+ *    petal base can't carry a white label.
+ * 4. The bar is FLAT WHITE WITH A PERMANENT SHADOW, at every scroll
+ *    position. Three earlier versions are worth recording, because each
+ *    was wrong for its own reason:
+ *
+ *    - transparent until the first scroll, then `teal-100/85` with a
+ *      blur. Translucency over a busy hero is where sticky headers go
+ *      to become unreadable, and the blur cost a compositing layer on
+ *      scroll for a difference nobody could see.
+ *    - opaque `teal-100` always, shadow on scroll. That fixed the
+ *      readability, but a tinted bar reads as part of the ground rather
+ *      than as chrome sitting above it.
+ *    - white, shadow on scroll. The header then had two looks, and the
+ *      flat one — the one you meet first — was the weaker.
+ *
+ *    White is the surface every card on the page already uses, so the
+ *    header reads as the topmost of them; the shadow is what says it
+ *    floats over the ground rather than being painted onto it. Neither
+ *    fact depends on scroll position, so neither is animated any more,
+ *    which takes the scroll listener, the rAF guard and the scrolled-
+ *    state attribute out of this component entirely.
+ *
+ * The drawer's state machine, focus handling and skip link are COPIED
+ * UNCHANGED from Header.astro — this component keeps the exact same
+ * contract (`data-nav-open` on <html>, `aria-controls="site-nav"`,
+ * `nav:close`), so the shipped SideNav.astro works with it as-is and is
+ * what should be rendered alongside it.
+ */
+import ButtonV2 from './ButtonV2.astro';
+import Logo from '../../../components/layout/Logo.astro';
+import WhatsappIcon from '../../../assets/icons/whatsapp.svg';
+import { hasWhatsapp, siteConfig, whatsappHref } from '../../../data/site';
+
+const ctaLabel = hasWhatsapp ? 'וואטסאפ' : 'צרו קשר';
+const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+---
+
+<a
+  href="#main"
+  class="sr-only focus-visible:not-sr-only focus-visible:absolute focus-visible:top-3 focus-visible:start-3 focus-visible:z-[60] focus-visible:rounded-control focus-visible:bg-white focus-visible:px-4 focus-visible:py-2 focus-visible:text-sm focus-visible:font-medium focus-visible:text-ink-900 focus-visible:shadow-elevated"
+>
+  דלגו לתוכן הראשי
+</a>
+
+<header
+  data-site-header
+  class="sticky top-0 z-50 bg-white shadow-card"
+>
+  <div
+    class="flex h-header flex-row-reverse items-center justify-between gap-4 px-gutter lg:h-header-lg lg:px-gutter-lg"
+  >
+    <Logo class="h-14 lg:h-16" />
+
+    <!-- Inline nav, 2xl and up. `flex-row-reverse` for the same reason
+         the bar itself is reversed: DOM order stays the reading order,
+         the row runs left-to-right physically. -->
+    <nav aria-label="ניווט ראשי" class="hidden 2xl:block">
+      <ul class="flex flex-row-reverse items-center gap-1">
+        {
+          siteConfig.nav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class="nav-link rounded-pill px-3 py-2 text-base font-medium whitespace-nowrap text-ink-700 transition-colors duration-[var(--duration-fast)] hover:text-ink-900"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="flex flex-row-reverse items-center gap-2 sm:gap-3">
+      <ButtonV2
+        href={whatsappHref()}
+        size="sm"
+        variant="primary"
+        class="max-sm:size-10 max-sm:gap-0 max-sm:px-0"
+        {...external}
+      >
+        <WhatsappIcon class="h-4 w-4 max-sm:h-5 max-sm:w-5" aria-hidden="true" />
+        <span class="sr-only sm:not-sr-only">{ctaLabel}</span>
+      </ButtonV2>
+
+      <!-- Drawer trigger. Hidden once the inline nav appears — leaving
+           both would give the same links two entry points. -->
+      <button
+        type="button"
+        data-nav-toggle
+        aria-controls="site-nav"
+        aria-expanded="false"
+        class="inline-flex h-10 w-10 items-center justify-center rounded-pill text-ink-800 ring-1 ring-ink-900/10 transition-colors duration-[var(--duration-fast)] hover:bg-paper-100 2xl:hidden"
+      >
+        <span class="sr-only">תפריט</span>
+        <span class="toggle-bars" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  /* Underline that grows from the inline start, instead of a background
+     pill — a pill per link would put eight competing surfaces in a bar
+     that already has a filled CTA in it. */
+  .nav-link {
+    position: relative;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    inset-block-end: 0.35rem;
+    inset-inline: 0.75rem;
+    height: 2px;
+    border-radius: var(--radius-pill);
+    background: var(--color-teal-700);
+    transform: scaleX(0);
+    transform-origin: var(--nav-underline-origin, left);
+    transition: transform var(--duration-base) var(--ease-standard);
+  }
+  :global([dir='rtl']) .nav-link::after {
+    --nav-underline-origin: right;
+  }
+  .nav-link:hover::after,
+  .nav-link:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  /* The header used to drop its shadow while the drawer was open:
+     both were `teal-100`, so a shadow across the join broke up what
+     was meant to read as one continuous surface. That reasoning died
+     with the tinted bar — a white header above a `paper-100` drawer is
+     two surfaces, and the shadow between them is the truth rather than
+     a seam. Hence no nav-open override here at all now. */
+
+  .toggle-bars {
+    display: grid;
+    gap: 4px;
+    width: 1.25rem;
+  }
+  .toggle-bars > span {
+    display: block;
+    height: 2px;
+    border-radius: var(--radius-pill);
+    background: currentColor;
+    transition:
+      transform var(--duration-base) var(--ease-standard),
+      opacity var(--duration-fast) var(--ease-standard);
+  }
+  :global(html[data-nav-open]) .toggle-bars > span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+  :global(html[data-nav-open]) .toggle-bars > span:nth-child(2) {
+    opacity: 0;
+  }
+  :global(html[data-nav-open]) .toggle-bars > span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+</style>
+
+<script>
+  /* Copied verbatim from src/components/layout/Header.astro — the state
+     machine isn't what's under review here, only the bar's look. Same
+     contract, so the shipped SideNav.astro pairs with this unchanged. */
+  const html = document.documentElement;
+  const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+
+  function setNavOpen(open: boolean) {
+    html.toggleAttribute('data-nav-open', open);
+    toggle?.setAttribute('aria-expanded', String(open));
+    html.style.overflow = open ? 'hidden' : '';
+  }
+
+  toggle?.addEventListener('click', () => {
+    setNavOpen(!html.hasAttribute('data-nav-open'));
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !html.hasAttribute('data-nav-open')) return;
+    setNavOpen(false);
+    toggle?.focus();
+  });
+
+  document.addEventListener('nav:close', () => setNavOpen(false));
+</script>

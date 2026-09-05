@@ -1,15 +1,14 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteLayout from '../layouts/SiteLayout.astro';
 ---
 
-<BaseLayout
-  title="בית"
-  description="מקום לילדים עם צרכים מיוחדים לשחק ולגדול."
->
-  <!-- Header/Nav are being rebuilt from scratch — see /playground -->
-  <main class="flex min-h-[50vh] items-center justify-center px-gutter">
-    <h1 class="font-display text-4xl font-bold text-ink-900">
-      שאר העמוד בבנייה
-    </h1>
-  </main>
-</BaseLayout>
+<SiteLayout title="בית" description="מקום לילדים עם צרכים מיוחדים לשחק ולגדול.">
+  <!--
+    Sections still to come. `site.ts` nav hrefs are placeholder slugs
+    until each matching section exists here and gets the real `id`, so
+    the rail's links have nothing to land on yet.
+  -->
+  <div class="flex min-h-[50vh] items-center justify-center px-gutter lg:px-gutter-lg">
+    <h1 class="font-display text-4xl font-bold text-ink-900">שאר העמוד בבנייה</h1>
+  </div>
+</SiteLayout>

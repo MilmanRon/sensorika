@@ -1,0 +1,80 @@
+---
+/**
+ * PROPOSED (new — no current counterpart).
+ *
+ * Every section on the page currently opens with a bare `<h2>` and
+ * nothing else, so all three sections enter at exactly the same weight
+ * and a reader scrolling past gets no sense of where one ends and the
+ * next begins. Both reference designs solve this the same way: a small
+ * colored eyebrow naming the section, then the headline, then an
+ * optional lead line.
+ *
+ * The eyebrow is a tinted pill rather than colored text on its own. At
+ * 13px the accent's own base is nowhere near 4.5:1 on a light ground;
+ * the pill is what makes the color usable, by pairing a -100 tint with
+ * the -800 step (8.5:1) or inverting to white on -700 (5.9:1).
+ *
+ * The pill is ornament, so it takes a petal hue rather than the working
+ * teal — a different one per section is what tells them apart on a long
+ * scroll. It's the -800 step on its own -100 tint, never the -500 base.
+ */
+interface Props {
+  /** Small label above the heading — what this section *is*. */
+  eyebrow: string;
+  /** Petal hue for the eyebrow pill. */
+  accent?: 'coral' | 'teal' | 'amber' | 'purple';
+  /** Optional sentence under the heading. */
+  lead?: string;
+  /** `center` for full-width sections, `start` for prose columns. */
+  align?: 'start' | 'center';
+  class?: string;
+}
+
+const {
+  eyebrow,
+  accent = 'coral',
+  lead,
+  align = 'center',
+  class: className = '',
+} = Astro.props;
+
+const eyebrows = {
+  coral: 'bg-coral-100 text-coral-800',
+  teal: 'bg-teal-100 text-teal-800',
+  amber: 'bg-amber-100 text-amber-800',
+  purple: 'bg-purple-100 text-purple-800',
+};
+---
+
+<div class:list={[align === 'center' && 'text-center', className]}>
+  <p
+    class:list={[
+      'inline-flex items-center gap-2 rounded-pill px-4 py-1.5 font-display text-sm font-semibold',
+      eyebrows[accent],
+    ]}
+  >
+    {eyebrow}
+  </p>
+
+  <h2
+    class:list={[
+      'mt-5 font-display text-3xl leading-heading font-bold text-balance text-ink-900 sm:text-4xl',
+      align === 'center' && 'mx-auto max-w-3xl',
+    ]}
+  >
+    <slot />
+  </h2>
+
+  {
+    lead && (
+      <p
+        class:list={[
+          'mt-5 text-lg leading-body text-pretty text-ink-600',
+          align === 'center' && 'mx-auto max-w-[var(--width-prose)]',
+        ]}
+      >
+        {lead}
+      </p>
+    )
+  }
+</div>

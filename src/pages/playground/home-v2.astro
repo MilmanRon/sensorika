@@ -1,0 +1,46 @@
+---
+/**
+ * Composition preview of the PROPOSED look — the same page as
+ * /playground/home (chrome, Hero, Method, Programs) built from the
+ * copies under _proposed/. Open the two side by side; that's the
+ * comparison that matters, because most of what changed is the rhythm
+ * *between* sections rather than anything inside one.
+ *
+ * Builds on BaseLayout rather than SiteLayout because SiteLayout hard-
+ * codes the shipped Header. The drawer is the shipped SideNav, unchanged
+ * — HeaderV2 keeps Header's exact state contract, so the two pair up
+ * without SideNav being touched.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SideNav from '../../components/layout/SideNav.astro';
+import HeaderV2 from './_proposed/HeaderV2.astro';
+import HeroV2 from './_proposed/HeroV2.astro';
+import MethodV2 from './_proposed/MethodV2.astro';
+import ProgramsV2 from './_proposed/ProgramsV2.astro';
+---
+
+<BaseLayout title="Home (proposed) · Playground" description="Component playground">
+  <HeaderV2 />
+  <SideNav />
+
+  <main id="main">
+    <HeroV2 />
+    <MethodV2 />
+    <ProgramsV2 />
+
+    <div class="mx-auto flex max-w-[var(--width-content)] gap-6 px-gutter pb-16 lg:px-gutter-lg">
+      <a
+        href="/playground"
+        class="text-sm font-medium text-ink-600 transition-colors duration-[var(--duration-fast)] hover:text-ink-900"
+      >
+        ← כל הרכיבים
+      </a>
+      <a
+        href="/playground/home"
+        class="text-sm font-medium text-ink-600 transition-colors duration-[var(--duration-fast)] hover:text-ink-900"
+      >
+        ↔ להשוואה: העמוד הנוכחי
+      </a>
+    </div>
+  </main>
+</BaseLayout>

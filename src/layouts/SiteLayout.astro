@@ -1,0 +1,34 @@
+---
+/**
+ * The public site's shell: BaseLayout plus the shared chrome every real
+ * route needs — header, side nav, and a <main> that clears both.
+ *
+ * The side nav is a drawer over the page at every width, never a pinned
+ * column beside it, so <main> needs no inset — page content runs the
+ * full width and the nav sits on top of it only while it's open.
+ *
+ * Playground pages deliberately don't use this — they build on
+ * BaseLayout/PlaygroundLayout so a component can be seen without the
+ * chrome that's often the thing being worked on.
+ */
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/layout/Header.astro';
+import SideNav from '../components/layout/SideNav.astro';
+
+interface Props {
+  /** Page title, rendered as "{title} · Sensorika" */
+  title: string;
+  /** 1-2 sentence page description for SEO/social previews */
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <Header />
+  <SideNav />
+  <main id="main">
+    <slot />
+  </main>
+</BaseLayout>

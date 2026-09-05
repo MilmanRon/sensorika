@@ -1,0 +1,75 @@
+---
+/**
+ * "התוכניות שלנו" — the two ways a family can work with the clinic,
+ * side by side as a pair of cards.
+ *
+ * Two columns from `md` up, stacked below. The cards are equal in
+ * weight on purpose: neither track is the "real" one, they're two
+ * entry points, so they get the same size, the same CTA, and differ
+ * only in the petal hue of their accent bar. The bars are ornament, not
+ * a signal — both cards carry the same CTA in the same teal.
+ *
+ * Each card's body is deliberately short — enough to tell the two apart
+ * and answer "is this the one for us?", with the detail living behind
+ * the CTA rather than in the card.
+ */
+import Card from '../ui/Card.astro';
+import Button from '../ui/Button.astro';
+
+/**
+ * `href` is a placeholder: there's no per-program page or section yet,
+ * so both CTAs land on contact. Point each at its own target once it
+ * exists — TODO.
+ */
+const programs = [
+  {
+    title: 'אבחון וטיפול פרטניים',
+    body: 'מפגש אחד-על-אחד שמתחיל בהיכרות ובאבחון חושי-תפקודי, וממשיך בתוכנית טיפול שנבנית סביב הילד הזה — הקצב שלו, החוזקות שלו ומה שקשה לו.',
+    accent: 'coral',
+    href: '#contact',
+  },
+  {
+    title: 'פעילויות קבוצתיות התפתחותיות',
+    body: 'קבוצות קטנות לפי גיל ורמה, שבהן ילדים מתנסים בתנועה, במשחק ובשיתוף פעולה — ולומדים יחד, בקבוצה, את מה שקשה להם לבד.',
+    accent: 'teal',
+    href: '#contact',
+  },
+] as const;
+---
+
+<!--
+  The one tinted band on the page. Sections alternate white / teal-50 so
+  the eye gets a break between blocks without any of them turning into a
+  colored panel; the cards stay bg-white, which is what lifts them off
+  the tint.
+-->
+<section id="programs" class="bg-teal-50 py-section lg:py-section-lg">
+  <div class="mx-auto max-w-[var(--width-content)] px-gutter lg:px-gutter-lg">
+    <h2 class="font-display text-3xl leading-heading font-bold text-ink-900 sm:text-4xl">
+      התוכניות שלנו
+    </h2>
+
+    <div class="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8">
+      {
+        programs.map((program) => (
+          /*
+           * `h-full` + column flex so both cards match the taller one's
+           * height and their buttons still line up: `mt-auto` pushes the
+           * CTA to the bottom regardless of how long the body runs.
+           */
+          <Card accent={program.accent} class="flex h-full flex-col">
+            <h3 class="font-display text-xl leading-heading font-semibold text-ink-900 sm:text-2xl">
+              {program.title}
+            </h3>
+            <p class="mt-4 leading-body text-ink-700">{program.body}</p>
+            <div class="mt-auto pt-8">
+              <Button href={program.href} variant="secondary">
+                לפרטים נוספים
+              </Button>
+            </div>
+          </Card>
+        ))
+      }
+    </div>
+  </div>
+</section>
