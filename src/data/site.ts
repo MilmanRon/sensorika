@@ -5,7 +5,7 @@
  * of these values in a component.
  *
  * EVERYTHING HERE IS THE SAME IN BOTH LANGUAGES. The phone number, the
- * Facebook URL and the six nav slugs don't change when the reader
+ * Facebook URL and the nav's slugs don't change when the reader
  * switches to Russian, which is exactly why they're here and not in
  * i18n.ts. Anything that *does* change with the language — the chrome's
  * own vocabulary, the direction of the page — lives there. The one
@@ -82,12 +82,16 @@ export const siteConfig = {
     facebook: '', // TODO: e.g. 'https://facebook.com/sensorika'
   },
   /**
-   * Primary nav — SIX SLUGS, IN ORDER, AND NOTHING ELSE.
+   * Primary nav — SEVEN SLUGS, IN ORDER, AND NOTHING ELSE.
    *
    * Each one is a PAGE: every slug here has a matching .md in
-   * src/content/pages/<locale>/ that [...locale]/[navpage].astro renders
-   * as a route of its own. The nav was a list of `#` placeholders while
-   * those pages didn't exist yet; they do, so it isn't any more.
+   * src/content/pages/<locale>/. Six of them are rendered by
+   * [...locale]/[navpage].astro as a route of its own; the seventh is
+   * `home`, whose copy is in the same collection but whose route is
+   * index.astro. That's the ONLY entry whose href isn't `/<slug>` — see
+   * `navHref()` — and it's first, because a nav of six destinations
+   * with no way back to the front page makes the logo the only exit,
+   * which is a convention rather than a signpost.
    *
    * IT USED TO CARRY THE LABELS TOO, and it can't any more — a label is
    * Hebrew or Russian, and this file is the half of the configuration
@@ -104,6 +108,7 @@ export const siteConfig = {
    * finding out about the clinic; the CTA is for getting in touch.
    */
   nav: [
+    'home',
     'sensory-regulation',
     'how-we-help',
     'individual',
@@ -130,6 +135,23 @@ export function whatsappHref(message?: string): string {
 }
 
 /**
+ * The one slug in the nav that is NOT at `/<slug>`.
+ *
+ * `home.md` is a `pages` entry like the other six — same frontmatter,
+ * same collection — but index.astro renders it, so its URL is the site
+ * root (`/`, or `/ru`) and it carries `nav: false` to keep
+ * [navpage].astro from building a second copy of it at `/home`.
+ */
+const homeSlug = 'home';
+
+/** Where one nav slug points, in one language. */
+function navHref(locale: Locale, slug: string): string {
+  return slug === homeSlug
+    ? homeHref(locale)
+    : localizedHref(locale, `${pagesBase}/${slug}`);
+}
+
+/**
  * The nav, resolved for one language: label, href and slug per entry, in
  * `siteConfig.nav` order.
  *
@@ -140,7 +162,7 @@ export function whatsappHref(message?: string): string {
  * nav follows, in both languages, from the copy the clinic supplied.
  *
  * IT THROWS RATHER THAN RENDERING A BROKEN NAV. Two lists have to agree
- * — the six slugs above and the files in src/content/pages/<locale>/ —
+ * — the slugs above and the files in src/content/pages/<locale>/ —
  * and they live in places that can't see each other. Previously this
  * check lived in the route; it belongs here, because now it has to hold
  * for every language and the route only ever built one. A missing
@@ -162,7 +184,7 @@ export async function getNavItems(locale: Locale) {
     return {
       slug,
       label: page.data.navLabel ?? page.data.title,
-      href: localizedHref(locale, `${pagesBase}/${slug}`),
+      href: navHref(locale, slug),
     };
   });
 }

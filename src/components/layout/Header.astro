@@ -12,16 +12,18 @@
  *    יכולים לעזור" is 22 characters). With the eight original entries
  *    they ran ~1030px at 16px, which together with the logo, the CTA
  *    and the gutters needed ~1500px — hence `2xl` (1536px) rather than
- *    `xl`. `site.ts` is down to six entries since ("יצירת קשר" and
- *    "הרשמה" are the CTA's job, not the nav's), so the row is narrower
- *    and `xl` may now fit — but that wants measuring in the browser
- *    before the breakpoint moves, not arithmetic here. Below whatever
- *    it ends up being, the drawer is the nav.
+ *    `xl`. Two of those eight went ("יצירת קשר" and "הרשמה" are the
+ *    CTA's job, not the nav's) and the row has since taken back two
+ *    things that are not links: "בית"/"Главная", and the language
+ *    switcher at the head of it. Whether `xl` would now fit wants
+ *    measuring in the browser rather than arithmetic here — and the
+ *    thing to measure is the RUSSIAN row, per the next paragraph.
+ *    Below whatever breakpoint it ends up being, the drawer is the nav.
  *
- *    AND RUSSIAN IS LONGER THAN HEBREW. The bar now renders whichever
- *    language the URL is in, and the six Russian labels are wider than
- *    the six Hebrew ones — both because Cyrillic sets wider than Hebrew
- *    at the same size and because the words are longer. That's the whole
+ *    AND RUSSIAN IS LONGER THAN HEBREW. The bar renders whichever
+ *    language the URL is in, and the Russian labels are wider than the
+ *    Hebrew ones — both because Cyrillic sets wider than Hebrew at the
+ *    same size and because the words are longer. That's the whole
  *    reason the Russian pages carry short `navLabel`s in their
  *    frontmatter ("Сенсорная интеграция", not "Что такое сенсорная
  *    интеграция"): the shortening happens in the content, where a human

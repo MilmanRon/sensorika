@@ -14,9 +14,9 @@
  *
  * It is rendered BESIDE <nav>, not inside its <ul>. That keeps the part
  * of the old arrangement that was right: the primary nav's list stays a
- * list of pages, so a screen reader still hears "6 items" and not "7,
- * one of which isn't a page", and the switcher keeps the landmark and
- * the label of its own. All that moved is where it is and what it looks
+ * list of pages, so a screen reader hears a list of exactly the pages
+ * and not one with a language control counted among them, and the
+ * switcher keeps the landmark and the label of its own. All that moved is where it is and what it looks
  * like — `size="nav"` gives it NavItem's box, so it reads as row one.
  *
  * The current page is worked out HERE, off `Astro.url`, rather than

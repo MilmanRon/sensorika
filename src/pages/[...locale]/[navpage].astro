@@ -17,11 +17,13 @@
  * with a static route would be silently unreachable — the static routes
  * are the 404s.
  *
- * NOT EVERY PAGE HERE IS IN THE NAV. `siteConfig.nav` names six
- * destinations; this route builds every `pages` entry that asks for one,
- * which is those six plus the two the home page's program cards land on
- * (group-forms, individual-packages). A page with `nav: false` — the
- * home page's copy, which HeroMethod renders — gets no route at all.
+ * NOT EVERY PAGE HERE IS IN THE NAV, AND NOT EVERY NAV ENTRY IS HERE.
+ * `siteConfig.nav` names seven entries; this route builds every `pages`
+ * entry that asks for a route, which is six of those seven plus the two
+ * the home page's program cards land on (group-forms,
+ * individual-packages). A page with `nav: false` — the home page's copy,
+ * which index.astro renders through HeroMethod — gets no route here at
+ * all, which is exactly why the nav's seventh entry points at `/`.
  *
  * THE PAGE IS ASSEMBLED LIKE THE HOME PAGE, and for the same reasons:
  * these are its siblings, not a different kind of document, so they get

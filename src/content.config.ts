@@ -240,10 +240,12 @@ const pages = defineCollection({
      * everything — but it's rendered by the home hero rather than by
      * that route, so it sets `nav: false`.
      *
-     * It does NOT decide what the header carries: `siteConfig.nav` names
-     * the six nav destinations, and a page can have a route without
-     * being one of them (the group program's forms page is reached from
-     * a card on the home page).
+     * IT DOES NOT DECIDE WHAT THE HEADER CARRIES, and the two now cross
+     * in both directions: `siteConfig.nav` names the seven nav entries,
+     * a page can have a route without being one of them (the group
+     * program's forms page is reached from a card on the home page),
+     * and home is the converse — in the nav, and `nav: false`, because
+     * the nav points at `/` and this flag is only about `/home`.
      */
     nav: z.boolean().default(true),
     /**
