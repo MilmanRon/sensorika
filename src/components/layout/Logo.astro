@@ -17,6 +17,7 @@ import LogoLockup from '../../assets/brand/logo.svg';
 import LogoLockupMono from '../../assets/brand/logo-mono.svg';
 import LogoMark from '../../assets/brand/logo-mark.svg';
 import LogoMarkMono from '../../assets/brand/logo-mark-mono.svg';
+import { currentLocale, ui } from '../../data/i18n';
 import { siteConfig } from '../../data/site';
 
 interface Props {
@@ -74,7 +75,7 @@ const markClass = variant === 'responsive' ? 'sm:hidden' : '';
   ) : (
     <a
       href={href}
-      aria-label={`${siteConfig.name} — לעמוד הבית`}
+      aria-label={`${siteConfig.name} — ${ui(currentLocale(Astro)).homeAria}`}
       class="inline-flex shrink-0 items-center rounded-control transition-opacity duration-[var(--duration-fast)] hover:opacity-80"
     >
       {variant !== 'mark' && (

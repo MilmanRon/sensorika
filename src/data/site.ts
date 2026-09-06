@@ -3,7 +3,18 @@
  * (content collections) — the stuff a header, footer, and contact
  * section all need to agree on. Import this instead of hardcoding any
  * of these values in a component.
+ *
+ * EVERYTHING HERE IS THE SAME IN BOTH LANGUAGES. The phone number, the
+ * Facebook URL and the six nav slugs don't change when the reader
+ * switches to Russian, which is exactly why they're here and not in
+ * i18n.ts. Anything that *does* change with the language — the chrome's
+ * own vocabulary, the direction of the page — lives there. The one
+ * bridge between the two is `getNavItems()` at the bottom, which pairs
+ * these slugs with labels read out of the current locale's content.
  */
+import { getCollection } from 'astro:content';
+
+import { localizedHref, type Locale } from './i18n';
 
 /**
  * WHERE THE SITE LIVES.
@@ -12,13 +23,26 @@
  * `'/playground'` and `'/playground/full-page'` while the design was
  * under review, which is the whole reason they're constants: every href
  * the chrome renders is derived from them, so moving the site was this
- * one edit rather than a search for hardcoded paths. They stay for the
- * next such move — a subdirectory deploy, a locale prefix.
+ * one edit rather than a search for hardcoded paths.
+ *
+ * THE LOCALE PREFIX IS NOT ONE OF THEM. That's `localizedHref()` in
+ * i18n.ts, and it composes with this: the Russian FAQ is
+ * `localizedHref('ru', `${pagesBase}/faq`)`. Two prefixes, two owners —
+ * this one for where the site is deployed, that one for what language
+ * the reader is in.
  */
 export const pagesBase = '';
 
-/** The brand lockup's destination, in the header and in the footer. */
-export const homeHref = '/';
+/**
+ * The brand lockup's destination, in the header and in the footer —
+ * for a given locale. It's a function rather than a constant now
+ * because home is `/` in Hebrew and `/ru` in Russian, and a lockup that
+ * always pointed at `/` would quietly drop a Russian reader back into
+ * Hebrew.
+ */
+export function homeHref(locale: Locale): string {
+  return localizedHref(locale, '/');
+}
 
 export const siteConfig = {
   name: 'Sensorika',
@@ -48,15 +72,20 @@ export const siteConfig = {
     facebook: '', // TODO: e.g. 'https://facebook.com/sensorika'
   },
   /**
-   * Primary nav. Each entry is a PAGE now, not a same-page anchor: every
-   * label here has a matching .md in src/content/pages/ that
-   * [navpage].astro renders as a route of its own, and `slug` is that
-   * file's id. The nav was a list of `#` placeholders while those pages
-   * didn't exist yet; they do, so it isn't any more.
+   * Primary nav — SIX SLUGS, IN ORDER, AND NOTHING ELSE.
    *
-   * `href` is derived from `slug` rather than written out, so the six
-   * paths can never drift from the six files — and so the whole nav
-   * moves with `pagesBase` when the prototype is promoted (see there).
+   * Each one is a PAGE: every slug here has a matching .md in
+   * src/content/pages/<locale>/ that [...locale]/[navpage].astro renders
+   * as a route of its own. The nav was a list of `#` placeholders while
+   * those pages didn't exist yet; they do, so it isn't any more.
+   *
+   * IT USED TO CARRY THE LABELS TOO, and it can't any more — a label is
+   * Hebrew or Russian, and this file is the half of the configuration
+   * that's neither. The labels were always duplicated anyway: every one
+   * of them already existed as `navLabel` in the page's own frontmatter,
+   * so the nav and the page it points at could disagree about what the
+   * page is called. Now there is one place per language (the content) and
+   * one place for the order (here), and `getNavItems()` joins them.
    *
    * The two conversion entries — "יצירת קשר" and "הרשמה" — are
    * deliberately absent. The header carries a standing WhatsApp CTA, so
@@ -65,17 +94,13 @@ export const siteConfig = {
    * finding out about the clinic; the CTA is for getting in touch.
    */
   nav: [
-    { label: 'מהו ויסות חושי', slug: 'sensory-regulation' },
-    { label: 'מתי אנחנו יכולים לעזור', slug: 'how-we-help' },
-    { label: 'אבחון וטיפול פרטניים', slug: 'individual' },
-    { label: 'פעילות קבוצתית', slug: 'groups' },
-    { label: 'קצת עליי', slug: 'about' },
-    { label: 'שאלות נפוצות', slug: 'faq' },
-  ].map((item) => ({ ...item, href: `${pagesBase}/${item.slug}` })) as {
-    label: string;
-    slug: string;
-    href: string;
-  }[],
+    'sensory-regulation',
+    'how-we-help',
+    'individual',
+    'groups',
+    'about',
+    'faq',
+  ] as const,
 };
 
 /**
@@ -92,4 +117,42 @@ export function whatsappHref(message?: string): string {
   if (!hasWhatsapp) return '#contact';
   const query = message ? `?text=${encodeURIComponent(message)}` : '';
   return `https://wa.me/${siteConfig.contact.phone}${query}`;
+}
+
+/**
+ * The nav, resolved for one language: label, href and slug per entry, in
+ * `siteConfig.nav` order.
+ *
+ * THE LABEL COMES FROM THE PAGE, NOT FROM HERE. Each page's frontmatter
+ * already carries `navLabel` (the short name, where the nav calls the
+ * page something shorter than its own h1) falling back to `title`. So
+ * adding Russian meant translating nine .md files and nothing else — the
+ * nav follows, in both languages, from the copy the clinic supplied.
+ *
+ * IT THROWS RATHER THAN RENDERING A BROKEN NAV. Two lists have to agree
+ * — the six slugs above and the files in src/content/pages/<locale>/ —
+ * and they live in places that can't see each other. Previously this
+ * check lived in the route; it belongs here, because now it has to hold
+ * for every language and the route only ever built one. A missing
+ * translation is a build failure with the locale and the slug named,
+ * not a header link that 404s in production.
+ */
+export async function getNavItems(locale: Locale) {
+  const pages = await getCollection('pages', ({ id }) => id.startsWith(`${locale}/`));
+  const bySlug = new Map(pages.map((page) => [page.id.slice(locale.length + 1), page]));
+
+  return siteConfig.nav.map((slug) => {
+    const page = bySlug.get(slug);
+    if (!page) {
+      throw new Error(
+        `site.ts nav names "${slug}", which has no matching file at ` +
+          `src/content/pages/${locale}/${slug}.md. Every nav slug must exist in every locale.`,
+      );
+    }
+    return {
+      slug,
+      label: page.data.navLabel ?? page.data.title,
+      href: localizedHref(locale, `${pagesBase}/${slug}`),
+    };
+  });
 }

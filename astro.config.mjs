@@ -40,7 +40,49 @@ export default defineConfig({
    */
   trailingSlash: 'never',
 
-  integrations: [mdx(), sitemap()],
+  /**
+   * TWO LANGUAGES, AND HEBREW KEEPS THE BARE PATHS.
+   *
+   * `prefixDefaultLocale: false` is the load-bearing line. Hebrew stays
+   * at `/faq`, Russian goes to `/ru/faq`, and there is no `/he/faq` at
+   * all. The site is already live at the unprefixed paths and already in
+   * a sitemap under them — moving Hebrew under a prefix would break
+   * every existing link and every indexed URL to gain nothing.
+   *
+   * Configuring i18n here rather than rolling the routing by hand is
+   * what gives every component `Astro.currentLocale`, derived from the
+   * URL. Without it the locale would have to be threaded as a prop
+   * through Header → Nav → NavItem and through every section, and the
+   * one component that forgot would silently render the wrong language.
+   *
+   * `redirectToDefaultLocale: false` leaves `/` alone: it's a real route
+   * (src/pages/index.astro), not something to bounce off.
+   */
+  i18n: {
+    defaultLocale: 'he',
+    locales: ['he', 'ru'],
+    routing: {
+      prefixDefaultLocale: false,
+      redirectToDefaultLocale: false,
+    },
+  },
+
+  integrations: [
+    mdx(),
+    /**
+     * The sitemap has to be told about the languages too, or it lists
+     * the Hebrew and Russian pages as fourteen unrelated URLs instead of
+     * seven pages in two languages. With this it emits `xhtml:link`
+     * alternates for each pair — the machine-readable half of the same
+     * statement BaseLayout makes with its `hreflang` tags.
+     */
+    sitemap({
+      i18n: {
+        defaultLocale: 'he',
+        locales: { he: 'he-IL', ru: 'ru-RU' },
+      },
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

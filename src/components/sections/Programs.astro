@@ -24,7 +24,11 @@ import Button from '../ui/Button.astro';
 import Card from '../ui/Card.astro';
 import Icon from '../ui/Icon.astro';
 import SectionHeading from '../ui/SectionHeading.astro';
+import { currentLocale, localizedHref, ui } from '../../data/i18n';
 import { hasWhatsapp, pagesBase, whatsappHref } from '../../data/site';
+
+const locale = currentLocale(Astro);
+const t = ui(locale);
 
 /**
  * `href` per card. NEITHER CARD POINTS AT ITS NAV PAGE. Both tracks have
@@ -46,24 +50,33 @@ import { hasWhatsapp, pagesBase, whatsappHref } from '../../data/site';
  * `cta` overrides the default "לפרטים נוספים" on both, since neither
  * destination is "more about this program" — a card that lands a parent
  * on forms or on a price list should say which. NEW COPY — still
- * awaiting sign-off with the rest.
+ * awaiting sign-off with the rest, now in two languages.
+ *
+ * EVERY STRING BELOW COMES FROM i18n.ts, not from the content
+ * collection. This section is the one piece of page copy that isn't in a
+ * .md file, and it stays that way for the reason it always was: it's
+ * two cards and a band that exist to route a visitor, not a page a
+ * parent reads. The Russian side of it is a translation of the Hebrew
+ * rather than clinic-supplied copy — the clinic's own Russian documents
+ * cover the nine pages, and the home page's two program cards are the
+ * site's invention.
  */
 const programs = [
   {
-    title: 'אבחון וטיפול פרטניים',
-    body: 'מפגש אחד-על-אחד שמתחיל בהיכרות ובאבחון חושי-תפקודי, וממשיך בתוכנית טיפול שנבנית סביב הילד הזה — הקצב שלו, החוזקות שלו ומה שקשה לו.',
+    title: t.programsIndividualTitle,
+    body: t.programsIndividualBody,
     accent: 'coral',
     icon: 'user',
-    href: `${pagesBase}/individual-packages`,
-    cta: 'למסגרות, למחירים ולתנאים',
+    href: localizedHref(locale, `${pagesBase}/individual-packages`),
+    cta: t.programsIndividualCta,
   },
   {
-    title: 'פעילויות קבוצתיות התפתחותיות',
-    body: 'קבוצות קטנות לפי גיל ורמה, שבהן ילדים מתנסים בתנועה, במשחק ובשיתוף פעולה — ולומדים יחד, בקבוצה, את מה שקשה להם לבד.',
+    title: t.programsGroupsTitle,
+    body: t.programsGroupsBody,
     accent: 'teal',
     icon: 'users',
-    href: `${pagesBase}/group-forms`,
-    cta: 'לטפסים ולתנאי ההשתתפות',
+    href: localizedHref(locale, `${pagesBase}/group-forms`),
+    cta: t.programsGroupsCta,
   },
 ] as const;
 
@@ -76,18 +89,18 @@ const tiles = {
 
 /* Same guard the header uses: while `contact.phone` is a TODO the CTA
    scrolls to the contact section, so the label has to follow it. */
-const ctaLabel = hasWhatsapp ? 'שלחו הודעה בוואטסאפ' : 'צרו קשר';
+const ctaLabel = hasWhatsapp ? t.whatsappCta : t.contact;
 const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 ---
 
 <section id="programs" class="py-section lg:py-section-lg">
   <div class="mx-auto max-w-[var(--width-content)] px-gutter lg:px-gutter-lg">
     <SectionHeading
-      eyebrow="התוכניות שלנו"
+      eyebrow={t.programsEyebrow}
       accent="teal"
-      lead="שתי נקודות כניסה שוות ערך — פרטני או קבוצתי. אפשר להתחיל מכל אחת מהן, ואפשר גם לשלב."
+      lead={t.programsLead}
     >
-      שתי דרכים להתחיל
+      {t.programsHeading}
     </SectionHeading>
 
     <div class="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8">
@@ -112,7 +125,7 @@ const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } 
                 label still aligns with the card's text column. */}
             <div class="mt-auto -ms-4 pt-8">
               <Button href={program.href} variant="ghost" arrow>
-                {'cta' in program ? program.cta : 'לפרטים נוספים'}
+                {'cta' in program ? program.cta : t.programsMore}
               </Button>
             </div>
           </Card>
@@ -133,10 +146,10 @@ const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } 
       >
         <div>
           <p class="font-display text-2xl leading-heading font-bold text-balance text-ink-900">
-            לא בטוחים איזו מסגרת מתאימה?
+            {t.programsAskHeading}
           </p>
           <p class="mt-2 max-w-xl leading-body text-pretty text-ink-700">
-            כתבו לי מה קורה אצלכם בבית, ונחשוב יחד מאיפה נכון להתחיל.
+            {t.programsAskBody}
           </p>
         </div>
         <Button href={whatsappHref()} variant="primary" size="lg" arrow {...external}>

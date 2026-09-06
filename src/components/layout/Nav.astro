@@ -12,7 +12,8 @@
  * this is the only component that has the list of candidates to compare
  * it against.
  */
-import { siteConfig } from '../../data/site';
+import { currentLocale, ui } from '../../data/i18n';
+import { getNavItems } from '../../data/site';
 import NavItem from './NavItem.astro';
 
 interface Props {
@@ -25,7 +26,14 @@ interface Props {
 }
 
 const { orientation = 'horizontal' } = Astro.props;
-const { nav } = siteConfig;
+
+/* The locale is worked out here for the same reason the current page is:
+   it's a property of the request, identical for every caller, and
+   threading it down as a prop would just be one more thing a caller
+   could forget. Same argument, one line lower. */
+const locale = currentLocale(Astro);
+const t = ui(locale);
+const nav = await getNavItems(locale);
 
 /* Trailing slash trimmed on both sides: Astro serves these routes as
    directories (`/faq/`) while the href in site.ts has no
@@ -39,7 +47,7 @@ const layouts = {
 };
 ---
 
-<nav aria-label="ניווט ראשי">
+<nav aria-label={t.primaryNav}>
   <ul class={layouts[orientation]}>
     {
       nav.map((item) => (

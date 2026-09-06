@@ -1,0 +1,95 @@
+---
+/**
+ * Every content page, in every language, from the `pages` collection:
+ * one route instead of one .astro file per nav entry per locale, because
+ * the pages differ only in their copy and that copy lives in
+ * src/content/pages/<locale>/.
+ *
+ * `[...locale]` IS A REST PARAM SO IT CAN BE EMPTY. Hebrew is the
+ * default locale and carries no prefix (astro.config.mjs), so its pages
+ * are `/faq` while Russian's are `/ru/faq`. A plain `[locale]` segment
+ * would force a prefix on both and there would have to be a `/he/faq`;
+ * a rest param that `getStaticPaths` sets to `undefined` collapses to
+ * nothing, which is exactly the shape wanted. That's why the two
+ * languages share one route file rather than one each.
+ *
+ * Astro matches static routes before dynamic ones, so a slug colliding
+ * with a static route would be silently unreachable — the static routes
+ * are the 404s.
+ *
+ * NOT EVERY PAGE HERE IS IN THE NAV. `siteConfig.nav` names six
+ * destinations; this route builds every `pages` entry that asks for one,
+ * which is those six plus the two the home page's program cards land on
+ * (group-forms, individual-packages). A page with `nav: false` — the
+ * home page's copy, which HeroMethod renders — gets no route at all.
+ *
+ * THE PAGE IS ASSEMBLED LIKE THE HOME PAGE, and for the same reasons:
+ * these are its siblings, not a different kind of document, so they get
+ * the same ground and the same floor. PageBackdrop first and outside
+ * <main>, then the chrome, then the page's own copy, then the footer —
+ * which comes with the backdrop rather than as a separate nicety, since
+ * the fixed ground has no bottom edge of its own and without a solid
+ * band the last panel would just stop.
+ */
+import { getCollection } from 'astro:content';
+
+import Footer from '../../components/layout/Footer.astro';
+import Header from '../../components/layout/Header.astro';
+import PageBackdrop from '../../components/layout/PageBackdrop.astro';
+import SideNav from '../../components/layout/SideNav.astro';
+import ProsePage from '../../components/sections/ProsePage.astro';
+import { defaultLocale, isLocale } from '../../data/i18n';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  /* `nav: false` entries (each language's home copy) live in the same
+     collection but are rendered by their own section, not by this route. */
+  const pages = (await getCollection('pages', ({ data }) => data.nav)).sort(
+    (a, b) => a.data.order - b.data.order,
+  );
+
+  return pages.map((entry) => {
+    /* The id is '<locale>/<slug>' — the directory the file sits in is the
+       only place the language is written down, so the path and the locale
+       can't disagree. Anything that isn't a known locale prefix would be
+       a stray directory under src/content/pages/, which is a content bug
+       and not something to route around. */
+    const [prefix, ...rest] = entry.id.split('/');
+    if (!isLocale(prefix) || rest.length !== 1) {
+      throw new Error(
+        `src/content/pages/${entry.id}.md is not <locale>/<slug>. Every page file ` +
+          'belongs in exactly one locale directory (he/, ru/).',
+      );
+    }
+
+    return {
+      /* `undefined` for Hebrew is what makes the rest param collapse and
+         the route come out as `/faq` rather than `/he/faq`. */
+      params: {
+        locale: prefix === defaultLocale ? undefined : prefix,
+        navpage: rest[0],
+      },
+      props: { entry },
+    };
+  });
+}
+
+const { entry } = Astro.props;
+
+/* The nav's own slug-to-file check used to live here. It moved to
+   `getNavItems()` in site.ts, because it now has to hold for every
+   language and this route only ever built one page at a time — see
+   there. */
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.description}>
+  <PageBackdrop />
+  <Header />
+  <SideNav />
+
+  <main id="main">
+    <ProsePage page={entry.data} />
+  </main>
+
+  <Footer />
+</BaseLayout>

@@ -91,6 +91,8 @@
 
 import { getEntry } from 'astro:content';
 
+import { currentLocale } from '../../data/i18n';
+
 import Card from '../ui/Card.astro';
 
 /*
@@ -99,10 +101,15 @@ import Card from '../ui/Card.astro';
  * banner and an empty panel, which is worse at build time than a
  * failed build.
  */
-const home = await getEntry('pages', 'home');
+/* The home copy for THIS language: 'he/home' or 'ru/home'. The two files
+   carry the same panel, the same four paragraphs and the same pull-out,
+   so the section's layout doesn't branch on the locale — only the words
+   it's handed do. */
+const locale = currentLocale(Astro);
+const home = await getEntry('pages', `${locale}/home`);
 if (!home?.data.brand || home.data.panels.length === 0) {
   throw new Error(
-    'HeroMethod needs src/content/pages/home.md with a `brand` lockup and one panel.',
+    `HeroMethod needs src/content/pages/${locale}/home.md with a \`brand\` lockup and one panel.`,
   );
 }
 

@@ -16,6 +16,7 @@
  * for a close by dispatching `nav:close` — it never writes the
  * attribute or touches the header's DOM. That keeps one writer.
  */
+import LangSwitcher from './LangSwitcher.astro';
 import Nav from './Nav.astro';
 ---
 
@@ -24,6 +25,22 @@ import Nav from './Nav.astro';
 <div id="site-nav" class="rail">
   <div class="p-3">
     <Nav orientation="vertical" />
+
+    <!-- The language switcher, BELOW the links and set off by a rule.
+         The header carries it too, but hides it below `sm` where the bar
+         has no room for a third control — so on a phone this is the only
+         one there is, and it has to be here rather than being a
+         desktop-only affordance.
+
+         Under the nav rather than above it because it isn't a
+         destination: the drawer's job is the six pages, and the switcher
+         changes which language you read them in. Putting a utility above
+         the thing it modifies would make it the first item a screen
+         reader announces in a list it isn't part of — which is why it's
+         also outside <Nav>'s own <nav>, in a landmark of its own. -->
+    <div class="mt-4 border-t border-ink-900/10 px-2 pt-4">
+      <LangSwitcher size="drawer" class="flex justify-start" />
+    </div>
   </div>
 </div>
 

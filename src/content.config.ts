@@ -44,6 +44,20 @@ const schedule = defineCollection({
  * points AT, so unlike `articles` they aren't a library a parent browses
  * — there's exactly one per nav entry and its slug is its route.
  *
+ * ONE DIRECTORY PER LANGUAGE, and the id carries the language:
+ * src/content/pages/he/faq.md is `he/faq`, its Russian twin is `ru/faq`.
+ * The two directories hold the SAME NINE FILENAMES — that's what makes
+ * the language switcher a prefix swap rather than a lookup table, and
+ * `getNavItems()` in site.ts fails the build if a locale is missing one
+ * the nav points at.
+ *
+ * A locale is not a schema field for the same reason the slug isn't: it
+ * would be a second place to write down something the path already says,
+ * and the two could disagree. Everything below applies identically to
+ * both languages — the panels, the disclosures, the FAQ list are shape,
+ * and shape doesn't change with language. Only `dir` does, and that's
+ * BaseLayout's business, not the content's.
+ *
  * The copy lives in frontmatter rather than in the markdown body on
  * purpose. A page here isn't one flowing document: it's a stack of
  * accented panels, each with its own eyebrow / heading / pull-out line,

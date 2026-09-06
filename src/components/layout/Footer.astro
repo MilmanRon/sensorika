@@ -59,7 +59,11 @@
 import Logo from './Logo.astro';
 import FacebookIcon from '../../assets/icons/facebook.svg';
 import WhatsappIcon from '../../assets/icons/whatsapp.svg';
+import { currentLocale, ui } from '../../data/i18n';
 import { hasWhatsapp, homeHref, siteConfig, whatsappHref } from '../../data/site';
+
+const locale = currentLocale(Astro);
+const t = ui(locale);
 
 /*
  * The icon row. Both icons always render; each one's URL degrades to the
@@ -72,14 +76,14 @@ const facebook = siteConfig.social.facebook;
 
 const socials = [
   {
-    label: hasWhatsapp ? 'וואטסאפ' : 'יצירת קשר',
+    label: hasWhatsapp ? t.whatsapp : t.contactNoun,
     href: whatsappHref(),
     Icon: WhatsappIcon,
     /* Only a real off-site URL opens a new tab. */
     external: hasWhatsapp,
   },
   {
-    label: facebook ? 'פייסבוק' : 'יצירת קשר',
+    label: facebook ? t.facebook : t.contactNoun,
     href: facebook || '#contact',
     Icon: FacebookIcon,
     external: Boolean(facebook),
@@ -113,7 +117,7 @@ const year = new Date().getFullYear();
            tokens.css defines as `#243C5A` — the wordmark's own colour,
            so the mono lockup is the artwork's navy applied to all of it
            rather than a new colour. -->
-      <Logo class="h-14 text-ink-900 lg:h-16" href={homeHref} variant="responsive" tone="mono" />
+      <Logo class="h-14 text-ink-900 lg:h-16" href={homeHref(locale)} variant="responsive" tone="mono" />
 
       <!-- `justify-self-center` centres the list inside the middle
            track; the track itself is what centres it on the band. -->
@@ -142,7 +146,7 @@ const year = new Date().getFullYear();
     </div>
 
     <p class="mt-8 border-t border-ink-900/10 pt-6 text-center text-sm text-ink-600">
-      © {year} {siteConfig.name}. כל הזכויות שמורות.
+      © {year} {siteConfig.name}. {t.rightsReserved}
     </p>
   </div>
 </footer>

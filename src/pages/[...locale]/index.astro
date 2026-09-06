@@ -1,0 +1,87 @@
+---
+/**
+ * THE HOME PAGE, IN EVERY LANGUAGE: the chrome, the two sections, and
+ * the floor.
+ *
+ *   PageBackdrop   the ground. First in the slot and OUTSIDE <main>: one
+ *                  fixed layer behind the header, the section and the
+ *                  footer alike, not content of any of them.
+ *   Header         white, sticky, shadowed.
+ *   SideNav        the drawer the header's hamburger opens.
+ *   HeroMethod     the greeting and the method, from <locale>/home.md.
+ *   Programs       the two tracks. It follows HeroMethod for the reason
+ *                  HeroMethod ends without a CTA of its own: the section
+ *                  closes on its takeaway line, and the first action a
+ *                  visitor is offered is the one in Programs. That
+ *                  hand-off is the whole argument for the combined hero,
+ *                  and it only exists when the two are adjacent.
+ *   Footer         white and shadowed like the header: the two bars
+ *                  bracket the document.
+ *
+ * IT'S A DYNAMIC ROUTE NOW, and that's the only thing this file gained
+ * when Russian arrived. `[...locale]` is a rest param set to `undefined`
+ * for Hebrew and `'ru'` for Russian, so the two home pages come out as
+ * `/` and `/ru` from one file — see [navpage].astro for why the rest
+ * param rather than a plain segment. Nothing below branches on the
+ * language: every component reads `Astro.currentLocale` for itself.
+ *
+ * THE TITLE AND DESCRIPTION COME FROM THE CONTENT, not from literals
+ * here as they used to. They have to exist in two languages, and
+ * <locale>/home.md is already where the rest of this page's words live
+ * — a second copy in this file is a second thing to translate and a
+ * second thing to forget.
+ *
+ * NO OTHER SECTIONS. The nav's six destinations are pages of their own
+ * ([navpage].astro), not anchors on this one, so nothing here scrolls.
+ *
+ * WHICH LEAVES `#contact` DANGLING. Programs' closing band and the
+ * footer's WhatsApp icon resolve there, because `whatsappHref()` falls
+ * back to the anchor while `contact.phone` is a TODO in site.ts. There
+ * is no contact section on the page, so both are inert. A number in
+ * site.ts fixes them without touching a component — and the clinic's
+ * Russian «Контакты и запись» document supplies one.
+ *
+ * BaseLayout rather than a site-wide shell: the chrome is three
+ * components in a known order, and the one page that varies it (the
+ * prose pages put ProsePage between them) would have had to opt out of
+ * the shell anyway.
+ */
+import { getEntry } from 'astro:content';
+
+import Footer from '../../components/layout/Footer.astro';
+import Header from '../../components/layout/Header.astro';
+import PageBackdrop from '../../components/layout/PageBackdrop.astro';
+import SideNav from '../../components/layout/SideNav.astro';
+import HeroMethod from '../../components/sections/HeroMethod.astro';
+import Programs from '../../components/sections/Programs.astro';
+import { currentLocale, defaultLocale, locales } from '../../data/i18n';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+  return locales.map((locale) => ({
+    params: { locale: locale === defaultLocale ? undefined : locale },
+  }));
+}
+
+const locale = currentLocale(Astro);
+
+/* `nav: false`, so [navpage].astro gives this copy no route of its own —
+   this file is its route, and HeroMethod is what renders it. */
+const home = await getEntry('pages', `${locale}/home`);
+if (!home) {
+  throw new Error(`The home page needs src/content/pages/${locale}/home.md.`);
+}
+---
+
+<BaseLayout title={home.data.title} description={home.data.description}>
+  <PageBackdrop />
+  <Header />
+  <SideNav />
+
+  <main id="main">
+    <HeroMethod />
+    <Programs />
+  </main>
+
+  <Footer />
+</BaseLayout>

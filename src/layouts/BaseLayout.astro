@@ -1,6 +1,14 @@
 ---
 import '../styles/global.css';
 
+import {
+  alternatePath,
+  currentLocale,
+  defaultLocale,
+  localeMeta,
+  locales,
+} from '../data/i18n';
+
 interface Props {
   /** Page title, rendered as "{title} · Sensorika" */
   title: string;
@@ -10,6 +18,8 @@ interface Props {
 
 const { title, description } = Astro.props;
 const siteName = 'Sensorika';
+
+const locale = currentLocale(Astro);
 
 /**
  * Absolute URL of the page being rendered, for the canonical link and
@@ -21,15 +31,43 @@ const siteName = 'Sensorika';
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : undefined;
 
 /**
- * First draft is Hebrew-only, so lang/dir are hardcoded here rather
- * than driven by i18n routing yet. When Russian content is ready,
- * this becomes per-locale (Astro i18n routing + dir="ltr" for /ru/)
- * instead of a constant — every component should already be written
- * with logical properties (ms-/me-/text-start) so that swap doesn't
- * require touching them.
+ * THE ONE PLACE THE PAGE'S DIRECTION IS DECIDED.
+ *
+ * This used to be `const dir = 'rtl'` with a note saying it would become
+ * per-locale once Russian existed, and that it should be a two-line
+ * change because every component is written with logical properties
+ * (ms-/me-/text-start, inset-inline) rather than left/right. Russian
+ * exists; this is that change, and the note held — nothing else on the
+ * site needed touching to make an LTR page lay out correctly.
+ *
+ * `Astro.currentLocale` derives from the URL (astro.config.mjs), so a
+ * page under /ru gets dir="ltr" without anybody passing it a prop.
  */
-const lang = 'he';
-const dir = 'rtl';
+const { lang, dir, ogLocale } = localeMeta[locale];
+
+/**
+ * hreflang alternates: the same page in every language it exists in,
+ * plus x-default pointing at Hebrew.
+ *
+ * This is the machine-readable half of what the header's switcher says
+ * to a reader. Without it, the Hebrew and Russian versions of a page are
+ * two unrelated documents competing with each other in search, and a
+ * Russian speaker searching in Russian has no reason to be shown /ru.
+ *
+ * The alternates are per-PAGE, not per-site: /faq points at /ru/faq, not
+ * at /ru. Getting that wrong is the standard way sites end up funnelling
+ * every foreign-language visitor onto their home page.
+ *
+ * Omitted entirely when `site` isn't set, for the same reason the
+ * canonical is — an absolute URL has to be absolute against something.
+ */
+const alternates = Astro.site
+  ? locales.map((other) => ({
+      locale: other,
+      hreflang: localeMeta[other].lang,
+      href: new URL(alternatePath(Astro.url.pathname, locale, other), Astro.site).href,
+    }))
+  : [];
 ---
 
 <html lang={lang} dir={dir}>
@@ -55,12 +93,32 @@ const dir = 'rtl';
     <title>{title} · {siteName}</title>
     <meta name="description" content={description} />
     {canonical && <link rel="canonical" href={canonical.href} />}
+    {
+      alternates.map(({ hreflang, href }) => (
+        <link rel="alternate" hreflang={hreflang} href={href} />
+      ))
+    }
+    {/* x-default is the Hebrew page, explicitly — not `alternates[0]`,
+        which happens to be Hebrew only because of the order `locales` is
+        written in. */}
+    {
+      alternates
+        .filter((alternate) => alternate.locale === defaultLocale)
+        .map(({ href }) => <link rel="alternate" hreflang="x-default" href={href} />)
+    }
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:locale" content="he_IL" />
+    <meta property="og:locale" content={ogLocale} />
+    {
+      alternates
+        .filter((alternate) => alternate.locale !== locale)
+        .map(({ locale: other }) => (
+          <meta property="og:locale:alternate" content={localeMeta[other].ogLocale} />
+        ))
+    }
     {canonical && <meta property="og:url" content={canonical.href} />}
     <!-- TODO: og:image. Social previews fall back to a bare text card
          until there's a 1200x630 share image in public/. -->

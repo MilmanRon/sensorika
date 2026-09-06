@@ -18,6 +18,18 @@
  *    before the breakpoint moves, not arithmetic here. Below whatever
  *    it ends up being, the drawer is the nav.
  *
+ *    AND RUSSIAN IS LONGER THAN HEBREW. The bar now renders whichever
+ *    language the URL is in, and the six Russian labels are wider than
+ *    the six Hebrew ones — both because Cyrillic sets wider than Hebrew
+ *    at the same size and because the words are longer. That's the whole
+ *    reason the Russian pages carry short `navLabel`s in their
+ *    frontmatter ("Сенсорная интеграция", not "Что такое сенсорная
+ *    интеграция"): the shortening happens in the content, where a human
+ *    can judge it, rather than by truncation here. `2xl` is the widest
+ *    breakpoint Tailwind offers, so if the Russian row still overruns
+ *    it, the fix is shorter labels or a smaller `text-base` — not a
+ *    wider gate. Measure before deciding which.
+ *
  * 2. The logo drops from h-18/h-22 to h-14/h-16. At 88px inside a 112px
  *    bar it fills 79% of the header's height, which reads as an
  *    oversized asset rather than as a brand mark, and leaves the CTA
@@ -73,11 +85,21 @@
  *     site.ts owns where home is and this component doesn't.
  */
 import Button from '../ui/Button.astro';
+import LangSwitcher from './LangSwitcher.astro';
 import Logo from './Logo.astro';
 import WhatsappIcon from '../../assets/icons/whatsapp.svg';
-import { hasWhatsapp, homeHref, siteConfig, whatsappHref } from '../../data/site';
+import { currentLocale, ui } from '../../data/i18n';
+import { getNavItems, hasWhatsapp, homeHref, whatsappHref } from '../../data/site';
 
-const ctaLabel = hasWhatsapp ? 'וואטסאפ' : 'צרו קשר';
+const locale = currentLocale(Astro);
+const t = ui(locale);
+
+/* The six entries with their labels in THIS language. The labels come
+   from each page's own frontmatter (see getNavItems), so the bar and the
+   page it links to can't disagree about what the page is called. */
+const nav = await getNavItems(locale);
+
+const ctaLabel = hasWhatsapp ? t.whatsapp : t.contact;
 const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 
 /* Same comparison Nav.astro makes for the drawer, for the same reason —
@@ -91,7 +113,7 @@ const here = trim(Astro.url.pathname);
   href="#main"
   class="sr-only focus-visible:not-sr-only focus-visible:absolute focus-visible:top-3 focus-visible:start-3 focus-visible:z-[60] focus-visible:rounded-control focus-visible:bg-white focus-visible:px-4 focus-visible:py-2 focus-visible:text-sm focus-visible:font-medium focus-visible:text-ink-900 focus-visible:shadow-elevated"
 >
-  דלגו לתוכן הראשי
+  {t.skipToMain}
 </a>
 
 <header
@@ -101,14 +123,17 @@ const here = trim(Astro.url.pathname);
   <div
     class="flex h-header items-center justify-between gap-4 px-gutter lg:h-header-lg lg:px-gutter-lg"
   >
-    <Logo class="h-14 lg:h-16" href={homeHref} variant="mark" />
+    <Logo class="h-14 lg:h-16" href={homeHref(locale)} variant="mark" />
 
-    <!-- Inline nav, 2xl and up. Plain row: the page is dir=rtl, so the
-         links already run right-to-left in the order they're written. -->
-    <nav aria-label="ניווט ראשי" class="hidden 2xl:block">
+    <!-- Inline nav, 2xl and up. Plain row, and it stays a plain row in
+         both languages: the items are laid out in source order and the
+         page's `dir` decides which end that order starts from, so the
+         Hebrew bar runs right-to-left and the Russian one left-to-right
+         with no per-language markup. -->
+    <nav aria-label={t.primaryNav} class="hidden 2xl:block">
       <ul class="flex items-center gap-1">
         {
-          siteConfig.nav.map((item) => {
+          nav.map((item) => {
             const current = trim(item.href) === here;
             return (
               <li>
@@ -129,9 +154,19 @@ const here = trim(Astro.url.pathname);
       </ul>
     </nav>
 
-    <!-- CTA first, trigger second — under dir=rtl that leaves the
-         trigger outboard at the bar's far left edge. -->
+    <!-- Switcher, CTA, trigger — in that order, so under dir=rtl the
+         trigger stays outboard at the bar's far left edge and the
+         switcher sits inboard of the CTA rather than in front of it. The
+         site's one conversion action stays the most prominent thing on
+         this side of the bar; changing language is a utility.
+
+         The switcher is HIDDEN BELOW `sm`, where the CTA has already
+         collapsed to a bare icon to save room — three controls in a
+         phone-width bar beside the logo is one too many. It reappears in
+         the drawer instead, which is where a phone's nav lives anyway. -->
     <div class="flex items-center gap-2 sm:gap-3">
+      <LangSwitcher class="max-sm:hidden" />
+
       <Button
         href={whatsappHref()}
         size="sm"
@@ -152,7 +187,7 @@ const here = trim(Astro.url.pathname);
         aria-expanded="false"
         class="inline-flex h-10 w-10 items-center justify-center rounded-pill text-ink-800 ring-1 ring-ink-900/10 transition-colors duration-[var(--duration-fast)] hover:bg-paper-100 2xl:hidden"
       >
-        <span class="sr-only">תפריט</span>
+        <span class="sr-only">{t.menu}</span>
         <span class="toggle-bars" aria-hidden="true">
           <span></span><span></span><span></span>
         </span>

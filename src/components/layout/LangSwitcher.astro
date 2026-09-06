@@ -1,0 +1,113 @@
+---
+/**
+ * THE LANGUAGE SWITCHER: עב | RU, as one segmented control.
+ *
+ * A SEGMENTED CONTROL, NOT A DROPDOWN AND NOT A SINGLE TOGGLE. There are
+ * exactly two languages and both names are two or three characters wide,
+ * so the whole choice fits in the space a dropdown's trigger alone would
+ * take — and it shows the reader what the other option IS rather than
+ * making them open something to find out. A single "RU" button would be
+ * smaller still, but it hides which language you're currently in, which
+ * is the one thing a reader who landed on the wrong one needs to see.
+ *
+ * NO FLAGS. A flag is a country, not a language: Hebrew is not the
+ * Israeli flag (it's read by people who aren't in Israel) and Russian
+ * emphatically isn't the Russian one (most of this clinic's Russian-
+ * speaking parents are Israeli). The two-letter labels are also legible
+ * at 12px in a way a 16px flag glyph is not.
+ *
+ * EACH LANGUAGE NAMES ITSELF, in its own script — "עב" and "RU", not
+ * "עברית / רוסית" in Hebrew and the reverse in Russian. A Russian
+ * speaker who has landed on the Hebrew site can't read a Hebrew word for
+ * "Russian"; "RU" is the only label that works for the person who most
+ * needs it. That's `switchLabel` in i18n.ts.
+ *
+ * IT LINKS TO THE SAME PAGE, NOT TO HOME. `alternatePath()` swaps the
+ * prefix and keeps the slug, so a parent halfway through the packages
+ * page in Hebrew arrives at the packages page in Russian. Dropping them
+ * on the home page instead is the single most common way a language
+ * switcher is wrong, and it's worst exactly where it matters most — on
+ * the long pages someone is actually reading.
+ *
+ * THE CURRENT LANGUAGE IS A `<span>`, NOT A LINK. It's marked
+ * `aria-current="true"` and carries the white pill. Rendering it as an
+ * <a> to the page you're already on gives a keyboard user a stop that
+ * does nothing and a screen reader a link with no destination.
+ *
+ * IT IS `dir="ltr"` REGARDLESS OF THE PAGE. The pair reads עב-then-RU in
+ * both languages, so the control doesn't reorder itself when you use it
+ * — which would be the one moment a reader is looking straight at it.
+ */
+import { alternatePath, currentLocale, localeMeta, locales, ui } from '../../data/i18n';
+
+interface Props {
+  /**
+   * `bar` is the header's: a compact pill sized to sit beside the CTA.
+   * `drawer` is the side nav's, one step larger, because the drawer is
+   * a touch surface and its other rows are `text-lg`.
+   */
+  size?: 'bar' | 'drawer';
+  class?: string;
+}
+
+const { size = 'bar', class: className = '' } = Astro.props;
+
+const locale = currentLocale(Astro);
+const t = ui(locale);
+
+const sizes = {
+  bar: 'gap-0.5 p-0.5 text-xs',
+  drawer: 'gap-1 p-1 text-sm',
+};
+
+const segment = {
+  bar: 'min-w-8 px-2 py-1',
+  drawer: 'min-w-10 px-3 py-1.5',
+};
+---
+
+<nav aria-label={t.languageNav} class={className}>
+  <ul
+    dir="ltr"
+    class:list={[
+      'flex items-center rounded-pill bg-paper-200 ring-1 ring-ink-900/10',
+      sizes[size],
+    ]}
+  >
+    {
+      locales.map((other) => {
+        const meta = localeMeta[other];
+        const current = other === locale;
+        const classes = [
+          'block rounded-pill text-center font-semibold transition-colors duration-[var(--duration-fast)]',
+          segment[size],
+          current ? 'bg-white text-ink-900 shadow-card' : 'text-ink-600 hover:text-ink-900',
+        ];
+
+        return (
+          <li>
+            {current ? (
+              <span aria-current="true" lang={meta.lang} class:list={classes}>
+                {meta.switchLabel}
+              </span>
+            ) : (
+              <a
+                href={alternatePath(Astro.url.pathname, locale, other)}
+                lang={meta.lang}
+                hreflang={meta.lang}
+                class:list={classes}
+              >
+                {/* The visible label is two letters; the accessible name
+                    is the language's own name in its own language, so
+                    "עב" isn't announced as an abbreviation nobody can
+                    expand. */}
+                <span class="sr-only">{meta.name}</span>
+                <span aria-hidden="true">{meta.switchLabel}</span>
+              </a>
+            )}
+          </li>
+        );
+      })
+    }
+  </ul>
+</nav>

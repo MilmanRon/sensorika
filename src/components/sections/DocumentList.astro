@@ -21,6 +21,7 @@
  * out of. Browsers that ignore the attribute for cross-origin files are
  * not a concern — these are same-origin.
  */
+import { currentLocale, ui } from '../../data/i18n';
 import Button from '../ui/Button.astro';
 import Card from '../ui/Card.astro';
 import Icon from '../ui/Icon.astro';
@@ -99,7 +100,7 @@ const tiles = {
             <div class="mt-auto pt-8">
               <Button href={item.file} download type="application/pdf">
                 <Icon name="download" class="h-5 w-5" />
-                הורדת הטופס
+                {ui(currentLocale(Astro)).downloadForm}
               </Button>
             </div>
           </Card>

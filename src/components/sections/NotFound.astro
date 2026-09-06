@@ -1,0 +1,55 @@
+---
+/**
+ * The body of the not-found page: the code, the apology and the way
+ * home. It's a section rather than markup inside the route because
+ * there are two 404 routes — one per language — and they differ in
+ * nothing but which file emits them.
+ *
+ * WHY TWO ROUTES AT ALL, when every other page shares one. A 404 is
+ * served for a URL that matched no route, so nothing about the visitor's
+ * actual path reaches Astro: on a static deploy Cloudflare hands back a
+ * pre-built 404.html, and which one it picks is decided by the file
+ * layout, not by the request. The language therefore has to be baked
+ * into *which file* is served, which means one per locale.
+ *
+ * `locale` is a PROP, not `Astro.currentLocale`. The derived answer
+ * happens to be right in both files — /404 builds as Hebrew and /ru/404
+ * as Russian, because the build-time URL says so — but it's right by
+ * coincidence of where the file sits, and this is the one page whose
+ * language is a deliberate choice about who is being apologised to
+ * rather than a fact about the URL. Saying it out loud also means the
+ * two routes can't silently become the same page.
+ */
+import { ui, type Locale } from '../../data/i18n';
+import { homeHref } from '../../data/site';
+import Button from '../ui/Button.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui(locale);
+---
+
+<section class="py-section lg:py-section-lg">
+  <div
+    class="mx-auto flex max-w-[var(--width-content)] flex-col items-center px-gutter text-center lg:px-gutter-lg"
+  >
+    <p class="font-display text-6xl leading-heading font-bold text-teal-600 sm:text-7xl">404</p>
+
+    <h1
+      class="mt-6 font-display text-3xl leading-heading font-bold text-balance text-ink-900 sm:text-4xl"
+    >
+      {t.notFoundHeading}
+    </h1>
+
+    <p class="mt-5 max-w-[var(--width-prose)] text-lg leading-body text-pretty text-ink-700">
+      {t.notFoundBody}
+    </p>
+
+    <div class="mt-10">
+      <Button href={homeHref(locale)} variant="primary" size="lg" arrow>{t.notFoundCta}</Button>
+    </div>
+  </div>
+</section>
