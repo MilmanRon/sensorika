@@ -31,15 +31,16 @@
  * — a second copy in this file is a second thing to translate and a
  * second thing to forget.
  *
- * NO OTHER SECTIONS. The nav's six destinations are pages of their own
+ * NO OTHER SECTIONS. The nav's other six entries are pages of their own
  * ([navpage].astro), not anchors on this one, so nothing here scrolls.
+ * (The seventh is this page — see `navHref()` in site.ts.)
  *
- * WHICH LEAVES `#contact` DANGLING. Programs' closing band and the
- * footer's WhatsApp icon resolve there, because `whatsappHref()` falls
- * back to the anchor while `contact.phone` is a TODO in site.ts. There
- * is no contact section on the page, so both are inert. A number in
- * site.ts fixes them without touching a component — and the clinic's
- * Russian «Контакты и запись» document supplies one.
+ * `#contact` USED TO DANGLE HERE. Programs' closing band and the
+ * footer's WhatsApp icon resolved to an anchor with no section behind
+ * it, because `whatsappHref()` fell back to one while `contact.phone`
+ * was a TODO. The number is in site.ts now, so both go to wa.me — as
+ * does the header's CTA — and this page has no inert links left. It took no edit here, which was the
+ * point of the fallback living in site.ts rather than in a component.
  *
  * BaseLayout rather than a site-wide shell: the chrome is three
  * components in a known order, and the one page that varies it (the

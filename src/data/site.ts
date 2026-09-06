@@ -50,13 +50,18 @@ export const siteConfig = {
   contact: {
     email: '', // TODO
     /**
-     * E.164 digits only — no '+', spaces or dashes (e.g. '972501234567').
-     * That exact shape is what wa.me expects, so this one field backs
-     * both the phone link and the WhatsApp link. Still a TODO; while
-     * it's empty, `whatsappHref()` degrades instead of emitting a dead
-     * wa.me URL.
+     * E.164 digits only — no '+', spaces or dashes. That exact shape is
+     * what wa.me expects, so this one field backs both the phone link
+     * and the WhatsApp link.
+     *
+     * The clinic writes it +972 54-454-8600; E.164 drops the '+', the
+     * separators and the trunk '0' that the local form (054-…) carries.
+     * Anything else here — a '+', a space, the leading zero — produces a
+     * wa.me URL that resolves to WhatsApp's "phone number is invalid"
+     * page rather than to a chat, and it fails silently: the link still
+     * looks fine in the markup.
      */
-    phone: '', // TODO
+    phone: '972544548600',
     /**
      * NOT HERE — see `venueStreet` / `venueName` in i18n.ts.
      *
@@ -79,7 +84,16 @@ export const siteConfig = {
    * can disagree.
    */
   social: {
-    facebook: '', // TODO: e.g. 'https://facebook.com/sensorika'
+    /**
+     * THE CANONICAL PROFILE URL, not the share link.
+     *
+     * The clinic hands these over as facebook.com/share/<id>/, which is
+     * a redirect: it costs a hop, and it lands the reader on the profile
+     * with `?rdid=…&share_url=…` tracking appended. This is where that
+     * one resolves to — the numeric id is the stable half, the name in
+     * the path is decorative and survives a rename either way.
+     */
+    facebook: 'https://www.facebook.com/people/NDFA-Anna-Milman/61579742867682/',
   },
   /**
    * Primary nav — SEVEN SLUGS, IN ORDER, AND NOTHING ELSE.
@@ -121,10 +135,13 @@ export const siteConfig = {
 /**
  * The clinic's WhatsApp link, with an optional prefilled first message.
  *
- * Falls back to the on-page contact section while `contact.phone` is
- * still a TODO — a header CTA that 404s is worse than one that scrolls.
- * Callers that show a WhatsApp-specific label should branch on
- * `hasWhatsapp` so the label matches where the link actually goes.
+ * The `#contact` fallback is now unreachable — `contact.phone` is set,
+ * so every caller gets a real wa.me URL. It stays because the condition
+ * it guards can come back (a number redacted, a new deployment with the
+ * field blanked) and because a header CTA that scrolls is a better
+ * failure than one that 404s. Callers that show a WhatsApp-specific
+ * label branch on `hasWhatsapp` so the label matches where the link
+ * actually goes; that branch is now always the WhatsApp side.
  */
 export const hasWhatsapp = Boolean(siteConfig.contact.phone);
 
