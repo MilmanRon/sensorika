@@ -1,12 +1,12 @@
 ---
 /**
- * THE LANGUAGE SWITCHER: עב | RU, as one segmented control.
+ * THE LANGUAGE SWITCHER: עב | Рус, as one segmented control.
  *
  * A SEGMENTED CONTROL, NOT A DROPDOWN AND NOT A SINGLE TOGGLE. There are
  * exactly two languages and both names are two or three characters wide,
  * so the whole choice fits in the space a dropdown's trigger alone would
  * take — and it shows the reader what the other option IS rather than
- * making them open something to find out. A single "RU" button would be
+ * making them open something to find out. A single "Рус" button would be
  * smaller still, but it hides which language you're currently in, which
  * is the one thing a reader who landed on the wrong one needs to see.
  *
@@ -16,11 +16,12 @@
  * speaking parents are Israeli). The two-letter labels are also legible
  * at 12px in a way a 16px flag glyph is not.
  *
- * EACH LANGUAGE NAMES ITSELF, in its own script — "עב" and "RU", not
+ * EACH LANGUAGE NAMES ITSELF, in its own script — "עב" and "Рус", not
  * "עברית / רוסית" in Hebrew and the reverse in Russian. A Russian
  * speaker who has landed on the Hebrew site can't read a Hebrew word for
- * "Russian"; "RU" is the only label that works for the person who most
- * needs it. That's `switchLabel` in i18n.ts.
+ * "Russian"; a label in their own alphabet is the only one that works
+ * for the person who most needs it. See `switchLabel` in i18n.ts for why
+ * it's "Рус" and not the Latin "RU" or the transliterated "РУ".
  *
  * IT LINKS TO THE SAME PAGE, NOT TO HOME. `alternatePath()` swaps the
  * prefix and keeps the slug, so a parent halfway through the packages
@@ -34,9 +35,9 @@
  * <a> to the page you're already on gives a keyboard user a stop that
  * does nothing and a screen reader a link with no destination.
  *
- * IT IS `dir="ltr"` REGARDLESS OF THE PAGE. The pair reads עב-then-RU in
- * both languages, so the control doesn't reorder itself when you use it
- * — which would be the one moment a reader is looking straight at it.
+ * IT IS `dir="ltr"` REGARDLESS OF THE PAGE. The pair reads עב-then-Рус
+ * in both languages, so the control doesn't reorder itself when you use
+ * it — which would be the one moment a reader is looking straight at it.
  */
 import { alternatePath, currentLocale, localeMeta, locales, ui } from '../../data/i18n';
 

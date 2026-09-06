@@ -63,18 +63,30 @@ export function currentLocale(astro: { currentLocale?: string }): Locale {
  * `[dir='rtl']` and simply don't apply under Russian.
  *
  * `switchLabel` is what the language switcher prints. Each language
- * names ITSELF, in its own script — "עב" and "RU" — rather than both
+ * names ITSELF, in its own script — "עב" and "Рус" — rather than both
  * being named in the language you're currently reading. That's the point
  * of a language switcher: a Russian speaker landing on the Hebrew site
  * has to be able to find their way out of it, and "רוסית" would not help
  * them do that.
+ *
+ * WHY "Рус" AND NOT "RU". The Latin "RU" is what a locale picker usually
+ * shows, and it was what this one showed first — but it broke the rule
+ * above: the Hebrew half was in Hebrew script and the Russian half was
+ * in the alphabet of neither language, which makes it a code rather than
+ * a name. "Рус" is the ordinary Russian short form of "Русский".
+ *
+ * NOT "РУ", the letter-for-letter transliteration, for a reason specific
+ * to Cyrillic: Р and У are homoglyphs of the Latin P and Y, so "РУ" is
+ * read as "PY" by anyone who doesn't already read Cyrillic — precisely
+ * the visitor this label exists for. The third letter is what makes it
+ * unmistakably a Russian word rather than two Latin letters.
  */
 export const localeMeta: Record<
   Locale,
   { lang: string; dir: 'rtl' | 'ltr'; ogLocale: string; switchLabel: string; name: string }
 > = {
   he: { lang: 'he', dir: 'rtl', ogLocale: 'he_IL', switchLabel: 'עב', name: 'עברית' },
-  ru: { lang: 'ru', dir: 'ltr', ogLocale: 'ru_RU', switchLabel: 'RU', name: 'Русский' },
+  ru: { lang: 'ru', dir: 'ltr', ogLocale: 'ru_RU', switchLabel: 'Рус', name: 'Русский' },
 };
 
 /**
