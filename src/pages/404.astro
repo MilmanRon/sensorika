@@ -11,14 +11,27 @@
  * to be a real page and not a fragment.
  *
  * ITS RUSSIAN TWIN IS src/pages/ru/404.astro, and the split is forced:
- * see NotFound.astro. Which of the two Cloudflare serves for a bad URL
- * under /ru depends on whether "404-page" walks up from the requested
- * path to find the nearest 404.html or always returns the root one — the
- * docs say the former, but it is worth confirming against the deployed
- * site rather than taking on trust. If it turns out to be the latter,
- * a Russian visitor who mistypes a URL lands on this Hebrew page, which
- * is no worse than what the site did before Russian existed, and the
- * fix is a redirect rule rather than anything in this file.
+ * see NotFound.astro.
+ *
+ * CONFIRMED AGAINST THE DEPLOYED SITE: "404-page" does NOT walk up from
+ * the requested path looking for the nearest 404.html. It always serves
+ * the root one — this file. `https://sensorika.co.il/ru/anything-wrong`
+ * returns this Hebrew page, not /ru/404.
+ *
+ * So ru/404.astro is currently reachable only at its own URL and is not
+ * what a Russian visitor sees when they mistype. That's a degradation,
+ * not a break: this page carries the full header, so the nav and the
+ * language switcher are right there and the switcher's link resolves to
+ * `/ru` — one click back into Russian. It is also exactly what the site
+ * did for everyone before Russian existed.
+ *
+ * FIXING IT PROPERLY MEANS GIVING UP THE NO-WORKER DEPLOY. Static-assets
+ * `not_found_handling` is one setting for the whole site, so serving a
+ * different 404 per path prefix needs request-time logic — a Worker
+ * script with an ASSETS binding, plus `main` in wrangler.jsonc, which
+ * that file's opening comment explains the site deliberately does
+ * without. That trade (a worker, for a localised 404 on mistyped URLs)
+ * is worth making only if the Russian side turns out to attract them.
  *
  * The locale is passed to NotFound explicitly — see there for why this
  * is the one page that states its language rather than deriving it.

@@ -1,9 +1,21 @@
 ---
 /**
- * The not-found page, Russian — emitted at /ru/404.html so Cloudflare
- * has a Russian one to reach for on a bad URL under /ru. See
- * src/pages/404.astro for the whole argument, and NotFound.astro for why
- * `locale` is a prop here rather than something derived.
+ * The not-found page, Russian.
+ *
+ * IT IS NOT CURRENTLY SERVED FOR BAD URLS. It was added expecting
+ * Cloudflare's "404-page" handling to reach for the nearest 404.html and
+ * find this one for a mistyped path under /ru; the deployed site says
+ * otherwise — the root /404.html is served for everything. See
+ * src/pages/404.astro for the confirmation and for what fixing it would
+ * cost.
+ *
+ * It stays, for two reasons: it is a correct Russian page at a real URL
+ * (/ru/404) that can be linked to, and it is the half of the pair that
+ * already exists if the site ever does grow the worker that would route
+ * to it. Deleting it would mean writing it again.
+ *
+ * See NotFound.astro for why `locale` is a prop here rather than
+ * something derived.
  *
  * A static route rather than another `[...locale]` branch, because
  * `src/pages/404.astro` is special-cased by Astro (the dev server serves
