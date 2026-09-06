@@ -61,9 +61,35 @@
  *    White is the surface every card on the page already uses, so the
  *    header reads as the topmost of them; the shadow is what says it
  *    floats over the ground rather than being painted onto it. Neither
- *    fact depends on scroll position, so neither is animated any more,
- *    which takes the scroll listener, the rAF guard and the scrolled-
- *    state attribute out of this component entirely.
+ *    fact depends on scroll position, so neither is animated any more.
+ *
+ *    (There IS a scroll listener again, for point 5 — but it decides
+ *    where the bar is, never what it looks like. The white and the
+ *    shadow are still constants.)
+ *
+ * 5. IT GETS OUT OF THE WAY ON THE WAY DOWN. This is a sticky bar over
+ *    pages that are mostly long-form parent reading, so it hides while
+ *    you scroll down and comes back the moment you scroll up: the
+ *    reader gets the whole viewport for the text, and the nav is one
+ *    upward flick away rather than a scroll back to the top.
+ *
+ *    Three cases override the direction, and each of them is a real
+ *    bug if you leave it out:
+ *
+ *    - NEAR THE TOP the bar is always shown, so the first flick on a
+ *      freshly opened page can't leave it looking headerless.
+ *    - WHILE THE DRAWER IS OPEN the bar is pinned. The drawer hangs
+ *      from the bottom of the header and the trigger is its close
+ *      button (it's showing an X by then), so hiding the bar would
+ *      take the only way out of the drawer with it.
+ *    - ON `focusin` the bar comes back, because its links and its CTA
+ *      are still in the tab order while it's translated off screen. A
+ *      keyboard user must never be focused on something invisible.
+ *
+ *    The direction is read through a small threshold rather than off
+ *    the raw delta: touch momentum and iOS rubber-banding emit tiny
+ *    alternating deltas, and without it the bar flickers open and shut
+ *    for the whole of a decelerating flick.
  *
  * The drawer's state machine, focus handling and skip link are COPIED
  * UNCHANGED from Header.astro — this component keeps the exact same
@@ -232,6 +258,25 @@ const here = trim(Astro.url.pathname);
      two surfaces, and the shadow between them is the truth rather than
      a seam. Hence no nav-open override here at all now. */
 
+  /* Hidden means MOVED, not removed. `transform` leaves the bar in the
+     layout — so `--spacing-header` still describes the gap that the
+     drawer's top and `scroll-margin-top` are measured against — and it
+     animates on the compositor instead of laying out the page again on
+     every scroll frame. */
+  [data-site-header] {
+    transition: transform var(--duration-base) var(--ease-standard);
+  }
+  [data-site-header][data-hidden] {
+    transform: translateY(-100%);
+  }
+  /* The bar still hides; it just stops sliding. Someone who asked for
+     less motion asked about the animation, not about the behaviour. */
+  @media (prefers-reduced-motion: reduce) {
+    [data-site-header] {
+      transition: none;
+    }
+  }
+
   .toggle-bars {
     display: grid;
     gap: 4px;
@@ -258,16 +303,29 @@ const here = trim(Astro.url.pathname);
 </style>
 
 <script>
-  /* Copied verbatim from src/components/layout/Header.astro — the state
-     machine isn't what's under review here, only the bar's look. Same
-     contract, so the shipped SideNav.astro pairs with this unchanged. */
+  /* The drawer's state machine keeps the contract SideNav.astro is
+     written against — `data-nav-open` on <html>, `aria-expanded` on the
+     trigger, a `nav:close` event to ask for a close — so the two stay
+     swappable. The hide-on-scroll below it is this component's own, and
+     writes only to the header's own element. */
   const html = document.documentElement;
+  const header = document.querySelector<HTMLElement>('[data-site-header]');
   const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+
+  /* Where the bar is, as opposed to what it looks like. It's an
+     attribute rather than an inline transform so the stylesheet above
+     keeps ownership of the animation and this keeps only the decision. */
+  function setHeaderHidden(hidden: boolean) {
+    header?.toggleAttribute('data-hidden', hidden);
+  }
 
   function setNavOpen(open: boolean) {
     html.toggleAttribute('data-nav-open', open);
     toggle?.setAttribute('aria-expanded', String(open));
     html.style.overflow = open ? 'hidden' : '';
+    /* An open drawer pins the bar: the drawer hangs off the bottom of
+       it and the trigger is now the X that closes it. */
+    if (open) setHeaderHidden(false);
   }
 
   toggle?.addEventListener('click', () => {
@@ -281,4 +339,51 @@ const here = trim(Astro.url.pathname);
   });
 
   document.addEventListener('nav:close', () => setNavOpen(false));
+
+  /* Below this many pixels a scroll is momentum or rubber-band rather
+     than someone deciding to go somewhere. */
+  const DIRECTION_THRESHOLD = 8;
+
+  let lastY = window.scrollY;
+  let ticking = false;
+
+  function onScroll() {
+    const y = Math.max(window.scrollY, 0);
+    const delta = y - lastY;
+
+    /* `lastY` is deliberately NOT updated when the threshold isn't met:
+       the deltas of a slow drag have to accumulate against a fixed
+       reference, or a gentle scroll would never move the bar at all. */
+    if (Math.abs(delta) < DIRECTION_THRESHOLD) return;
+    lastY = y;
+
+    /* setNavOpen already showed the bar and owns it until it closes. */
+    if (html.hasAttribute('data-nav-open')) return;
+
+    /* Within the bar's own height of the top, hiding buys no reading
+       room worth the page appearing to lose its header on flick one. */
+    if (y <= (header?.offsetHeight ?? 0)) {
+      setHeaderHidden(false);
+      return;
+    }
+
+    setHeaderHidden(delta > 0);
+  }
+
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        onScroll();
+      });
+    },
+    { passive: true },
+  );
+
+  /* The nav links and the CTA stay tabbable while the bar is translated
+     off screen, so focus arriving at one of them has to bring it back. */
+  header?.addEventListener('focusin', () => setHeaderHidden(false));
 </script>
