@@ -33,7 +33,15 @@
  * 2. The logo drops from h-18/h-22 to h-14/h-16. At 88px inside a 112px
  *    bar it fills 79% of the header's height, which reads as an
  *    oversized asset rather than as a brand mark, and leaves the CTA
- *    looking undersized next to it. It's also the PETALS ONLY at every
+ *    looking undersized next to it.
+ *
+ *    THAT RATIO IS BACK, and it's fine, because it was never the ratio
+ *    that was wrong. The bar has since come down to 80/88px around the
+ *    same h-14/h-16 mark (tokens.css), so the logo fills ~70% of it
+ *    again — but as a normal mark in a tight bar rather than an
+ *    88px asset in a loose one. What the earlier version was buying
+ *    with its extra 16-24px was empty white above and below a 56px
+ *    glyph, on a sticky element that sits over every page. It's also the PETALS ONLY at every
  *    width, not just below `sm`: the home page's h1 is now the wordmark
  *    at `text-brand`, so a second, small "Sensorika" in the bar above it
  *    is the same word twice on one screen — and the mark is what has to

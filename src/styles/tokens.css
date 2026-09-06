@@ -206,9 +206,16 @@
   /* Sticky-header height. A real token rather than a magic number
      because anything that has to sit clear of the header needs the
      same value: the side nav's top offset, scroll-margin on anchor
-     targets, the drawer's height. */
-  --spacing-header: 6rem;
-  --spacing-header-lg: 7rem;
+     targets, the drawer's height.
+
+     These were 6rem/7rem: the logo's own 3.5rem/4rem plus 20px and 24px
+     of air above and below it. The air is what came out — 12px a side at
+     both widths, which is enough to keep the mark off the edges and not
+     enough to read as a band of empty white over every page. The logo did NOT shrink to pay for it (Header
+     point 2 explains why the mark's size is settled), so the bar is now
+     a close fit around it by design rather than by accident. */
+  --spacing-header: 5rem;
+  --spacing-header-lg: 5.5rem;
 
   /* Pinned side-nav width. Two things must agree on it and they live in
      different components — the rail itself, and the inset SiteLayout
