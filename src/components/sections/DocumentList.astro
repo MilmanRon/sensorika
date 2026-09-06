@@ -45,8 +45,9 @@ const { heading, intro, items, class: className = '' } = Astro.props;
    hue tells one card from the next and means nothing else. */
 const cycle = ['coral', 'teal', 'purple', 'amber'] as const;
 
-/* The -800 step on its own -100 tint — the only pairing in which a petal
-   may carry a glyph or a label. Same table as ProsePanel's eyebrow. */
+/* The -800 step on its own -100 tint — the pairing in which a petal may
+   carry a glyph or a label. Same table as ProsePanel's eyebrow. (The
+   mark's own squares are the exemption: see ui/PetalMark.astro.) */
 const tiles = {
   coral: 'bg-coral-100 text-coral-800',
   teal: 'bg-teal-100 text-teal-800',

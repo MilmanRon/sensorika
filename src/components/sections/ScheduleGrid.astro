@@ -26,18 +26,24 @@
  * The hues mean nothing beyond that; they're wayfinding, the same way
  * PanelStack cycles its panels.
  *
- * WHY THE TILES AREN'T THE SATURATED SQUARES OF THE ORIGINAL. The
- * graphic sets a white glyph on the full-strength petal, which is 3:1 at
- * best (amber is 1.7:1). The site's rule — tokens.css, and every tile in
- * DocumentList and ProsePanel — is that a petal carrying anything is the
- * -800 step on its own -100 tint. Same four hues, same pairing of hue to
- * glyph as the logo; legible at 28px.
+ * THE ROW'S SQUARE IS THE LOGO'S OWN, not a tinted tile with an icon in
+ * it: ui/PetalMark.astro draws the petal and its white glyph straight
+ * from assets/brand/logo-mark.svg. This grid first carried four 24px
+ * stroke glyphs of the same four subjects and they read as a generic
+ * hand and a generic ear — the mark's petals are soft irregular squares
+ * and its glyphs are filled, weighted shapes, and neither survives being
+ * approximated in a stroke. See that file on why white on a
+ * full-strength petal is the mark and not a tile.
+ *
+ * The DAY PILL is still the -800-on--100 pairing, because a day is a
+ * word and words have to be read.
  */
 import { getCollection } from 'astro:content';
 
 import { currentLocale, dayName, ui, weekdays } from '../../data/i18n';
 import Card from '../ui/Card.astro';
 import Icon from '../ui/Icon.astro';
+import PetalMark from '../ui/PetalMark.astro';
 
 interface Props {
   heading: string;
@@ -74,12 +80,12 @@ for (const item of classes) {
   else days.push({ day: item.dayOfWeek, classes: [item] });
 }
 
-/* Hue → glyph is the logo's own pairing (logo-mark.svg): teal hand,
-   coral ear, purple spiral, amber eye. Only the ORDER hues are handed
-   out in is a choice, and it's positional. */
+/* Which glyph a hue comes with isn't decided here — a petal and its
+   glyph are one square in the logo, and PetalMark draws them as one.
+   Only the ORDER the hues are handed out in is a choice, and it's
+   positional. */
 const cycle = ['teal', 'coral', 'purple', 'amber'] as const;
 type Accent = (typeof cycle)[number];
-const glyphs = { teal: 'hand', coral: 'ear', purple: 'spiral', amber: 'eye' } as const;
 
 /* An age range is a group, and a group keeps its petal across the week:
    first appearance takes the next hue in the cycle. */
@@ -94,11 +100,11 @@ for (const item of classes) {
    the rows' so a column header doesn't repeat its own first row. */
 const dayCycle = ['teal', 'amber', 'purple', 'coral'] as const;
 
-/* The three petal pairings, each a full class string so the lookup can
-   only ever land on a token. Tile and pill are the -800-on--100 pairing
-   every other tinted label on the site uses; the row wash and the dotted
-   rule are ornament and take the light steps. */
-const tiles: Record<Accent, string> = {
+/* Each a full class string so the lookup can only ever land on a token.
+   The day pill is the -800-on--100 pairing every other tinted label on
+   the site uses; the row wash and the dotted rule are ornament and take
+   the light steps. */
+const pills: Record<Accent, string> = {
   coral: 'bg-coral-100 text-coral-800',
   teal: 'bg-teal-100 text-teal-800',
   amber: 'bg-amber-100 text-amber-800',
@@ -148,7 +154,7 @@ const columns = days.length >= 3 ? 'sm:grid-cols-2 lg:grid-cols-3' : 'sm:grid-co
             <h3
               class:list={[
                 'mx-auto flex w-full max-w-xs items-center justify-center rounded-pill px-5 py-2.5 font-display text-lg leading-heading font-bold sm:text-xl',
-                tiles[dayCycle[i % dayCycle.length]],
+                pills[dayCycle[i % dayCycle.length]],
               ]}
             >
               {dayName(locale, day)}
@@ -164,14 +170,7 @@ const columns = days.length >= 3 ? 'sm:grid-cols-2 lg:grid-cols-3' : 'sm:grid-co
                       rows[accent],
                     ]}
                   >
-                    <span
-                      class:list={[
-                        'flex size-12 shrink-0 items-center justify-center rounded-card',
-                        tiles[accent],
-                      ]}
-                    >
-                      <Icon name={glyphs[accent]} class="h-6 w-6" />
-                    </span>
+                    <PetalMark petal={accent} class="size-12 shrink-0" />
 
                     {/*
                       `dir="ltr"` on the two number runs, and nothing

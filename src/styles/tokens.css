@@ -115,6 +115,13 @@
   /* pastels (coral is 3.0:1 on white, amber 1.7:1) and can only ever  */
   /* be a shape.                                                       */
   /*                                                                  */
+  /* THE ONE EXEMPTION is the mark itself: ui/PetalMark.astro sets the */
+  /* logo's own white glyph on the -500 petal, because that IS the     */
+  /* logo — the same four squares as the header lockup. It's ornament  */
+  /* (whatever a square identifies is written beside it in text), not  */
+  /* a tile the site invented, and it's the only place a -500 carries  */
+  /* anything.                                                         */
+  /*                                                                  */
   /*   50/100   pill tints, icon tiles, a whole section's wash          */
   /*   200/300  the light circles and petal shapes in the background   */
   /*   500      the exact logo values — ornament at full strength      */
