@@ -1,0 +1,80 @@
+---
+/**
+ * Where the classes happen: one card, a pin, the studio and the street.
+ *
+ * It sits under the timetable because it answers the second half of the
+ * same question — a parent looking at "שלישי, 16:45" is deciding whether
+ * they can be there, and "where" is part of that. It's a card of its own
+ * rather than a line inside the grid so a second page can show the venue
+ * without the schedule (`venue: true` in a page's frontmatter).
+ *
+ * THE ADDRESS COMES FROM i18n.ts, not from the page and not from
+ * site.ts. One clinic, one address — but it's written differently in
+ * each language (the Hebrew original, transliterated for Russian), which
+ * is precisely the split those two files draw between them.
+ *
+ * UNDER RUSSIAN IT ALSO PRINTS THE HEBREW. The transliteration tells a
+ * Russian-reading parent what the street is called; the Hebrew line is
+ * what's actually written on the sign at the corner and on the door, and
+ * what a taxi driver can be shown. It's set `lang="he" dir="rtl"` so it
+ * is read out in Hebrew and laid out right-to-left inside the LTR page,
+ * rather than as a mangled run of foreign glyphs.
+ */
+import { currentLocale, defaultLocale, ui } from '../../data/i18n';
+import Card from '../ui/Card.astro';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+const locale = currentLocale(Astro);
+const t = ui(locale);
+
+/* Hebrew is the default locale, so on the Hebrew page this is `t` and
+   the second line would be a duplicate — hence the flag rather than
+   printing it unconditionally. */
+const source = ui(defaultLocale);
+const showSource = locale !== defaultLocale;
+---
+
+<!-- A div and not a <section>: it carries no heading, and a section with
+     no accessible name is one more unnamed landmark to page past. -->
+<div class:list={['scroll-mt-header lg:scroll-mt-header-lg', className]} id="venue">
+  <Card accent="teal" petal={false}>
+    <!-- The row lives INSIDE the card, not on it: Card wraps its slot in
+         a positioning div, so a `flex` handed to Card lays out that one
+         wrapper and leaves its children stacked. -->
+    <!-- Centered rather than pushed to the inline start. The card spans
+         the same width as the timetable above it so the two read as one
+         block, and three short lines against that width look stranded on
+         one edge; the grid's own heading and footnote are centered too. -->
+    <div class="flex items-center justify-center gap-4 sm:gap-5">
+      <span class="flex size-12 shrink-0 items-center justify-center rounded-card bg-teal-100 text-teal-800">
+        <Icon name="pin" class="h-6 w-6" />
+      </span>
+
+      <div>
+        <p class="font-display text-sm leading-heading font-semibold text-teal-800">
+          {t.venueLabel}
+        </p>
+
+        <p class="mt-1.5 font-display text-xl leading-heading font-semibold text-pretty text-ink-900">
+          {t.venueName}
+        </p>
+
+        <p class="mt-1 text-lg leading-body text-ink-700">{t.venueStreet}</p>
+
+        {
+          showSource && (
+            <p class="mt-1 leading-body text-ink-500" lang="he" dir="rtl">
+              {source.venueStreet}, {source.venueName}
+            </p>
+          )
+        }
+      </div>
+    </div>
+  </Card>
+</div>

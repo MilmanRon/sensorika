@@ -5,6 +5,10 @@ description: Два бланка, которые нужно заполнить �
 order: 4.5
 intro: >-
   Перед началом участия в групповых занятиях нужно заполнить и подписать два приведённых ниже бланка. Их можно скачать, распечатать и принести на первую встречу. Полные условия участия приведены ниже на этой странице; они совпадают с приложением к бланку 2.
+schedule:
+  heading: Расписание групповых занятий
+  note: Из расчёта одного занятия в неделю, на ваш выбор
+venue: true
 documents:
   heading: Бланки для скачивания
   items:
@@ -85,16 +89,23 @@ panels:
   It has a route but is NOT in the header nav; it's reached from the
   "Групповые развивающие занятия" card on the home page.
 
-  ALSO IN THE SOURCE AND NOT ON THIS PAGE: the group timetable (day, age
-  group, time), the venue, and a "Регистрация и оплата" link. The Hebrew
-  page carries none of them either — the timetable lives in the
-  `schedule` collection, which nothing renders yet, and the source itself
-  says the registration URL is to be wired up "после получения готового
-  URL". Both languages are waiting on the same two things.
+  THE TIMETABLE AND THE VENUE, from the same source, now open the page —
+  and they cost this file two lines, not a translation. The five classes
+  are language-free data in src/content/schedule/ and are shared with the
+  Hebrew page; the day names come from i18n.ts; the address is there too,
+  transliterated, because "רח. הגליל 6" is written differently in each
+  language. Only the heading and the footnote here are Russian text.
+  The venue card also prints the Hebrew address under the Russian one:
+  that's what the street sign says.
+
+  STILL NOT ON THIS PAGE, from the same source: the registration phone
+  number (054-4548600, which belongs in site.ts) and the "Регистрация и
+  оплата" link, which the source says is to be wired up "после получения
+  готового URL".
 
   NEW COPY, needing sign-off: `title`, `description`, `intro`, the
-  download heading, the two one-line descriptions and the "на иврите"
-  note. Everything in the panels and the two form titles is the
-  clinic's own. The Hebrew page's equivalents are flagged as unapproved
-  too.
+  schedule and download headings, the schedule footnote, the two
+  one-line descriptions and the "на иврите" note. Everything in the
+  panels and the two form titles is the clinic's own. The Hebrew page's
+  equivalents are flagged as unapproved too.
 -->

@@ -1,0 +1,224 @@
+---
+/**
+ * The weekly timetable: one column per day the clinic runs classes, one
+ * row per class, drawn from the `schedule` collection.
+ *
+ * It is a rebuild of the clinic's own schedule graphic — the square they
+ * hand out with שלישי and חמישי side by side, each class a tinted bar
+ * carrying a petal, an age range and a time — in this site's materials
+ * rather than as a flat image. That's the point of rebuilding it: an
+ * image can't be read by a screen reader, can't reflow onto a phone,
+ * can't be translated, and has to be redrawn in a design tool every time
+ * a class moves by fifteen minutes. This renders from five data files.
+ *
+ * NOTHING HERE IS WRITTEN IN A LANGUAGE. The classes are numbers and a
+ * day enum (src/content/schedule/), the day names and the two
+ * screen-reader labels come from i18n.ts, and the heading, opening line
+ * and footnote are the page's own frontmatter. So the Russian timetable
+ * is the same five files as the Hebrew one, and a class that moves moves
+ * once.
+ *
+ * THE PETAL IS AN AGE GROUP'S IDENTITY, and it's derived rather than
+ * stored. Every class for 8–10s gets the same hue and the same glyph on
+ * both days, because the hue is assigned per age range in order of first
+ * appearance — so it can't be written down twice and disagree with
+ * itself, and adding a Sunday for the 8–10s needs no colour decision.
+ * The hues mean nothing beyond that; they're wayfinding, the same way
+ * PanelStack cycles its panels.
+ *
+ * WHY THE TILES AREN'T THE SATURATED SQUARES OF THE ORIGINAL. The
+ * graphic sets a white glyph on the full-strength petal, which is 3:1 at
+ * best (amber is 1.7:1). The site's rule — tokens.css, and every tile in
+ * DocumentList and ProsePanel — is that a petal carrying anything is the
+ * -800 step on its own -100 tint. Same four hues, same pairing of hue to
+ * glyph as the logo; legible at 28px.
+ */
+import { getCollection } from 'astro:content';
+
+import { currentLocale, dayName, ui, weekdays } from '../../data/i18n';
+import Card from '../ui/Card.astro';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  heading: string;
+  intro?: string;
+  /** Footnote under the grid — how many of these classes a child takes. */
+  note?: string;
+  class?: string;
+}
+
+const { heading, intro, note, class: className = '' } = Astro.props;
+
+const locale = currentLocale(Astro);
+const t = ui(locale);
+
+/* The week's order comes from `weekdays`, and a class's own order within
+   a day from its start time — zero-padded "HH:mm" sorts correctly as a
+   string, which is why the schema insists on that shape. */
+const classes = (await getCollection('schedule'))
+  .map((entry) => entry.data)
+  .sort(
+    (a, b) =>
+      weekdays.indexOf(a.dayOfWeek) - weekdays.indexOf(b.dayOfWeek) ||
+      a.startTime.localeCompare(b.startTime),
+  );
+
+/* One column per day that actually has classes — an empty Wednesday is
+   not a column, and the grid stays right if the clinic adds a third day
+   or drops one. */
+type Class = (typeof classes)[number];
+const days: { day: Class['dayOfWeek']; classes: Class[] }[] = [];
+for (const item of classes) {
+  const open = days.at(-1);
+  if (open && open.day === item.dayOfWeek) open.classes.push(item);
+  else days.push({ day: item.dayOfWeek, classes: [item] });
+}
+
+/* Hue → glyph is the logo's own pairing (logo-mark.svg): teal hand,
+   coral ear, purple spiral, amber eye. Only the ORDER hues are handed
+   out in is a choice, and it's positional. */
+const cycle = ['teal', 'coral', 'purple', 'amber'] as const;
+type Accent = (typeof cycle)[number];
+const glyphs = { teal: 'hand', coral: 'ear', purple: 'spiral', amber: 'eye' } as const;
+
+/* An age range is a group, and a group keeps its petal across the week:
+   first appearance takes the next hue in the cycle. */
+const ageKey = (item: Class) => `${item.ageRange.min}-${item.ageRange.max}`;
+const groupAccent = new Map<string, Accent>();
+for (const item of classes) {
+  const key = ageKey(item);
+  if (!groupAccent.has(key)) groupAccent.set(key, cycle[groupAccent.size % cycle.length]);
+}
+
+/* The day pills run a cycle of their own, starting one hue apart from
+   the rows' so a column header doesn't repeat its own first row. */
+const dayCycle = ['teal', 'amber', 'purple', 'coral'] as const;
+
+/* The three petal pairings, each a full class string so the lookup can
+   only ever land on a token. Tile and pill are the -800-on--100 pairing
+   every other tinted label on the site uses; the row wash and the dotted
+   rule are ornament and take the light steps. */
+const tiles: Record<Accent, string> = {
+  coral: 'bg-coral-100 text-coral-800',
+  teal: 'bg-teal-100 text-teal-800',
+  amber: 'bg-amber-100 text-amber-800',
+  purple: 'bg-purple-100 text-purple-800',
+};
+
+const rows: Record<Accent, string> = {
+  coral: 'bg-coral-50',
+  teal: 'bg-teal-50',
+  amber: 'bg-amber-50',
+  purple: 'bg-purple-50',
+};
+
+const rules: Record<Accent, string> = {
+  coral: 'border-coral-300',
+  teal: 'border-teal-300',
+  amber: 'border-amber-300',
+  purple: 'border-purple-300',
+};
+
+/* Two days sit side by side from `sm`; three or more get a third column
+   on `lg` rather than leaving one stranded on a row of its own. */
+const columns = days.length >= 3 ? 'sm:grid-cols-2 lg:grid-cols-3' : 'sm:grid-cols-2';
+---
+
+{
+  /* No classes, no section — a heading over an empty grid is worse than
+     a page that simply doesn't mention a timetable yet. */
+  days.length > 0 && (
+    <section class:list={['scroll-mt-header lg:scroll-mt-header-lg', className]} id="schedule">
+      <h2 class="text-center font-display text-2xl leading-heading font-bold text-balance text-ink-900 sm:text-3xl">
+        {heading}
+      </h2>
+
+      {intro && (
+        <p class="mx-auto mt-4 max-w-[var(--width-prose)] text-center text-lg leading-body text-pretty text-ink-700">
+          {intro}
+        </p>
+      )}
+
+      <div class:list={['mt-8 grid grid-cols-1 gap-6 lg:gap-8', columns]}>
+        {days.map(({ day, classes: dayClasses }, i) => (
+          <Card accent={dayCycle[i % dayCycle.length]} petal={false}>
+            {/* The day is a heading, not a caption: it's what the column
+                under it is. Centered on its own pill, as the clinic's
+                graphic sets it. */}
+            <h3
+              class:list={[
+                'mx-auto flex w-full max-w-xs items-center justify-center rounded-pill px-5 py-2.5 font-display text-lg leading-heading font-bold sm:text-xl',
+                tiles[dayCycle[i % dayCycle.length]],
+              ]}
+            >
+              {dayName(locale, day)}
+            </h3>
+
+            <ul class="mt-6 flex flex-col gap-3">
+              {dayClasses.map((item) => {
+                const accent = groupAccent.get(ageKey(item)) ?? cycle[0];
+                return (
+                  <li
+                    class:list={[
+                      'flex items-center gap-3 rounded-card p-3 sm:gap-4 sm:p-4',
+                      rows[accent],
+                    ]}
+                  >
+                    <span
+                      class:list={[
+                        'flex size-12 shrink-0 items-center justify-center rounded-card',
+                        tiles[accent],
+                      ]}
+                    >
+                      <Icon name={glyphs[accent]} class="h-6 w-6" />
+                    </span>
+
+                    {/*
+                      `dir="ltr"` on the two number runs, and nothing
+                      else. A range is digits either side of a dash, and
+                      a dash is bidi-neutral: on the Hebrew page it takes
+                      the paragraph's direction and "16:45–17:30" comes
+                      out reading right to left. The attribute isolates
+                      the run so both languages get one number line.
+
+                      The units are said only to a screen reader. The
+                      graphic labels neither, and sighted readers get the
+                      distinction from the column of clock times beside a
+                      column of small integers — but "8–10, 16:45–17:30"
+                      read aloud is four numbers in a row.
+                    */}
+                    <p class="font-display text-2xl leading-heading font-bold text-ink-900">
+                      <span class="sr-only">{t.scheduleAges}: </span>
+                      <span dir="ltr">
+                        {item.ageRange.min}–{item.ageRange.max}
+                      </span>
+                    </p>
+
+                    <p
+                      class:list={[
+                        'ms-auto flex items-center self-stretch border-s border-dotted ps-3 text-base leading-body tabular-nums text-ink-700 sm:ps-4',
+                        rules[accent],
+                      ]}
+                    >
+                      <span class="sr-only">{t.scheduleTime}: </span>
+                      <span dir="ltr">
+                        {item.startTime}–{item.endTime}
+                      </span>
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          </Card>
+        ))}
+      </div>
+
+      {note && (
+        <p class="mt-6 flex items-center justify-center gap-2 text-center text-pretty text-ink-600">
+          <Icon name="sparkle" class="h-5 w-5 shrink-0 text-amber-500" />
+          {note}
+        </p>
+      )}
+    </section>
+  )
+}

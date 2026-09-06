@@ -2,6 +2,8 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
+import { weekdays } from './data/i18n';
+
 /**
  * Long-form parent material (methodology, guides, FAQs). One .md/.mdx
  * file per article under src/content/articles/. MDX lets an article
@@ -21,21 +23,53 @@ const articles = defineCollection({
 });
 
 /**
- * The weekly class schedule — one data file (.yaml/.json) per class
- * under src/content/schedule/. Structured data, not prose, so it's
- * read programmatically to render the schedule grid/table.
+ * THE WEEKLY TIMETABLE — one data file per class under
+ * src/content/schedule/, read by sections/ScheduleGrid.astro.
+ *
+ * IT SAYS NOTHING IN EITHER LANGUAGE, and that is the whole design of
+ * this collection. A class here is a day, an age range and two clock
+ * times — four facts a Hebrew reader and a Russian reader are given
+ * identically. The words around them ("שלישי" / "Вторник", "גילאי" /
+ * "Возраст") are the chrome's, and they live in i18n.ts, so the
+ * timetable exists ONCE for both languages instead of twice with a
+ * chance of drifting. Adding a class is one file, not two.
+ *
+ * That's why `className`, `level` and `coach` are gone from this shape.
+ * They were scaffolding from before the site spoke two languages, and a
+ * class NAME is exactly the kind of string that would have forced a
+ * he/ru split on data that doesn't need one. The clinic's own schedule
+ * graphic doesn't name the groups either — it identifies each one by its
+ * age range and its petal, which is what the grid draws.
+ *
+ * `dayOfWeek` takes its values from `weekdays` in i18n.ts rather than
+ * spelling them out again: that list is also the order the grid renders
+ * its columns in and the key its day names are looked up by, so a day
+ * that's valid here is a day that has a name and a position.
  */
+const time = z
+  .string()
+  .regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'A 24-hour clock time, zero-padded — "16:45".');
+
 const schedule = defineCollection({
   loader: glob({ pattern: '**/*.{yaml,yml,json}', base: './src/content/schedule' }),
-  schema: z.object({
-    className: z.string(),
-    level: z.enum(['beginner', 'intermediate', 'advanced']),
-    ageRange: z.object({ min: z.number(), max: z.number() }),
-    dayOfWeek: z.enum(['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']),
-    startTime: z.string(), // 24h "HH:mm"
-    endTime: z.string(),
-    coach: z.string().optional(),
-  }),
+  schema: z
+    .object({
+      dayOfWeek: z.enum(weekdays),
+      /** Inclusive, in years — `{ min: 8, max: 10 }` prints as "8–10". */
+      ageRange: z.object({ min: z.number().int().positive(), max: z.number().int().positive() }),
+      startTime: time,
+      endTime: time,
+    })
+    .refine((c) => c.ageRange.max >= c.ageRange.min, {
+      message: 'ageRange.max must not be below ageRange.min.',
+      path: ['ageRange'],
+    })
+    /* Zero-padded "HH:mm" compares correctly as a string, which is also
+       how the grid sorts a day's classes into the order they run. */
+    .refine((c) => c.endTime > c.startTime, {
+      message: 'endTime must be after startTime.',
+      path: ['endTime'],
+    }),
 });
 
 /**
@@ -267,6 +301,35 @@ const pages = defineCollection({
         panels: z.array(panel).nonempty(),
       })
       .optional(),
+    /**
+     * The weekly timetable, rendered from the `schedule` collection at
+     * the TOP of the page — above the downloads, which are above the
+     * panels. A parent deciding whether the group program is for them
+     * asks "when does it run and where is it" before they ask anything
+     * a form or a terms panel can answer.
+     *
+     * Only the block's own words are here. The classes themselves are
+     * NOT: they're data, they're shared by both languages, and they live
+     * in src/content/schedule/ (see that collection's note). This is the
+     * heading over them, an optional opening line, and the footnote
+     * under them — the three things that are prose.
+     */
+    schedule: z
+      .object({
+        heading: z.string(),
+        intro: z.string().optional(),
+        /** Footnote under the grid — "על בסיס שיעור אחד בשבוע, לבחירתכם". */
+        note: z.string().optional(),
+      })
+      .optional(),
+    /**
+     * Show the venue card (where the classes happen), under the
+     * timetable. A switch and not a block of copy, because the address
+     * isn't this page's to own: one clinic, one address, written per
+     * language in i18n.ts. A second page that needs it flips this rather
+     * than repeating it.
+     */
+    venue: z.boolean().default(false),
     /**
      * Downloads, rendered as a card each ABOVE the panels — a page that
      * exists to hand a parent two forms shouldn't open with the reading

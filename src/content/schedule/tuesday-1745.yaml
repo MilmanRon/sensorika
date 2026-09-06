@@ -1,0 +1,6 @@
+dayOfWeek: tuesday
+ageRange:
+  min: 5
+  max: 7
+startTime: '17:45'
+endTime: '18:30'

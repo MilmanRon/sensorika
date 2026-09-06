@@ -90,6 +90,62 @@ export const localeMeta: Record<
 };
 
 /**
+ * THE WEEK, IN ORDER, AND WHAT EACH DAY IS CALLED IN EACH LANGUAGE.
+ *
+ * The `schedule` collection says a class is on `tuesday`; it does not
+ * say "שלישי" or "Вторник", because a timetable is data and the two
+ * languages share it. This is where that enum becomes a word, so the
+ * one Russian file that has to exist for the schedule is this table
+ * rather than a second copy of the timetable itself.
+ *
+ * SUNDAY FIRST, because the clinic's week starts there — the classes
+ * run Tuesday and Thursday, and a Sunday-first list is what puts them
+ * in the order a parent in Israel reads them. `weekdays` is also the
+ * order the schedule grid renders its columns in, and the source of the
+ * `dayOfWeek` enum in content.config.ts, so the two can't disagree.
+ *
+ * Russian doesn't capitalize weekday names mid-sentence; these are
+ * standing labels on their own pill, which is a position where it does.
+ */
+export const weekdays = [
+  'sunday',
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+] as const;
+
+export type Weekday = (typeof weekdays)[number];
+
+const dayNames: Record<Locale, Record<Weekday, string>> = {
+  he: {
+    sunday: 'ראשון',
+    monday: 'שני',
+    tuesday: 'שלישי',
+    wednesday: 'רביעי',
+    thursday: 'חמישי',
+    friday: 'שישי',
+    saturday: 'שבת',
+  },
+  ru: {
+    sunday: 'Воскресенье',
+    monday: 'Понедельник',
+    tuesday: 'Вторник',
+    wednesday: 'Среда',
+    thursday: 'Четверг',
+    friday: 'Пятница',
+    saturday: 'Суббота',
+  },
+};
+
+/** What one day of the week is called in one language. */
+export function dayName(locale: Locale, day: Weekday): string {
+  return dayNames[locale][day];
+}
+
+/**
  * The URL prefix a locale's pages live under — '' for Hebrew, '/ru' for
  * Russian. Every href the chrome builds goes through `localizedHref()`
  * rather than concatenating this by hand.
@@ -203,6 +259,16 @@ const he = {
   /* Documents */
   downloadForm: 'הורדת הטופס',
 
+  /* Schedule (the group timetable) */
+  scheduleAges: 'גילאי',
+  scheduleTime: 'שעה',
+
+  /* Venue — see the note above the Russian side on why the address is
+     here and not in site.ts. */
+  venueLabel: 'המקום',
+  venueName: 'סטודיו טבסקו',
+  venueStreet: 'רח. הגליל 6',
+
   /* 404 */
   notFoundTitle: 'הדף לא נמצא',
   notFoundDescription: 'הדף שחיפשתם לא קיים. אפשר לחזור לעמוד הבית או לבחור מהתפריט.',
@@ -266,6 +332,29 @@ const ru: UiStrings = {
 
   /* Documents */
   downloadForm: 'Скачать бланк',
+
+  /* Schedule (the group timetable) */
+  scheduleAges: 'Возраст',
+  scheduleTime: 'Время',
+
+  /*
+   * Venue. THE ADDRESS IS HERE AND NOT IN site.ts, which is where a
+   * site-wide fact would normally go, because this one is written
+   * differently in each language: the street and the studio's name are
+   * Hebrew, and a Russian-reading parent gets them transliterated. That
+   * makes it a string the chrome says, which is what this file holds.
+   * site.ts keeps the facts that survive the switch — the phone number,
+   * the nav's slugs.
+   *
+   * ⚠ NEW COPY. The Hebrew — "רח. הגליל 6, סטודיו טבסקו" — is the
+   * clinic's own, from their schedule graphic. The Russian below is a
+   * transliteration of it and nobody has approved it; a parent standing
+   * on the street needs the Hebrew form as well, which is why the card
+   * renders the street in both scripts under Russian.
+   */
+  venueLabel: 'Место',
+  venueName: 'Студия «Табаско»',
+  venueStreet: 'ул. ха-Галиль, 6',
 
   /* 404 */
   notFoundTitle: 'Страница не найдена',

@@ -1,0 +1,8 @@
+# One file per class. The filename is only an id — day and time below
+# are what the grid reads, and what it sorts by.
+dayOfWeek: tuesday
+ageRange:
+  min: 8
+  max: 10
+startTime: '16:45'
+endTime: '17:30'

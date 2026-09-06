@@ -5,6 +5,10 @@ description: שני הטפסים שיש למלא לפני ההצטרפות לפ�
 order: 4.5
 intro: >-
   לפני תחילת ההשתתפות בפעילויות הקבוצתיות יש למלא ולחתום על שני הטפסים שלהלן. אפשר להוריד אותם, להדפיס ולהביא למפגש הראשון. תנאי ההשתתפות המלאים מופיעים בהמשך העמוד, והם זהים לנספח המצורף לטופס 2.
+schedule:
+  heading: לוח הפעילויות הקבוצתיות
+  note: על בסיס שיעור אחד בשבוע, לבחירתכם
+venue: true
 documents:
   heading: הטפסים להורדה
   items:
@@ -76,8 +80,23 @@ panels:
   `order: 4.5` puts it directly after "פעילות קבוצתית" (4), next to the
   program it belongs to.
 
+  THE TIMETABLE AND THE VENUE OPEN THE PAGE, above the two forms. Both
+  come from the clinic's own schedule graphic (שלישי / חמישי, three age
+  groups, רח. הגליל 6 — סטודיו טבסקו), rebuilt in the site's own
+  materials rather than posted as an image: `schedule:` here is only the
+  heading and the footnote, the five classes are data in
+  src/content/schedule/, and the address is in i18n.ts because it's
+  written differently in each language. See sections/ScheduleGrid.astro.
+
+  STILL MISSING from that graphic: the phone number it prints for
+  registration (054-4548600), which belongs in `contact.phone` in
+  site.ts — it's the one field standing between the header's CTA and a
+  working WhatsApp link — and the registration URL, which the clinic's
+  own instructions say is to be wired up once it exists.
+
   COPY NOTE: everything in the panels and the two form titles is the
-  clinic's own. `title`, `description`, `intro`, the download heading and
-  the two one-line descriptions under the form titles are NEW COPY and
-  still await sign-off.
+  clinic's own, as is the schedule footnote. `title`, `description`,
+  `intro`, the schedule and download headings and the two one-line
+  descriptions under the form titles are NEW COPY and still await
+  sign-off.
 -->

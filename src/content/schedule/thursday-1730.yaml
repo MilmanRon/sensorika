@@ -1,0 +1,6 @@
+dayOfWeek: thursday
+ageRange:
+  min: 5
+  max: 7
+startTime: '17:30'
+endTime: '18:15'

@@ -57,7 +57,17 @@ export const siteConfig = {
      * wa.me URL.
      */
     phone: '', // TODO
-    address: '', // TODO
+    /**
+     * NOT HERE — see `venueStreet` / `venueName` in i18n.ts.
+     *
+     * The clinic has one address and it looks like a site-wide fact,
+     * which is why this field existed. It isn't one: "רח. הגליל 6,
+     * סטודיו טבסקו" is Hebrew, and the Russian page transliterates it,
+     * so it changes with the language and belongs on the other side of
+     * the split this file is one half of. Left as a comment rather than
+     * deleted so the next person to reach for `contact.address` is told
+     * where it went instead of adding a second copy.
+     */
   },
   /**
    * Social profiles, as full URLs. Rendered as icons in the footer, and

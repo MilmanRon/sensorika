@@ -1,9 +1,9 @@
 ---
 /**
  * The shared body of a nav-item page: intro band + (on the forms page)
- * its downloads + a stack of accented ProsePanels + (on the individual
- * page) its collapsed packages and terms + (on the FAQ) an accordion.
- * Everything a page differs in
+ * its timetable, its venue and its downloads + a stack of accented
+ * ProsePanels + (on the individual page) its collapsed packages and
+ * terms + (on the FAQ) an accordion. Everything a page differs in
  * — its title, its opening line, how its copy splits into panels — comes
  * from one .md file in the `pages` collection, so a copy change is a
  * content edit and never a component edit.
@@ -41,6 +41,8 @@ import DisclosureList from './DisclosureList.astro';
 import DocumentList from './DocumentList.astro';
 import FaqList from './FaqList.astro';
 import PanelStack from './PanelStack.astro';
+import ScheduleGrid from './ScheduleGrid.astro';
+import Venue from './Venue.astro';
 
 interface Props {
   /** A `pages` collection entry's frontmatter. */
@@ -49,6 +51,14 @@ interface Props {
 
 const { page } = Astro.props;
 
+/* The intro band's own bottom padding is the gap down to whatever comes
+   first, so the FIRST block on a page carries no top margin and every
+   block after it adds one. Which block is first now depends on the page
+   — the timetable, the downloads, or the panels — so it's worked out
+   here rather than each block guessing. */
+const gap = 'mt-14 lg:mt-20';
+const beforeDocuments = Boolean(page.schedule || page.venue);
+const beforePanels = beforeDocuments || Boolean(page.documents);
 ---
 
 <section class="pb-section lg:pb-section-lg">
@@ -86,6 +96,33 @@ const { page } = Astro.props;
     </div>
 
     {/*
+      WHEN AND WHERE FIRST, above everything else on the page.
+
+      On the group program's page the panels are its terms and the
+      downloads are its paperwork, and both of them answer questions a
+      parent only has once they've decided the program could work for
+      them. Whether it can work is a timetable question: two afternoons,
+      an age group, a street. So the schedule and the venue open the
+      page, and the forms follow.
+
+      Neither block is on any other page today — both are frontmatter
+      switches, and a page that sets neither opens exactly as it did.
+    */}
+    {
+      page.schedule && (
+        <ScheduleGrid
+          heading={page.schedule.heading}
+          intro={page.schedule.intro}
+          note={page.schedule.note}
+        />
+      )
+    }
+
+    {/* Tight under the grid rather than a section apart: the venue is
+        the rest of the same answer, not the page's next subject. */}
+    {page.venue && <Venue class={page.schedule ? 'mt-6' : ''} />}
+
+    {/*
       Downloads before the panels, not after: on the forms page the two
       PDFs are what the visitor came for, and the terms under them are
       what they read once they have them. A page with no `documents`
@@ -98,16 +135,14 @@ const { page } = Astro.props;
           heading={page.documents.heading}
           intro={page.documents.intro}
           items={page.documents.items}
+          class={beforeDocuments ? gap : ''}
         />
       )
     }
 
-    {/* The intro band's own padding is the gap down to whatever comes
-        first, so the stack carries no top margin of its own; a second
-        block above it (the forms page's downloads) has to add one. */}
     {
       page.panels.length > 0 && (
-        <PanelStack panels={page.panels} class={page.documents ? 'mt-14 lg:mt-20' : ''} />
+        <PanelStack panels={page.panels} class={beforePanels ? gap : ''} />
       )
     }
 
