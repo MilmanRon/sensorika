@@ -5,6 +5,20 @@
  * the same items can appear in a horizontal bar, a vertical rail, or a
  * footer without duplicating `site.ts`.
  *
+ * THE LANGUAGE SWITCHER IS THE FIRST ROW. It used to sit at the foot of
+ * the drawer, under a rule, on the argument that it isn't a destination
+ * and shouldn't lead a list of them. It reads as an afterthought down
+ * there — and on a site whose whole point is that half its parents read
+ * Russian, "am I in the right language" is the first question the nav
+ * has to answer, not the last.
+ *
+ * It is rendered BESIDE <nav>, not inside its <ul>. That keeps the part
+ * of the old arrangement that was right: the primary nav's list stays a
+ * list of pages, so a screen reader still hears "6 items" and not "7,
+ * one of which isn't a page", and the switcher keeps the landmark and
+ * the label of its own. All that moved is where it is and what it looks
+ * like — `size="nav"` gives it NavItem's box, so it reads as row one.
+ *
  * The current page is worked out HERE, off `Astro.url`, rather than
  * being passed down from whatever renders the nav. Every caller would
  * otherwise have to thread the same value through for no reason: the
@@ -14,6 +28,7 @@
  */
 import { currentLocale, ui } from '../../data/i18n';
 import { getNavItems } from '../../data/site';
+import LangSwitcher from './LangSwitcher.astro';
 import NavItem from './NavItem.astro';
 
 interface Props {
@@ -41,26 +56,38 @@ const nav = await getNavItems(locale);
 const trim = (path: string) => path.replace(/\/+$/, '');
 const here = trim(Astro.url.pathname);
 
-const layouts = {
+/* The switcher and the list are siblings, so the gap between them is the
+   same gap that separates two links — which is what makes the switcher
+   look like row one rather than like a block above the nav. */
+const wrappers = {
   horizontal: 'flex flex-wrap items-center justify-center gap-1 rounded-card bg-paper-200 p-2',
+  vertical: 'flex flex-col gap-1',
+};
+
+const layouts = {
+  horizontal: 'flex flex-wrap items-center gap-1',
   vertical: 'flex flex-col gap-1',
 };
 ---
 
-<nav aria-label={t.primaryNav}>
-  <ul class={layouts[orientation]}>
-    {
-      nav.map((item) => (
-        <li>
-          <NavItem
-            href={item.href}
-            current={trim(item.href) === here}
-            class={orientation === 'vertical' ? 'text-lg whitespace-normal' : ''}
-          >
-            {item.label}
-          </NavItem>
-        </li>
-      ))
-    }
-  </ul>
-</nav>
+<div class={wrappers[orientation]}>
+  <LangSwitcher size={orientation === 'vertical' ? 'nav' : 'bar'} />
+
+  <nav aria-label={t.primaryNav}>
+    <ul class={layouts[orientation]}>
+      {
+        nav.map((item) => (
+          <li>
+            <NavItem
+              href={item.href}
+              current={trim(item.href) === here}
+              class={orientation === 'vertical' ? 'text-lg whitespace-normal' : ''}
+            >
+              {item.label}
+            </NavItem>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</div>

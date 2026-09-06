@@ -38,16 +38,30 @@
  * IT IS `dir="ltr"` REGARDLESS OF THE PAGE. The pair reads עב-then-Рус
  * in both languages, so the control doesn't reorder itself when you use
  * it — which would be the one moment a reader is looking straight at it.
+ *
+ * That `dir` is on the <ul> and NOT on the outer <nav>, which is why the
+ * two are separate elements at all in the `nav` size: the frame carries
+ * `border-s-4`, and a logical border resolves against the direction of
+ * the element it's written on. Hoisted onto the same node as `dir="ltr"`
+ * it would draw the rule on the LEFT in Hebrew, where every row beside
+ * it has one on the right.
  */
 import { alternatePath, currentLocale, localeMeta, locales, ui } from '../../data/i18n';
 
 interface Props {
   /**
-   * `bar` is the header's: a compact pill sized to sit beside the CTA.
-   * `drawer` is the side nav's, one step larger, because the drawer is
-   * a touch surface and its other rows are `text-lg`.
+   * `bar` is the header's: a compact tinted pill, sized to sit in the
+   * inline nav row beside links that are bare text.
+   *
+   * `nav` is the drawer's, where the switcher is the first row of the
+   * nav and has to READ as one. It borrows NavItem's box exactly —
+   * `rounded-control`, `bg-paper-100`, a transparent `border-s-4` so
+   * its labels line up with the labels of the rows below it — and drops
+   * the tinted pill around the pair, because that box is now the
+   * container. What survives is the white segment on the current
+   * language, which is the same mark NavItem puts on the current page.
    */
-  size?: 'bar' | 'drawer';
+  size?: 'bar' | 'nav';
   class?: string;
 }
 
@@ -56,25 +70,28 @@ const { size = 'bar', class: className = '' } = Astro.props;
 const locale = currentLocale(Astro);
 const t = ui(locale);
 
-const sizes = {
-  bar: 'gap-0.5 p-0.5 text-xs',
-  drawer: 'gap-1 p-1 text-sm',
+/* The box around the control. `bar` has none: there, the pill below is
+   the box. `nav` has NavItem's, so the row matches the ones under it. */
+const frames = {
+  bar: '',
+  nav: 'rounded-control border-s-4 border-s-transparent bg-paper-100 p-2',
 };
 
+const lists = {
+  bar: 'gap-0.5 rounded-pill bg-paper-200 p-0.5 text-xs ring-1 ring-ink-900/10',
+  nav: 'gap-1 text-lg',
+};
+
+/* `nav`'s padding is NavItem's `px-5` less the segment's own `px-3`, so
+   "עב" starts on the same vertical as "בית" one row down. */
 const segment = {
   bar: 'min-w-8 px-2 py-1',
-  drawer: 'min-w-10 px-3 py-1.5',
+  nav: 'min-w-12 px-3 py-1',
 };
 ---
 
-<nav aria-label={t.languageNav} class={className}>
-  <ul
-    dir="ltr"
-    class:list={[
-      'flex items-center rounded-pill bg-paper-200 ring-1 ring-ink-900/10',
-      sizes[size],
-    ]}
-  >
+<nav aria-label={t.languageNav} class:list={[frames[size], className]}>
+  <ul dir="ltr" class:list={['flex items-center', lists[size]]}>
     {
       locales.map((other) => {
         const meta = localeMeta[other];

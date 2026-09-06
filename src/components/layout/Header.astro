@@ -155,44 +155,58 @@ const here = trim(Astro.url.pathname);
          both languages: the items are laid out in source order and the
          page's `dir` decides which end that order starts from, so the
          Hebrew bar runs right-to-left and the Russian one left-to-right
-         with no per-language markup. -->
-    <nav aria-label={t.primaryNav} class="hidden 2xl:block">
-      <ul class="flex items-center gap-1">
-        {
-          nav.map((item) => {
-            const current = trim(item.href) === here;
-            return (
-              <li>
-                <a
-                  href={item.href}
-                  aria-current={current ? 'page' : undefined}
-                  class:list={[
-                    'nav-link rounded-pill px-3 py-2 text-base font-medium whitespace-nowrap transition-colors duration-[var(--duration-fast)] hover:text-ink-900',
-                    current ? 'text-ink-900' : 'text-ink-700',
-                  ]}
-                >
-                  {item.label}
-                </a>
-              </li>
-            );
-          })
-        }
-      </ul>
-    </nav>
+         with no per-language markup.
 
-    <!-- Switcher, CTA, trigger — in that order, so under dir=rtl the
-         trigger stays outboard at the bar's far left edge and the
-         switcher sits inboard of the CTA rather than in front of it. The
-         site's one conversion action stays the most prominent thing on
-         this side of the bar; changing language is a utility.
+         THE SWITCHER LEADS THE ROW, for the reason Nav.astro gives for
+         leading the drawer with it: on a site half of whose parents read
+         Russian, the first thing the nav answers is which language
+         you're in. It sits beside <nav> rather than inside its <ul> so
+         the list stays a list of pages — same arrangement as the drawer,
+         same reason.
 
-         The switcher is HIDDEN BELOW `sm`, where the CTA has already
-         collapsed to a bare icon to save room — three controls in a
-         phone-width bar beside the logo is one too many. It reappears in
-         the drawer instead, which is where a phone's nav lives anyway. -->
+         It keeps `size="bar"`, the tinted pill, rather than borrowing
+         the links' bare text: the current LANGUAGE and the current PAGE
+         are two different "you are here"s, and the underline is already
+         spoken for by the second one. -->
+    <div class="hidden items-center gap-3 2xl:flex">
+      <LangSwitcher />
+
+      <nav aria-label={t.primaryNav}>
+        <ul class="flex items-center gap-1">
+          {
+            nav.map((item) => {
+              const current = trim(item.href) === here;
+              return (
+                <li>
+                  <a
+                    href={item.href}
+                    aria-current={current ? 'page' : undefined}
+                    class:list={[
+                      'nav-link rounded-pill px-3 py-2 text-base font-medium whitespace-nowrap transition-colors duration-[var(--duration-fast)] hover:text-ink-900',
+                      current ? 'text-ink-900' : 'text-ink-700',
+                    ]}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              );
+            })
+          }
+        </ul>
+      </nav>
+    </div>
+
+    <!-- CTA then trigger, in that order, so under dir=rtl the trigger
+         stays outboard at the bar's far left edge — the drawer opens
+         from that same edge, and the whole gesture reads as the panel
+         unfolding from under the button.
+
+         THE SWITCHER IS NO LONGER ONE OF THESE. It travels with the nav
+         now, which means the inline row above at 2xl and the drawer
+         below it — so the bar carries two controls at every width
+         instead of three at some of them, and the `max-sm:hidden` that
+         used to drop it on a phone is gone with it. -->
     <div class="flex items-center gap-2 sm:gap-3">
-      <LangSwitcher class="max-sm:hidden" />
-
       <Button
         href={whatsappHref()}
         size="sm"
