@@ -318,6 +318,32 @@
      it as grain rather than as smoothness, it is too high. */
   --backdrop-grain: 0.05;
 
+  /* How big PageBackdrop's logo tiles are drawn, as a multiplier on the
+     per-shape sizes in that component's own array.
+
+     It exists because those sizes are ABSOLUTE (rem), and a field of
+     absolute shapes is not the same composition at two viewport widths:
+     the 16rem tile is a sixth of a 1440px desktop and two thirds of a
+     390px phone, so the ground stops being a ground and becomes a
+     foreground object with the text on top of it.
+
+     Full proportional parity would be ~0.27 — the width ratio — but the
+     shapes are square and the two viewports are nearly the SAME HEIGHT,
+     which is the axis their `top` percentages are placed on. Scaling by
+     the width ratio alone would shrink them out of the vertical
+     composition they were drawn into. 0.55 is between the two ratios:
+     the field reads as background again without the tiles becoming
+     specks.
+
+     The blur is scaled by the same number, so a far shape stays as soft
+     RELATIVE TO ITS OWN SIZE as it is on a desktop — a shrunk tile at
+     full blur would just be a smudge.
+
+     The breakpoint is the one PageBackdrop already thins the field at,
+     and the two belong together: below 48rem the field loses three
+     shapes AND the survivors come down to size. */
+  --backdrop-petal-scale: 1;
+
   /* The brand word's balloon shading — see HeroMethod. Four knobs for
      one effect: a highlight, an underside, and two shadows.
 
@@ -352,4 +378,16 @@
      stacked shapes don't trace each other. */
   --radius-blob: 58% 42% 47% 53% / 46% 44% 56% 54%;
   --radius-blob-alt: 43% 57% 62% 38% / 51% 61% 39% 49%;
+}
+
+/* The one responsive token in the file. It lives here rather than in
+   PageBackdrop so that BOTH ends of the decision — full size and phone
+   size — sit together as one value with one comment, instead of the
+   default being a token and the override being a number buried in a
+   component's media query. 48rem is Tailwind's `md`, and the same
+   breakpoint PageBackdrop drops its three surplus shapes at. */
+@media (width < 48rem) {
+  :root {
+    --backdrop-petal-scale: 0.55;
+  }
 }

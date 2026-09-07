@@ -179,6 +179,12 @@ const TILES = {
  * nearest duplicate of a neighbour in both hue and depth, which leaves
  * every hue on screen and both depths represented in every region of
  * the page.
+ *
+ * `size` and `blur` are the DESKTOP figures. Below that same breakpoint
+ * both are multiplied by `--backdrop-petal-scale` (tokens.css) — the
+ * five survivors are not just fewer, they are smaller, because these
+ * numbers are absolute and a phone viewport is a quarter of the width
+ * they were drawn for.
  */
 const petals = [
   { hue: 'amber',  tint: 'text-amber-300/75',  size: '6rem',  left: '6%',  top: '14%',  drift: -78, spin: 14,  blur: '0.5px', phone: true },
@@ -305,14 +311,21 @@ const petals = [
   .petal {
     position: absolute;
     display: block;
-    width: var(--petal-size);
-    height: var(--petal-size);
+    /* `--petal-size` is the DESKTOP size; `--backdrop-petal-scale` is
+       what makes the field a background on a phone too — the sizes in
+       the array are absolute, so without it a 16rem tile that covers a
+       sixth of a desktop covers two thirds of a 390px screen. See the
+       token for why the number is what it is. */
+    width: calc(var(--petal-size) * var(--backdrop-petal-scale));
+    height: calc(var(--petal-size) * var(--backdrop-petal-scale));
     left: var(--petal-left);
     top: var(--petal-top);
     /* On the svg, so it blurs the finished drawing. A `clip-path` on a
        span would have the blur cut off flush at the outline instead —
-       see the note at the top. */
-    filter: blur(var(--petal-blur));
+       see the note at the top. Scaled with the shape, so "far away"
+       stays a ratio of blur to size rather than turning a shrunk tile
+       into a smudge. */
+    filter: blur(calc(var(--petal-blur) * var(--backdrop-petal-scale)));
     /* Blur spreads past the element box; the drawing must not be
        trimmed back to it. */
     overflow: visible;
@@ -324,7 +337,9 @@ const petals = [
   /* Thinning the field on a phone is a per-shape decision made in the
      array (`phone: false`), not an nth-child count — the markup order
      is a composition and shouldn't silently re-target when a shape is
-     added or moved. */
+     added or moved. The other half of the phone treatment — the
+     survivors coming down to size — is `--backdrop-petal-scale`, set
+     at this same breakpoint in tokens.css. */
   @media (width < 48rem) {
     .petal-desktop {
       display: none;
