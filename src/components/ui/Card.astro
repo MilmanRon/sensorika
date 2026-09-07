@@ -32,6 +32,8 @@ interface Props {
   interactive?: boolean;
   /** Decorative corner wash. Turn off where cards stack and it repeats. */
   petal?: boolean;
+  /** How much air the card holds. See `pads` below. */
+  pad?: 'tight' | 'default' | 'prose';
   class?: string;
   [key: string]: unknown;
 }
@@ -40,6 +42,7 @@ const {
   accent,
   interactive = false,
   petal = true,
+  pad = 'default',
   class: className = '',
   ...rest
 } = Astro.props;
@@ -53,12 +56,37 @@ const accents = {
   purple: 'ring-purple-500/25 hover:ring-purple-500/60 [--petal:var(--color-purple-50)]',
 };
 
-const base = 'card relative overflow-hidden rounded-card bg-white p-8 shadow-card ring-1';
+/*
+ * Padding is a PROP, not a class the caller layers on top, because
+ * layering doesn't work here: Tailwind emits `p-*` in ascending order,
+ * so a caller's `sm:p-4` loses to a base `sm:p-8` no matter which order
+ * the classes are written in. Two components were already fighting
+ * that — one wrote `p-2 sm:p-4` and won only because the base had no
+ * `sm:` step to beat, and its twin wrote `sm:p-4` and silently kept the
+ * base `p-8` on phones. One lookup, one slot, no collision.
+ *
+ *   tight    lists whose ROWS carry their own padding (the accordions).
+ *            The card here is a container, not a margin.
+ *   default  a card with content directly on it.
+ *   prose    a full-width panel of running text, where the padding is
+ *            what holds the measure in from the edges.
+ *
+ * Every one of them starts smaller than it ends. These are absolute
+ * values, and 32px a side is 18% of a 360px screen before the page's
+ * own gutter has been paid — see the phone block in tokens.css.
+ */
+const pads = {
+  tight: 'p-2 sm:p-4 lg:p-6',
+  default: 'p-5 sm:p-8',
+  prose: 'p-5 sm:p-12 lg:p-16',
+};
+
+const base = 'card relative overflow-hidden rounded-card bg-white shadow-card ring-1';
 const ring = accent ? accents[accent] : 'ring-ink-900/10 [--petal:var(--color-teal-50)]';
 ---
 
 <div
-  class:list={[base, ring, interactive && 'card-interactive', className]}
+  class:list={[base, pads[pad], ring, interactive && 'card-interactive', className]}
   {...rest}
 >
   {petal && <span class="petal" aria-hidden="true" />}

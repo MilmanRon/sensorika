@@ -34,7 +34,7 @@ const { href, current = false, class: className = '' } = Astro.props;
   href={href}
   aria-current={current ? 'page' : undefined}
   class:list={[
-    'block rounded-control px-5 py-3 text-base leading-snug font-medium whitespace-nowrap transition-colors duration-[var(--duration-fast)] hover:bg-white hover:text-ink-900 focus-visible:bg-white focus-visible:text-ink-900',
+    'block rounded-control px-4 py-3 text-base sm:px-5 leading-snug font-medium whitespace-nowrap transition-colors duration-[var(--duration-fast)] hover:bg-white hover:text-ink-900 focus-visible:bg-white focus-visible:text-ink-900',
     /* Both states carry the rule so the label never shifts by its
        width when the current item changes; only its colour differs. */
     'border-s-4',

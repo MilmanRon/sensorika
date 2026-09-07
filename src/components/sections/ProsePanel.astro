@@ -93,9 +93,12 @@ const rules = {
 };
 ---
 
-<!-- `sm:p-*` / `lg:p-*` rather than a bare `p-*`: Card's base sets
-     `p-8`, and only a variant utility reliably overrides it. -->
-<Card accent={accent} petal={petal} class:list={['sm:p-12 lg:p-16', className]}>
+<!-- `prose`: this is a full-width panel of running text, so the card's
+     padding IS the measure's margin — it's what holds the lines in from
+     the edges. (This used to be `sm:p-12 lg:p-16` passed as classes,
+     with a note that only a variant utility could beat Card's base
+     `p-8`. That's the collision the `pad` prop removed.) -->
+<Card accent={accent} petal={petal} pad="prose" class:list={[className]}>
   <div class="mx-auto max-w-[var(--width-prose)]">
     {
       eyebrow && (

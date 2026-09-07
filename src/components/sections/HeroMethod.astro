@@ -151,7 +151,7 @@ const rules = {
       section itself only pads at the bottom. See ProsePage — the two
       pages open on the same rhythm.
     -->
-    <div class="py-14 lg:py-20">
+    <div class="py-10 sm:py-14 lg:py-20">
       <!--
         `dir="ltr"` is load-bearing, not cosmetic: the letter spans are
         inline boxes, so on this RTL line the paragraph direction would
@@ -186,9 +186,9 @@ const rules = {
       >
     </div>
 
-    <!-- `sm:p-*` / `lg:p-*` rather than a bare `p-*`: Card's base sets
-         `p-8`, and only a variant utility reliably overrides it. -->
-    <Card accent={accent} petal={false} class="sm:p-12 lg:p-16">
+    <!-- `prose`, the same as ProsePanel: the greeting is running text on
+         a full-width card and wants the same margin around its measure. -->
+    <Card accent={accent} petal={false} pad="prose">
       <div class="mx-auto max-w-[var(--width-prose)]">
         <!-- Tinted pill, not colored text: same reasoning as
              SectionHeading — a petal hue needs its own -100 tint under

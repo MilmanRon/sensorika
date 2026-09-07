@@ -198,6 +198,9 @@
   /* ---------------------------------------------------------------- */
   /* Spacing — semantic aliases on top of Tailwind's numeric scale    */
   /* ---------------------------------------------------------------- */
+  /* Page-edge horizontal padding. Both of these are narrowed on a phone
+     at the bottom of this file — see the responsive block there for
+     why 1.5rem was too much of a 360px screen to spend on nothing. */
   --spacing-gutter: 1.5rem;      /* page-edge horizontal padding, mobile */
   --spacing-gutter-lg: 3rem;     /* page-edge horizontal padding, desktop */
   --spacing-section: 5rem;       /* vertical rhythm between page sections */
@@ -389,5 +392,29 @@
 @media (width < 48rem) {
   :root {
     --backdrop-petal-scale: 0.55;
+
+    /* THE PHONE IS NOT A NARROW DESKTOP, and these two tokens were
+       written as though it were: both are absolute, so the same edge
+       padding that costs a 1440px screen 3% of its width costs a 360px
+       one 13%. Stacked with the card padding inside it, 31% of an S23
+       was going to space around the text rather than the text — enough
+       that the widest schedule row (11–13 / 18:45–19:30) came out a
+       pixel over its line and broke in two.
+
+       1rem is the floor, not a preference: it still clears the rounded
+       corner of a card underneath and still reads as a margin rather
+       than as text running off the edge.
+
+       Note this also makes the home page's wordmark slightly LARGER —
+       `--text-brand` is derived to span gutter to gutter, so a narrower
+       gutter is a wider word. That is the token working, not a
+       side-effect to correct; the ceiling is still reached around 650px,
+       below this breakpoint, so the expression is unchanged above it. */
+    --spacing-gutter: 1rem;
+
+    /* Same argument vertically. 5rem of air between sections is a
+       breath on a desktop and a tenth of the whole screen on a phone,
+       where it reads as the page having ended. */
+    --spacing-section: 3.5rem;
   }
 }
