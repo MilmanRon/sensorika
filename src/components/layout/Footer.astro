@@ -24,15 +24,10 @@
  *   The whatsapp icon is the one shortcut worth keeping down here.
  * - NO BLURB. The page above just spent four paragraphs saying it.
  *
- * LAYOUT: three grid columns from `md`, with the third left empty on
- * purpose. That's what puts the icons at the true centre of the band
- * rather than at the centre of the space the lockup leaves over — the
- * arrangement the reference footer uses, and it only holds if the row
- * is a fixed three-column track. Under `md` the same two children stay
- * on ONE line, pushed to the two edges — the header's arrangement, and
- * the reason the lockup sheds its wordmark down there (below). Stacking
- * them would spend two rows of a narrow screen on a mark and two icons.
- * The copyright sits below the rule, centred at every width.
+ * LAYOUT: logo, social icons and copyright share one row. Three equal
+ * columns from `md` keep the icons centred on the band. On narrow
+ * screens the logo shows only its petals and the copyright can wrap
+ * within its own column.
  *
  * SURFACE: WHITE, LIKE THE HEADER, and for the same reason Header
  * gives: white is the surface every card on the page already uses, so
@@ -96,9 +91,9 @@ const year = new Date().getFullYear();
 ---
 
 <footer class="bg-white shadow-card-up">
-  <div class="mx-auto max-w-[var(--width-content)] px-gutter py-10 lg:px-gutter-lg lg:py-12">
+  <div class="mx-auto flex h-header max-w-[var(--width-content)] items-center px-gutter lg:h-header-lg lg:px-gutter-lg">
     <div
-      class="flex items-center justify-between gap-6 md:grid md:grid-cols-3 md:items-center"
+      class="flex w-full items-center justify-between gap-3 sm:gap-6 md:grid md:grid-cols-3"
     >
       <!-- `variant="responsive"`, the same as the header: below `sm` the
            wordmark drops and only the petals are left. That's what keeps
@@ -107,7 +102,7 @@ const year = new Date().getFullYear();
            means the top and the bottom of the page shed their labels at
            the same breakpoint rather than at two different ones. The
            mark isn't orphaned down here the way it would be alone: the
-           copyright line below it spells the name out in full.
+           copyright alongside it spells the name out in full.
 
            `tone="mono"` puts the whole lockup — petals included — in one
            flat ink instead of the four brand colours. The page above is
@@ -121,7 +116,7 @@ const year = new Date().getFullYear();
 
       <!-- `justify-self-center` centres the list inside the middle
            track; the track itself is what centres it on the band. -->
-      <ul class="flex items-center gap-4 md:justify-self-center">
+      <ul class="flex shrink-0 items-center gap-4 md:justify-self-center">
         {
           socials.map(({ label, href, Icon, external }) => (
             <li>
@@ -141,12 +136,9 @@ const year = new Date().getFullYear();
         }
       </ul>
 
-      <!-- Third column left empty on purpose — see the header comment.
-           It's what makes the middle track the centre of the band. -->
+      <p class="min-w-0 text-end text-xs text-ink-600 sm:text-sm">
+        © {year} {siteConfig.name}. {t.rightsReserved}
+      </p>
     </div>
-
-    <p class="mt-8 border-t border-ink-900/10 pt-6 text-center text-sm text-ink-600">
-      © {year} {siteConfig.name}. {t.rightsReserved}
-    </p>
   </div>
 </footer>

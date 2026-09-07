@@ -146,12 +146,11 @@ const rules = {
   <div class="mx-auto max-w-[var(--width-content)] px-gutter lg:px-gutter-lg">
     <!--
       The wordmark band. Its `pb-*` is the gap down to the panel, which
-      is why the panel carries no top margin of its own; its `pt-*`
-      matches it and is the gap up to the header, which is why the
-      section itself only pads at the bottom. See ProsePage — the two
-      pages open on the same rhythm.
+      is why the panel carries no top margin of its own. Its `pt-*`
+      is slightly smaller to bring the wordmark closer to the header;
+      the section itself only pads at the bottom.
     -->
-    <div class="py-10 sm:py-14 lg:py-20">
+    <div class="pt-8 pb-10 sm:pt-12 sm:pb-14 lg:pt-16 lg:pb-20">
       <!--
         `dir="ltr"` is load-bearing, not cosmetic: the letter spans are
         inline boxes, so on this RTL line the paragraph direction would
@@ -176,7 +175,7 @@ const rules = {
            in the Rubik import. -->
       <h1
         class="text-center font-display text-brand leading-heading font-extrabold"
-        ><span class="brand-word" dir="ltr" data-brand-word
+        ><span class="brand-word select-none" dir="ltr" data-brand-word
           ><span class="sr-only">{brand}</span><span aria-hidden="true"
             >{
               brandLetters.map((letter) => <span class="brand-letter" data-brand-letter><span class="letter-pop" data-letter-pop /><span class="letter-glyph" data-letter-glyph>{letter}</span></span>)
