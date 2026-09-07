@@ -1,4 +1,5 @@
 import { defineCollection } from 'astro:content';
+import type { SchemaContext } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
@@ -105,45 +106,67 @@ const schedule = defineCollection({
  * panel that the source copy gave no heading to simply opens cold rather
  * than getting a headline invented for it.
  */
-const panel = z.object({
-  /**
-   * Petal hue for the panel's ring, eyebrow pill and pull-out rule.
-   * Decoration only — the panel's own buttons and links stay teal like
-   * the rest of the site.
-   *
-   * Omit it: the page cycles coral → teal → purple → amber down the
-   * stack, which is what makes one panel tell itself apart from the next
-   * on a long scroll. The hues carry no meaning; they're wayfinding.
-   */
-  accent: z.enum(['coral', 'teal', 'amber', 'purple']).optional(),
-  /** Small label naming the panel, above the heading. */
-  eyebrow: z.string().optional(),
-  /** The panel's headline, set as an <h2>. */
-  heading: z.string().optional(),
-  /**
-   * Opening sentence set one step larger than the body. Use instead of
-   * `heading` where the copy's own first sentence is a full definition
-   * rather than a headline — it shouldn't be cut down to fit a heading
-   * it was never written as.
-   */
-  lead: z.string().optional(),
-  /** Body paragraphs, in order, above the list. */
-  body: z.array(z.string()).default([]),
-  /**
-   * A labelled list — "ויסות ורמת הפעילות. הילד נמצא כל הזמן בתנועה…",
-   * the four individual-work formats. `term` is the bold lead-in; leave
-   * it off for a plain list item.
-   */
-  items: z
-    .array(z.object({ term: z.string().optional(), text: z.string() }))
-    .optional(),
-  /** Number the items (the formats are numbered in the source copy). */
-  numbered: z.boolean().default(false),
-  /** A closing paragraph under the list. */
-  note: z.string().optional(),
-  /** Takeaway line, pulled out under the body on a colored rule. */
-  pullout: z.string().optional(),
-});
+const panel = ({ image }: SchemaContext) =>
+  z.object({
+    /**
+     * Petal hue for the panel's ring, eyebrow pill and pull-out rule.
+     * Decoration only — the panel's own buttons and links stay teal like
+     * the rest of the site.
+     *
+     * Omit it: the page cycles coral → teal → purple → amber down the
+     * stack, which is what makes one panel tell itself apart from the next
+     * on a long scroll. The hues carry no meaning; they're wayfinding.
+     */
+    accent: z.enum(['coral', 'teal', 'amber', 'purple']).optional(),
+    /** Small label naming the panel, above the heading. */
+    eyebrow: z.string().optional(),
+    /** The panel's headline, set as an <h2>. */
+    heading: z.string().optional(),
+    /**
+     * Opening sentence set one step larger than the body. Use instead of
+     * `heading` where the copy's own first sentence is a full definition
+     * rather than a headline — it shouldn't be cut down to fit a heading
+     * it was never written as.
+     */
+    lead: z.string().optional(),
+    /** Body paragraphs, in order, above the list. */
+    body: z.array(z.string()).default([]),
+    /**
+     * A labelled list — "ויסות ורמת הפעילות. הילד נמצא כל הזמן בתנועה…",
+     * the four individual-work formats. `term` is the bold lead-in; leave
+     * it off for a plain list item.
+     */
+    items: z
+      .array(z.object({ term: z.string().optional(), text: z.string() }))
+      .optional(),
+    /** Number the items (the formats are numbered in the source copy). */
+    numbered: z.boolean().default(false),
+    /** A closing paragraph under the list. */
+    note: z.string().optional(),
+    /** Takeaway line, pulled out under the body on a colored rule. */
+    /**
+     * A portrait for the panel, which turns it into a two-column block:
+     * the picture beside the copy from `lg` up, above it below that.
+     *
+     * `image()` and not a string path, so the file is resolved and
+     * type-checked at build time and goes through Astro's pipeline —
+     * a 1400px JPEG served as-is to a 340px frame is most of a
+     * megabyte for nothing.
+     *
+     * `alt` sits beside it rather than in i18n.ts because it is page
+     * prose: it's the sentence a screen reader hears in place of the
+     * picture, and it has to be written in the language of the file
+     * it's in. The same photo therefore appears in both locales'
+     * copies of a page, each with its own alt.
+     */
+    portrait: z
+      .object({
+        src: image(),
+        alt: z.string(),
+      })
+      .optional(),
+    pullout: z.string().optional(),
+  });
 
 /**
  * A file a page hands the reader — today, the group program's two
@@ -229,128 +252,129 @@ const disclosure = z.object({
 
 const pages = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/pages' }),
-  schema: z.object({
-    /** The page's own h1 — often longer than the nav label. */
-    title: z.string(),
-    /** The nav label, when the nav calls the page something shorter. */
-    navLabel: z.string().optional(),
-    /**
-     * Whether [navpage].astro gives this page a route of its own. The
-     * home page's copy lives in this collection too — same panels, same
-     * everything — but it's rendered by the home hero rather than by
-     * that route, so it sets `nav: false`.
-     *
-     * IT DOES NOT DECIDE WHAT THE HEADER CARRIES, and the two now cross
-     * in both directions: `siteConfig.nav` names the seven nav entries,
-     * a page can have a route without being one of them (the group
-     * program's forms page is reached from a card on the home page),
-     * and home is the converse — in the nav, and `nav: false`, because
-     * the nav points at `/` and this flag is only about `/home`.
-     */
-    nav: z.boolean().default(true),
-    /**
-     * The brand word — home page only, where the h1 is "Sensorika"
-     * itself rather than the `title` above. It's its own field because
-     * it has to sit in its own LTR box on the RTL line, or it renders
-     * backwards.
-     */
-    brand: z.object({ word: z.string() }).optional(),
-    description: z.string(),
-    /** Opening line, centered under the h1 in the intro band. */
-    intro: z.string().optional(),
-    /** Order in the nav. */
-    order: z.number(),
-    panels: z.array(panel).default([]),
-    /**
-     * Collapsed rows rendered AFTER the panels: the page's reference
-     * matter — prices, terms, the small print — which a parent opens the
-     * one row of that applies to them rather than reading top to bottom.
-     * The panels above are the argument; this is the paperwork.
-     *
-     * Rows are for things a reader CHOOSES BETWEEN — the four packages,
-     * of which exactly one is theirs. Reference matter that simply
-     * applies to all of them goes in `terms` below, as open panels.
-     */
-    disclosures: z
-      .object({
-        heading: z.string(),
-        intro: z.string().optional(),
-        items: z.array(disclosure).nonempty(),
-      })
-      .optional(),
-    /**
-     * The page's closing section: reference matter that governs
-     * everything above it, as a titled stack of open panels rendered
-     * after the disclosures.
-     *
-     * IT IS PANELS AND NOT MORE DISCLOSURE ROWS. The packages page's
-     * payment / interruption / cancellation terms were one fifth row in
-     * the list of four packages, and they read as a fifth package —
-     * something to weigh against the others and pick. There's nothing to
-     * choose here: these terms apply whichever package a parent takes,
-     * so they're set open, in boxes, the way group-forms.md sets the
-     * same kind of text. A toggle asks a question the reader doesn't
-     * have.
-     *
-     * `panels` rather than the page's own `panels` field because those
-     * render ABOVE the disclosures — they're the argument a page makes,
-     * and this comes after the offer it governs.
-     */
-    terms: z
-      .object({
-        heading: z.string(),
-        intro: z.string().optional(),
-        panels: z.array(panel).nonempty(),
-      })
-      .optional(),
-    /**
-     * The weekly timetable, rendered from the `schedule` collection at
-     * the TOP of the page — above the downloads, which are above the
-     * panels. A parent deciding whether the group program is for them
-     * asks "when does it run and where is it" before they ask anything
-     * a form or a terms panel can answer.
-     *
-     * Only the block's own words are here. The classes themselves are
-     * NOT: they're data, they're shared by both languages, and they live
-     * in src/content/schedule/ (see that collection's note). This is the
-     * heading over them, an optional opening line, and the footnote
-     * under them — the three things that are prose.
-     */
-    schedule: z
-      .object({
-        heading: z.string(),
-        intro: z.string().optional(),
-        /** Footnote under the grid — "על בסיס שיעור אחד בשבוע, לבחירתכם". */
-        note: z.string().optional(),
-      })
-      .optional(),
-    /**
-     * Show the venue card (where the classes happen), under the
-     * timetable. A switch and not a block of copy, because the address
-     * isn't this page's to own: one clinic, one address, written per
-     * language in i18n.ts. A second page that needs it flips this rather
-     * than repeating it.
-     */
-    venue: z.boolean().default(false),
-    /**
-     * Downloads, rendered as a card each ABOVE the panels — a page that
-     * exists to hand a parent two forms shouldn't open with the reading
-     * matter that follows them.
-     */
-    documents: z
-      .object({
-        heading: z.string(),
-        intro: z.string().optional(),
-        items: z.array(document).nonempty(),
-      })
-      .optional(),
-    /**
-     * Q&A list, rendered as an accordion after the panels. Only the FAQ
-     * page uses it, but it's here rather than in its own collection
-     * because it's one nav-item page among the others.
-     */
-    faq: z.array(z.object({ question: z.string(), answer: z.string() })).default([]),
-  }),
+  schema: (context) =>
+    z.object({
+      /** The page's own h1 — often longer than the nav label. */
+      title: z.string(),
+      /** The nav label, when the nav calls the page something shorter. */
+      navLabel: z.string().optional(),
+      /**
+       * Whether [navpage].astro gives this page a route of its own. The
+       * home page's copy lives in this collection too — same panels, same
+       * everything — but it's rendered by the home hero rather than by
+       * that route, so it sets `nav: false`.
+       *
+       * IT DOES NOT DECIDE WHAT THE HEADER CARRIES, and the two now cross
+       * in both directions: `siteConfig.nav` names the seven nav entries,
+       * a page can have a route without being one of them (the group
+       * program's forms page is reached from a card on the home page),
+       * and home is the converse — in the nav, and `nav: false`, because
+       * the nav points at `/` and this flag is only about `/home`.
+       */
+      nav: z.boolean().default(true),
+      /**
+       * The brand word — home page only, where the h1 is "Sensorika"
+       * itself rather than the `title` above. It's its own field because
+       * it has to sit in its own LTR box on the RTL line, or it renders
+       * backwards.
+       */
+      brand: z.object({ word: z.string() }).optional(),
+      description: z.string(),
+      /** Opening line, centered under the h1 in the intro band. */
+      intro: z.string().optional(),
+      /** Order in the nav. */
+      order: z.number(),
+      panels: z.array(panel(context)).default([]),
+      /**
+       * Collapsed rows rendered AFTER the panels: the page's reference
+       * matter — prices, terms, the small print — which a parent opens the
+       * one row of that applies to them rather than reading top to bottom.
+       * The panels above are the argument; this is the paperwork.
+       *
+       * Rows are for things a reader CHOOSES BETWEEN — the four packages,
+       * of which exactly one is theirs. Reference matter that simply
+       * applies to all of them goes in `terms` below, as open panels.
+       */
+      disclosures: z
+        .object({
+          heading: z.string(),
+          intro: z.string().optional(),
+          items: z.array(disclosure).nonempty(),
+        })
+        .optional(),
+      /**
+       * The page's closing section: reference matter that governs
+       * everything above it, as a titled stack of open panels rendered
+       * after the disclosures.
+       *
+       * IT IS PANELS AND NOT MORE DISCLOSURE ROWS. The packages page's
+       * payment / interruption / cancellation terms were one fifth row in
+       * the list of four packages, and they read as a fifth package —
+       * something to weigh against the others and pick. There's nothing to
+       * choose here: these terms apply whichever package a parent takes,
+       * so they're set open, in boxes, the way group-forms.md sets the
+       * same kind of text. A toggle asks a question the reader doesn't
+       * have.
+       *
+       * `panels` rather than the page's own `panels` field because those
+       * render ABOVE the disclosures — they're the argument a page makes,
+       * and this comes after the offer it governs.
+       */
+      terms: z
+        .object({
+          heading: z.string(),
+          intro: z.string().optional(),
+          panels: z.array(panel(context)).nonempty(),
+        })
+        .optional(),
+      /**
+       * The weekly timetable, rendered from the `schedule` collection at
+       * the TOP of the page — above the downloads, which are above the
+       * panels. A parent deciding whether the group program is for them
+       * asks "when does it run and where is it" before they ask anything
+       * a form or a terms panel can answer.
+       *
+       * Only the block's own words are here. The classes themselves are
+       * NOT: they're data, they're shared by both languages, and they live
+       * in src/content/schedule/ (see that collection's note). This is the
+       * heading over them, an optional opening line, and the footnote
+       * under them — the three things that are prose.
+       */
+      schedule: z
+        .object({
+          heading: z.string(),
+          intro: z.string().optional(),
+          /** Footnote under the grid — "על בסיס שיעור אחד בשבוע, לבחירתכם". */
+          note: z.string().optional(),
+        })
+        .optional(),
+      /**
+       * Show the venue card (where the classes happen), under the
+       * timetable. A switch and not a block of copy, because the address
+       * isn't this page's to own: one clinic, one address, written per
+       * language in i18n.ts. A second page that needs it flips this rather
+       * than repeating it.
+       */
+      venue: z.boolean().default(false),
+      /**
+       * Downloads, rendered as a card each ABOVE the panels — a page that
+       * exists to hand a parent two forms shouldn't open with the reading
+       * matter that follows them.
+       */
+      documents: z
+        .object({
+          heading: z.string(),
+          intro: z.string().optional(),
+          items: z.array(document).nonempty(),
+        })
+        .optional(),
+      /**
+       * Q&A list, rendered as an accordion after the panels. Only the FAQ
+       * page uses it, but it's here rather than in its own collection
+       * because it's one nav-item page among the others.
+       */
+      faq: z.array(z.object({ question: z.string(), answer: z.string() })).default([]),
+    }),
 });
 
 export const collections = { articles, schedule, pages };

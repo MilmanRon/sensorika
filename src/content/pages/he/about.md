@@ -6,7 +6,10 @@ order: 5
 intro: >-
   שמי אנה מילמן, ואני מאבחנת ומטפלת בוויסות חושי. אבל הסיפור המקצועי שלי התחיל הרבה לפני שהוויסות החושי ו-NDFA נכנסו לתוכו.
 panels:
-  - body:
+  - portrait:
+      src: ../../../assets/portraits/anna-milman.jpg
+      alt: אנה מילמן, מאבחנת ומטפלת בוויסות חושי
+    body:
       - >-
         אני עובדת עם ילדים כמעט לאורך כל חיי המקצועיים. במשך יותר מ-25 שנה ניהלתי את סטודיו הריקוד שלי ״טבסקו״, ודווקא שם התחלתי לראשונה להבחין בדברים שבאותה תקופה עדיין לא ידעתי לתת להם הסבר מקצועי.
       - >-
@@ -52,7 +55,9 @@ panels:
   the sentences the source already stands alone on their own lines, and
   every paragraph stays in the order it was supplied.
 
-  This page will want a portrait once there's one to use — it's the one
-  page on the site about a person, and it currently reads as panels of
-  text like every other.
+  The portrait on the first panel is the one photograph on the site.
+  It's here rather than in the intro band because the band's h1 and
+  opening line are centred on every page, and a picture beside a centred
+  heading reads as a mistake. Its `alt` is written per language, in each
+  locale's own copy of this file.
 -->

@@ -32,6 +32,8 @@
  * version under review, and rewriting it would invalidate the
  * comparison. Fold it in once the direction is signed off.
  */
+import { Image } from 'astro:assets';
+
 import Card from '../ui/Card.astro';
 
 interface Props {
@@ -60,6 +62,12 @@ interface Props {
   pullout?: string;
   /** Card's corner wash. Off by default — panels stack, see above. */
   petal?: boolean;
+  /**
+   * Turns the panel into a two-column block: the picture beside the
+   * copy from `lg` up, above it below that. `src` is an astro:assets
+   * import (the schema's `image()`), never a path.
+   */
+  portrait?: { src: ImageMetadata; alt: string };
   class?: string;
 }
 
@@ -71,6 +79,7 @@ const {
   lead,
   pullout,
   petal = false,
+  portrait,
   class: className = '',
 } = Astro.props;
 
@@ -99,7 +108,27 @@ const rules = {
      with a note that only a variant utility could beat Card's base
      `p-8`. That's the collision the `pad` prop removed.) -->
 <Card accent={accent} petal={petal} pad="prose" class:list={[className]}>
-  <div class="mx-auto max-w-[var(--width-prose)]">
+  <!--
+    With a portrait the panel is two columns from `lg` up and one below
+    it, and the two want OPPOSITE orders:
+
+      lg    — the copy takes the inline START, so its edge lines up with
+              every other panel in the stack. A photo leading the column
+              would indent this one panel's text and break the run. This
+              is just DOM order in a two-column grid; no `order` needed.
+      phone — stacked, she should come FIRST: straight under the intro
+              band's "שמי אנה מילמן", introduced before her own story
+              rather than buried under four paragraphs of it.
+
+    So the copy leads the DOM — which is also the right reading order —
+    and `max-lg:order-first` lifts the figure above it on a phone only.
+  -->
+  <div
+    class:list={[
+      portrait && 'flex flex-col items-center gap-8 lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-center lg:gap-12',
+    ]}
+  >
+    <div class:list={['mx-auto max-w-[var(--width-prose)]', portrait && 'w-full']}>
     {
       eyebrow && (
         <p
@@ -168,5 +197,133 @@ const rules = {
         </p>
       )
     }
+    </div>
+
+    {
+      portrait && (
+        <figure class="portrait max-lg:order-first lg:mx-0 lg:w-80 lg:max-w-none">
+          <span class="portrait-ring" aria-hidden="true" />
+          <div class="portrait-frame">
+            <Image
+              src={portrait.src}
+              alt={portrait.alt}
+              width={640}
+              widths={[240, 320, 480, 640]}
+              sizes="(min-width: 64rem) 20rem, 15rem"
+              class="portrait-img"
+            />
+          </div>
+          <span class="portrait-dot portrait-dot-amber" aria-hidden="true" />
+          <span class="portrait-dot portrait-dot-purple" aria-hidden="true" />
+        </figure>
+      )
+    }
   </div>
 </Card>
+
+<style>
+  /*
+   * The portrait's frame. Same construction the playground's hero used —
+   * a petal-shaped well, an offset ring on the ALTERNATE petal so the
+   * two silhouettes don't trace each other, and two loose dots in the
+   * hues the frame itself doesn't wear. The tokens are the ones
+   * `--radius-blob`'s comment has always named as "the photo frame".
+   *
+   * WHAT CHANGED, and why: that version framed a transparent cut-out
+   * and needed a teal-to-amber gradient behind it for the silhouette to
+   * be cut out OF. This photograph brings its own background, so the
+   * gradient is gone and a hairline takes its place — the photo's wall
+   * is a pale warm grey and would otherwise dissolve into the white
+   * card, leaving a coral ring apparently floating around nothing.
+   */
+  .portrait {
+    position: relative;
+    /* Centred and small on a phone, where the figure is stacked over the
+       copy and shouldn't fill the screen; a fixed column from lg. */
+    margin-inline: auto;
+    width: 100%;
+    max-width: 15rem;
+  }
+
+  .portrait-frame {
+    position: relative;
+    border-radius: var(--radius-blob);
+    /* The clip is the whole effect: the photo is a rectangle and this is
+       what makes it a petal. */
+    overflow: hidden;
+    /* The source is 1401x1389 — square. A frame fractionally taller than
+       that crops ~7% off the width and NOTHING off the height, so the
+       crop can never take the top of her head; `cover` trims the wall at
+       the sides instead, which is the part with nothing in it. */
+    aspect-ratio: 1 / 1.06;
+    box-shadow: 0 0 0 1px color-mix(in oklch, var(--color-ink-900) 12%, transparent);
+  }
+
+  .portrait-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 50%;
+  }
+
+  /* Rotated off the frame, and on the alternate blob, so it reads as a
+     second shape rather than as a badly-drawn outline of the first. */
+  .portrait-ring {
+    position: absolute;
+    /* Tight on a phone: Card's padding is 20px there, and a ring further
+       out than that would sit on the card's own edge. */
+    inset: -0.5rem;
+    border-radius: var(--radius-blob-alt);
+    border: 3px solid color-mix(in oklch, var(--color-coral-500) 35%, transparent);
+    transform: rotate(-8deg);
+  }
+
+  .portrait-dot {
+    position: absolute;
+    display: block;
+    border-radius: var(--radius-pill);
+  }
+
+  /* Logical inset properties, so the pair mirrors with the page: the
+     amber dot leads the frame in both languages rather than sitting on
+     the left in one of them. */
+  .portrait-dot-amber {
+    inset-block-start: -0.5rem;
+    inset-inline-start: 12%;
+    width: 1.25rem;
+    height: 1.25rem;
+    background: var(--color-amber-500);
+  }
+
+  .portrait-dot-purple {
+    inset-block-end: 8%;
+    inset-inline-end: -0.5rem;
+    width: 2rem;
+    height: 2rem;
+    background: var(--color-purple-300);
+  }
+
+  /* Card's padding opens up at sm, so the ornament can move outboard and
+     the dots can take their full size. */
+  @media (width >= 40rem) {
+    .portrait {
+      max-width: 18rem;
+    }
+
+    .portrait-ring {
+      inset: -1.25rem;
+    }
+
+    .portrait-dot-amber {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    .portrait-dot-purple {
+      inset-inline-end: -0.75rem;
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+  }
+</style>

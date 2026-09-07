@@ -6,7 +6,10 @@ order: 5
 intro: >-
   Меня зовут Анна Мильман, я специалист по сенсорной интеграции. Но моя профессиональная история началась задолго до того, как в ней появились сенсорная интеграция и NDFA.
 panels:
-  - body:
+  - portrait:
+      src: ../../../assets/portraits/anna-milman.jpg
+      alt: Анна Мильман, специалист по сенсорной интеграции
+    body:
       - >-
         Я работаю с детьми практически всю свою профессиональную жизнь. Более 25 лет я руководила собственной танцевальной студией «ТАБАСКО», и именно там впервые начала замечать то, чему тогда ещё не могла дать профессионального объяснения.
       - >-
@@ -55,6 +58,7 @@ panels:
   The Hebrew nav calls this page "קצת עליי" — "a bit about me" — rather
   than the full "על המומחית — אנה מילמן"; "Обо мне" is the same move.
 
-  This page will want a portrait once there's one to use — the same note
-  the Hebrew file carries, and the same portrait will serve both.
+  The portrait on the first panel is the same file the Hebrew page
+  uses — one photograph, two `alt` strings, because alt is prose and
+  belongs in the language of the page saying it.
 -->
