@@ -1,0 +1,92 @@
+# Ships main to Cloudflare Workers.
+#
+# This is `npm run deploy` (astro build && wrangler deploy) moved off
+# whoever's laptop and onto a runner, with one thing added: the build has
+# to pass `astro check` before anything is uploaded. That check is the
+# whole reason this file is worth having. The site's two languages are
+# kept honest by TypeScript — a string that exists in Hebrew but not in
+# Russian, or a nav slug missing from one locale's content directory, is
+# a type error rather than a runtime surprise — and running it here means
+# that guarantee holds for every commit that reaches the live site, not
+# just the ones where somebody remembered to run it.
+#
+# THE DEPLOY IS STILL `wrangler deploy` AGAINST wrangler.jsonc. Nothing
+# about how the site is served moved into this file: the assets
+# directory, the 404 handling and the trailing-slash rule all still live
+# in wrangler.jsonc, which is also what a local `npm run deploy` reads.
+# So a hand-run deploy and an automated one produce the same thing, and
+# there's no second copy of the config to drift.
+#
+# It needs two repository secrets:
+#
+#   CLOUDFLARE_API_TOKEN   a token with the "Edit Cloudflare Workers"
+#                          template, from the Cloudflare dashboard under
+#                          My Profile > API Tokens. NOT the OAuth login
+#                          `wrangler login` puts on a laptop — that one
+#                          is interactive and can't be used here.
+#   CLOUDFLARE_ACCOUNT_ID  the account the Worker lives in. It isn't a
+#                          credential, but this repository is public and
+#                          an account id is still an identifier worth not
+#                          publishing, so it comes from a secret rather
+#                          than being written down below.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  # Lets a deploy be re-run from the Actions tab without an empty commit
+  # — useful when a deploy failed on something outside the repo, like an
+  # expired token.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deploy at a time, and never cancel one in flight: a half-uploaded
+# set of assets is a broken site. A newer push simply waits its turn and
+# then overwrites, which is the correct end state anyway.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          # package.json pins >=22.12.0; this tracks the newest 22.x.
+          node-version: 22
+          cache: npm
+
+      # `ci` rather than `install`: the lockfile is the input, and a
+      # deploy must never resolve a dependency differently from the one
+      # that was tested.
+      - run: npm ci
+
+      # The gate. `astro check` also syncs content types first, so this
+      # is what catches a content collection whose frontmatter no longer
+      # matches its schema in content.config.ts.
+      - name: Typecheck
+        run: npx astro check
+
+      - name: Build
+        run: npm run build
+
+      # PLAIN `npx wrangler deploy`, NOT cloudflare/wrangler-action.
+      # The action is the usual answer and works fine, but it installs a
+      # wrangler of its own unless you pin `wranglerVersion` — so CI
+      # would ship through a different wrangler than the one in
+      # package-lock.json that `npm run deploy` uses locally. `npm ci`
+      # above already installed the pinned one; using it is both simpler
+      # and the reason a hand-run deploy and this one stay identical.
+      #
+      # Wrangler reads both of these from the environment, which is why
+      # there is no `--account-id` flag or token file anywhere here.
+      - name: Deploy to Cloudflare Workers
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
