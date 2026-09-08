@@ -4,12 +4,21 @@ interface Props {
 }
 
 // Support bold text and HTTPS links while keeping content HTML-escaped.
+//
+// A link written in the page copy OPENS IN A NEW TAB, and only these do
+// — the chrome (nav, logo, language switcher, CTAs) navigates in place
+// the way a site's own nav should. The pattern above only matches
+// `https://`, so every link this renders leaves the site by definition:
+// a parent halfway through the About page who taps "NDFA" is following
+// a citation, not leaving, and should still have the page behind them
+// when they come back. `rel` for the usual reason — a new-tab link
+// hands the opened page a handle on this one without it.
 const { text } = Astro.props;
 const parts = text.split(/(\*\*[^*]+\*\*|\[[^\]]+\]\(https:\/\/[^\s)]+\))/g);
 ---
 {parts.map((part) => {
   const link = part.match(/^\[([^\]]+)\]\((https:\/\/[^\s)]+)\)$/);
-  if (link) return <a href={link[2]} class="text-teal-800 underline underline-offset-4 hover:text-teal-900">{link[1]}</a>;
+  if (link) return <a href={link[2]} target="_blank" rel="noopener noreferrer" class="text-teal-800 underline underline-offset-4 hover:text-teal-900">{link[1]}</a>;
   return part.startsWith('**') && part.endsWith('**')
     ? <strong class="font-bold text-ink-900"><Astro.self text={part.slice(2, -2)} /></strong>
     : part;

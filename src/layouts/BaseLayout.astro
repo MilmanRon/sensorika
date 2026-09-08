@@ -83,22 +83,6 @@ const alternates = Astro.site
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="generator" content={Astro.generator} />
 
-    <!-- EVERY LINK ON THE SITE OPENS IN A NEW TAB, and this is the only
-         place that decides it — same arrangement as `dir` on <html>
-         above. A `<base>` carrying only `target` sets the default for
-         every <a> that doesn't name one of its own, so the rule holds
-         for both languages at once, for links written in a component
-         and for links written as markdown in src/content/, and for any
-         link added later without anyone having to remember it.
-
-         No `href` on it: adding one would re-root every relative URL on
-         the page, which is a different decision entirely and one
-         astro.config.mjs's `site` already owns.
-
-         The one opt-out is the skip link in Header.astro, which says
-         `target="_self"` explicitly — see the reason there. -->
-    <base target="_blank" />
-
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
