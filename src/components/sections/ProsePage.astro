@@ -36,6 +36,7 @@
  * sitting white-on-white.
  */
 import type { CollectionEntry } from 'astro:content';
+import InlineEmphasis from '../ui/InlineEmphasis.astro';
 
 import DisclosureList from './DisclosureList.astro';
 import DocumentList from './DocumentList.astro';
@@ -89,7 +90,7 @@ const beforePanels = beforeDocuments || Boolean(page.documents);
       {
         page.intro && (
           <p class="mx-auto mt-6 max-w-[var(--width-prose)] text-center text-lg leading-body text-pretty text-ink-700 sm:text-xl">
-            {page.intro}
+            <InlineEmphasis text={page.intro} />
           </p>
         )
       }

@@ -23,6 +23,7 @@
 import type { CollectionEntry } from 'astro:content';
 
 import ProsePanel from './ProsePanel.astro';
+import InlineEmphasis from '../ui/InlineEmphasis.astro';
 
 type Panels = CollectionEntry<'pages'>['data']['panels'];
 
@@ -80,7 +81,7 @@ const badges = {
           portrait={panel.portrait}
         >
           {panel.body.map((paragraph) => (
-            <p>{paragraph}</p>
+            <p><InlineEmphasis text={paragraph} /></p>
           ))}
 
           {/*

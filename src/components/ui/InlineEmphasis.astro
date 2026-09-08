@@ -1,0 +1,12 @@
+---
+interface Props {
+  text: string;
+}
+
+// Support **emphasis** in content strings while keeping all text HTML-escaped.
+const { text } = Astro.props;
+const parts = text.split(/(\*\*[^*]+\*\*)/g);
+---
+{parts.map((part) => part.startsWith('**') && part.endsWith('**')
+  ? <strong class="font-bold text-ink-900">{part.slice(2, -2)}</strong>
+  : part)}
