@@ -257,6 +257,9 @@ const pages = defineCollection({
       /** The page's own h1 — often longer than the nav label. */
       title: z.string(),
       /** The nav label, when the nav calls the page something shorter. */
+      hideTitle: z.boolean().default(false),
+      /** Optional portrait above the page introduction. */
+      introPortrait: z.object({ src: context.image(), alt: z.string() }).optional(),
       navLabel: z.string().optional(),
       /**
        * Whether [navpage].astro gives this page a route of its own. The

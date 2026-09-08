@@ -241,9 +241,8 @@ const he = {
 
   /* Programs (home page) */
   programsEyebrow: 'התוכניות שלנו',
-  programsHeading: 'שתי דרכים להתחיל',
   programsLead:
-    'שתי נקודות כניסה שוות ערך — פרטני או קבוצתי. אפשר להתחיל מכל אחת מהן, ואפשר גם לשלב.',
+    'שתי דרכים להתחיל — פרטני או קבוצתי. אפשר להתחיל מכל אחת מהן, ואפשר גם לשלב.',
   programsMore: 'לפרטים נוספים',
   programsIndividualTitle: 'אבחון וטיפול פרטניים',
   programsIndividualBody:
@@ -314,9 +313,8 @@ const ru: UiStrings = {
 
   /* Programs (home page) */
   programsEyebrow: 'Наши программы',
-  programsHeading: 'Два способа начать',
   programsLead:
-    'Две равноценные точки входа — индивидуальная работа или группа. Можно начать с любой из них, а можно совмещать.',
+    'Два способа начать — индивидуальная работа или группа. Можно начать с любой из них, а можно совмещать.',
   programsMore: 'Подробнее',
   programsIndividualTitle: 'Индивидуальная диагностика и терапия',
   programsIndividualBody:

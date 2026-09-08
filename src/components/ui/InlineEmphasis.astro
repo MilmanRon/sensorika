@@ -3,10 +3,14 @@ interface Props {
   text: string;
 }
 
-// Support **emphasis** in content strings while keeping all text HTML-escaped.
+// Support bold text and HTTPS links while keeping content HTML-escaped.
 const { text } = Astro.props;
-const parts = text.split(/(\*\*[^*]+\*\*)/g);
+const parts = text.split(/(\*\*[^*]+\*\*|\[[^\]]+\]\(https:\/\/[^\s)]+\))/g);
 ---
-{parts.map((part) => part.startsWith('**') && part.endsWith('**')
-  ? <strong class="font-bold text-ink-900">{part.slice(2, -2)}</strong>
-  : part)}
+{parts.map((part) => {
+  const link = part.match(/^\[([^\]]+)\]\((https:\/\/[^\s)]+)\)$/);
+  if (link) return <a href={link[2]} class="text-teal-800 underline underline-offset-4 hover:text-teal-900">{link[1]}</a>;
+  return part.startsWith('**') && part.endsWith('**')
+    ? <strong class="font-bold text-ink-900"><Astro.self text={part.slice(2, -2)} /></strong>
+    : part;
+})}

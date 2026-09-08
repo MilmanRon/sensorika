@@ -42,26 +42,28 @@ const eyebrows = {
   amber: 'bg-amber-100 text-amber-800',
   purple: 'bg-purple-100 text-purple-800',
 };
+const hasHeading = Astro.slots.has('default');
+const EyebrowTag = hasHeading ? 'p' : 'h2';
 ---
 
 <div class:list={[align === 'center' && 'text-center', className]}>
-  <p
+  <EyebrowTag
     class:list={[
       'inline-flex items-center gap-2 rounded-pill px-4 py-1.5 font-display text-sm font-semibold',
       eyebrows[accent],
     ]}
   >
     {eyebrow}
-  </p>
+  </EyebrowTag>
 
-  <h2
+  {hasHeading && <h2
     class:list={[
       'mt-5 font-display text-3xl leading-heading font-bold text-balance text-ink-900 sm:text-4xl',
       align === 'center' && 'mx-auto max-w-3xl',
     ]}
   >
     <slot />
-  </h2>
+  </h2>}
 
   {
     lead && (
