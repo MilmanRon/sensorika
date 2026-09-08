@@ -145,8 +145,15 @@ const trim = (path: string) => path.replace(/\/+$/, '');
 const here = trim(Astro.url.pathname);
 ---
 
+<!-- The one link exempt from the site-wide new-tab default that
+     BaseLayout's base element sets. This isn't navigation — it moves
+     focus to <main> on the page you are already on — so opening a new
+     tab would load a second copy of that page and throw the keyboard
+     user's place away, which is the exact thing a skip link exists to
+     protect. -->
 <a
   href="#main"
+  target="_self"
   class="sr-only focus-visible:not-sr-only focus-visible:absolute focus-visible:top-3 focus-visible:start-3 focus-visible:z-[60] focus-visible:rounded-control focus-visible:bg-white focus-visible:px-4 focus-visible:py-2 focus-visible:text-sm focus-visible:font-medium focus-visible:text-ink-900 focus-visible:shadow-elevated"
 >
   {t.skipToMain}
