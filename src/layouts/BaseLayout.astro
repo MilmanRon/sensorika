@@ -10,7 +10,13 @@ import {
 } from '../data/i18n';
 
 interface Props {
-  /** Page title, rendered as "{title} · Sensorika" */
+  /**
+   * The page's own name. It is NOT the tab title — the tab says
+   * "Sensorika" and nothing else on every page (see <title> below) —
+   * but it is still what og:title carries, so a link to a specific page
+   * pasted into WhatsApp still previews as that page rather than as the
+   * site.
+   */
   title: string;
   /** 1-2 sentence page description for SEO/social previews */
   description: string;
@@ -90,7 +96,14 @@ const alternates = Astro.site
       rel="stylesheet"
     />
 
-    <title>{title} · {siteName}</title>
+    <!-- THE BARE SITE NAME, on every page. This used to be
+         "{title} · Sensorika", which is the usual advice and is right
+         for a site whose pages are search destinations in their own
+         right. This one is a local clinic: the tab is read by parents
+         who have several of them open, and "Sensorika" is the word
+         that tells them which tab is us. The page's own name is still
+         on the page, in its h1, and still in og:title below. -->
+    <title>{siteName}</title>
     <meta name="description" content={description} />
     {canonical && <link rel="canonical" href={canonical.href} />}
     {
