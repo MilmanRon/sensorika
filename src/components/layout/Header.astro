@@ -159,7 +159,45 @@ const here = trim(Astro.url.pathname);
   <div
     class="flex h-header items-center justify-between gap-4 px-gutter lg:h-header-lg lg:px-gutter-lg"
   >
-    <Logo class="h-14 lg:h-16" href={homeHref(locale)} variant="mark" />
+    <!-- THE CONTROLS OPEN THE BAR, and the trigger is outboard within
+         them (`order-first` on the button) — so it sits hard against
+         the bar's inline-start edge, which is the edge the drawer opens
+         from, and the whole gesture reads as the panel unfolding from
+         under the button. Inline start is the RIGHT in Hebrew and the
+         left in Russian; the mark takes the other end, see below.
+
+         THE SWITCHER IS NO LONGER ONE OF THESE. It travels with the nav
+         now, which means the inline row below at 2xl and the drawer
+         under the bar — so the bar carries two controls at every width
+         instead of three at some of them, and the `max-sm:hidden` that
+         used to drop it on a phone is gone with it. -->
+    <div class="flex items-center gap-2 sm:gap-3">
+      <Button
+        href={whatsappHref()}
+        size="sm"
+        variant="primary"
+        class="max-sm:size-10 max-sm:gap-0 max-sm:px-0"
+        {...external}
+      >
+        <WhatsappIcon class="h-4 w-4 max-sm:h-5 max-sm:w-5" aria-hidden="true" />
+        <span class="sr-only sm:not-sr-only">{ctaLabel}</span>
+      </Button>
+
+      <!-- Drawer trigger. Hidden once the inline nav appears — leaving
+           both would give the same links two entry points. -->
+      <button
+        type="button"
+        data-nav-toggle
+        aria-controls="site-nav"
+        aria-expanded="false"
+        class="order-first inline-flex h-10 w-10 items-center justify-center rounded-pill text-ink-800 ring-1 ring-ink-900/10 transition-colors duration-[var(--duration-fast)] hover:bg-paper-100 2xl:hidden"
+      >
+        <span class="sr-only">{t.menu}</span>
+        <span class="toggle-bars" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+      </button>
+    </div>
 
     <!-- Inline nav, 2xl and up. Plain row, and it stays a plain row in
          both languages: the items are laid out in source order and the
@@ -206,43 +244,18 @@ const here = trim(Astro.url.pathname);
       </nav>
     </div>
 
-    <!-- CTA then trigger, in that order, so under dir=rtl the trigger
-         stays outboard at the bar's far left edge — the drawer opens
-         from that same edge, and the whole gesture reads as the panel
-         unfolding from under the button.
+    <!-- THE LOGO CLOSES THE BAR, at every width. It used to lead the
+         row and then get overtaken by the CTA group below `2xl`, which
+         made the mark jump edges the moment the window narrowed — the
+         one element in the header that has to sit still. Now the order
+         is the same on a phone and on a desktop: controls at the inline
+         start, nav in the middle, mark at the inline end.
 
-         THE SWITCHER IS NO LONGER ONE OF THESE. It travels with the nav
-         now, which means the inline row above at 2xl and the drawer
-         below it — so the bar carries two controls at every width
-         instead of three at some of them, and the `max-sm:hidden` that
-         used to drop it on a phone is gone with it. -->
-    <div class="order-first flex items-center gap-2 sm:gap-3 2xl:order-none">
-      <Button
-        href={whatsappHref()}
-        size="sm"
-        variant="primary"
-        class="max-sm:size-10 max-sm:gap-0 max-sm:px-0"
-        {...external}
-      >
-        <WhatsappIcon class="h-4 w-4 max-sm:h-5 max-sm:w-5" aria-hidden="true" />
-        <span class="sr-only sm:not-sr-only">{ctaLabel}</span>
-      </Button>
-
-      <!-- Drawer trigger. Hidden once the inline nav appears — leaving
-           both would give the same links two entry points. -->
-      <button
-        type="button"
-        data-nav-toggle
-        aria-controls="site-nav"
-        aria-expanded="false"
-        class="order-first inline-flex h-10 w-10 items-center justify-center rounded-pill text-ink-800 ring-1 ring-ink-900/10 transition-colors duration-[var(--duration-fast)] hover:bg-paper-100 2xl:hidden"
-      >
-        <span class="sr-only">{t.menu}</span>
-        <span class="toggle-bars" aria-hidden="true">
-          <span></span><span></span><span></span>
-        </span>
-      </button>
-    </div>
+         Inline END, not "left": the bar mirrors with the page like
+         everything else here, so the mark lands left in Hebrew and
+         right in Russian. It is source order doing this, not `order-*`,
+         so the tab order matches what the eye sees in both languages. -->
+    <Logo class="h-14 lg:h-16" href={homeHref(locale)} variant="mark" />
   </div>
 </header>
 
