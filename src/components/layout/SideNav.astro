@@ -36,16 +36,11 @@ import Nav from './Nav.astro';
      with it the trigger, now showing an X — stays reachable while the
      drawer is open.
 
-     Anchored to the inline END, because that's where the trigger is:
-     the hamburger is the last control in the header's button group, so
-     it sits at the bar's far end in both languages — far left under
-     Hebrew's RTL, far right under Russian's LTR. A drawer at the inline
-     start would open from the opposite edge to the button that opened
-     it, which is the one thing the panel can't afford to do: the whole
-     gesture reads as the menu unfolding from under the hamburger. */
+     Anchored to the inline START, which is the right edge in Hebrew's
+     RTL layout and the left edge in Russian's LTR layout. */
   .rail {
     position: fixed;
-    inset-inline-end: 0;
+    inset-inline-start: 0;
     inset-block: var(--spacing-header) 0;
     z-index: 40;
     width: min(var(--spacing-rail), 82vw);
@@ -61,17 +56,17 @@ import Nav from './Nav.astro';
        closed drawer's links out of the tab order — otherwise keyboard
        users would tab into an off-screen panel. */
     visibility: hidden;
-    /* Parked off the right edge — the panel's resting side under LTR. */
-    transform: translateX(100%);
+    /* Parked off the left edge — the panel's resting side under LTR. */
+    transform: translateX(-100%);
     transition:
       transform var(--duration-base) var(--ease-standard),
       visibility var(--duration-base) var(--ease-standard);
   }
 
-  /* Inline end is the LEFT under RTL, so the drawer has to leave in the
-     opposite direction. `transform` has no logical equivalent. */
+  /* Inline start is the RIGHT under RTL, so the drawer leaves right.
+     `transform` has no logical equivalent. */
   :global([dir='rtl']) .rail {
-    transform: translateX(-100%);
+    transform: translateX(100%);
   }
 
   /* Listed after both rest states so it wins on source order. Media

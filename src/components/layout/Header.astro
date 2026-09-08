@@ -216,7 +216,7 @@ const here = trim(Astro.url.pathname);
          below it — so the bar carries two controls at every width
          instead of three at some of them, and the `max-sm:hidden` that
          used to drop it on a phone is gone with it. -->
-    <div class="flex items-center gap-2 sm:gap-3">
+    <div class="order-first flex items-center gap-2 sm:gap-3 2xl:order-none">
       <Button
         href={whatsappHref()}
         size="sm"
@@ -235,7 +235,7 @@ const here = trim(Astro.url.pathname);
         data-nav-toggle
         aria-controls="site-nav"
         aria-expanded="false"
-        class="inline-flex h-10 w-10 items-center justify-center rounded-pill text-ink-800 ring-1 ring-ink-900/10 transition-colors duration-[var(--duration-fast)] hover:bg-paper-100 2xl:hidden"
+        class="order-first inline-flex h-10 w-10 items-center justify-center rounded-pill text-ink-800 ring-1 ring-ink-900/10 transition-colors duration-[var(--duration-fast)] hover:bg-paper-100 2xl:hidden"
       >
         <span class="sr-only">{t.menu}</span>
         <span class="toggle-bars" aria-hidden="true">
