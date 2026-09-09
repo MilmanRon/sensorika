@@ -175,7 +175,7 @@ const beforePanels = beforeDocuments || Boolean(page.documents);
           heading={page.disclosures.heading}
           intro={page.disclosures.intro}
           items={page.disclosures.items}
-          class="mt-14 lg:mt-20"
+          class={page.disclosures.compactTopGap ? 'mt-4 lg:mt-6' : gap}
         />
       )
     }

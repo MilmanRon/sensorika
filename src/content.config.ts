@@ -302,6 +302,8 @@ const pages = defineCollection({
         .object({
           heading: z.string(),
           intro: z.string().optional(),
+          /** Use when the page intro leads directly into this section. */
+          compactTopGap: z.boolean().default(false),
           items: z.array(disclosure).nonempty(),
         })
         .optional(),
