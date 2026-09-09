@@ -47,6 +47,11 @@ export function homeHref(locale: Locale): string {
 export const siteConfig = {
   name: 'Sensorika',
   tagline: '', // TODO: one-line description, once copy is finalized
+  location: {
+    /** Shared destination for the venue card in both language versions. */
+    mapHref:
+      'https://www.google.com/maps/search/?api=1&query=%D7%A8%D7%97.%20%D7%94%D7%92%D7%9C%D7%99%D7%9C%206%20%D7%9B%D7%A8%D7%9E%D7%99%D7%90%D7%9C',
+  },
   contact: {
     email: '', // TODO
     /**

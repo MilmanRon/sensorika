@@ -251,7 +251,7 @@ const he = {
   programsGroupsTitle: 'פעילויות קבוצתיות התפתחותיות',
   programsGroupsBody:
     'קבוצות קטנות לפי גיל ורמה, שבהן ילדים מתנסים בתנועה, במשחק ובשיתוף פעולה — ולומדים יחד, בקבוצה, את מה שקשה להם לבד.',
-  programsGroupsCta: 'לטפסים ולתנאי ההשתתפות',
+  programsGroupsCta: 'לתנאי ההשתתפות וטפסים',
   programsAskHeading: 'לא בטוחים איזו מסגרת מתאימה?',
   programsAskBody: 'כתבו לי מה קורה אצלכם בבית, ונחשוב יחד מאיפה נכון להתחיל.',
 
@@ -266,7 +266,7 @@ const he = {
      here and not in site.ts. */
   venueLabel: 'המקום',
   venueName: 'סטודיו טבסקו',
-  venueStreet: 'רח. הגליל 6',
+  venueStreet: 'רח. הגליל 6, כרמיאל',
 
   /* 404 */
   notFoundTitle: 'הדף לא נמצא',
@@ -323,7 +323,7 @@ const ru: UiStrings = {
   programsGroupsTitle: 'Групповые развивающие занятия',
   programsGroupsBody:
     'Небольшие группы по возрасту и уровню, где дети пробуют себя в движении, игре и совместной работе — и осваивают вместе, в группе, то, что трудно даётся в одиночку.',
-  programsGroupsCta: 'Бланки и условия участия',
+  programsGroupsCta: 'Условия участия и бланки',
   programsAskHeading: 'Не уверены, какой формат подходит?',
   programsAskBody:
     'Напишите мне, что происходит у вас дома, и мы вместе подумаем, с чего лучше начать.',
@@ -352,7 +352,7 @@ const ru: UiStrings = {
    */
   venueLabel: 'Место',
   venueName: 'Студия «Табаско»',
-  venueStreet: 'ул. ха-Галиль, 6',
+  venueStreet: 'ул. ха-Галиль, 6, Кармиэль',
 
   /* 404 */
   notFoundTitle: 'Страница не найдена',

@@ -21,6 +21,7 @@
  * rather than as a mangled run of foreign glyphs.
  */
 import { currentLocale, defaultLocale, ui } from '../../data/i18n';
+import { siteConfig } from '../../data/site';
 import Card from '../ui/Card.astro';
 import Icon from '../ui/Icon.astro';
 
@@ -43,7 +44,7 @@ const showSource = locale !== defaultLocale;
 <!-- A div and not a <section>: it carries no heading, and a section with
      no accessible name is one more unnamed landmark to page past. -->
 <div class:list={['scroll-mt-header lg:scroll-mt-header-lg', className]} id="venue">
-  <Card accent="teal" petal={false}>
+  <Card accent="teal" interactive petal={false}>
     <!-- The row lives INSIDE the card, not on it: Card wraps its slot in
          a positioning div, so a `flex` handed to Card lays out that one
          wrapper and leaves its children stacked. -->
@@ -51,7 +52,12 @@ const showSource = locale !== defaultLocale;
          the same width as the timetable above it so the two read as one
          block, and three short lines against that width look stranded on
          one edge; the grid's own heading and footnote are centered too. -->
-    <div class="flex items-center justify-center gap-4 sm:gap-5">
+    <a
+      class="flex items-center justify-center gap-4 rounded-control sm:gap-5"
+      href={siteConfig.location.mapHref}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       <span class="flex size-12 shrink-0 items-center justify-center rounded-card bg-teal-100 text-teal-800">
         <Icon name="pin" class="h-6 w-6" />
       </span>
@@ -75,6 +81,6 @@ const showSource = locale !== defaultLocale;
           )
         }
       </div>
-    </div>
+    </a>
   </Card>
 </div>

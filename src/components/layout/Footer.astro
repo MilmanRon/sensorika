@@ -24,10 +24,10 @@
  *   The whatsapp icon is the one shortcut worth keeping down here.
  * - NO BLURB. The page above just spent four paragraphs saying it.
  *
- * LAYOUT: logo, social icons and copyright share one row. Three equal
- * columns from `md` keep the icons centred on the band. On narrow
- * screens the logo shows only its petals and the copyright can wrap
- * within its own column.
+ * LAYOUT: the lockup and social shortcuts occupy the first row; the
+ * quieter copyright/legal line sits below a divider. This gives the
+ * footer a clear close without asking the mark, actions, and legal copy
+ * to compete for one narrow line.
  *
  * SURFACE: WHITE, LIKE THE HEADER, and for the same reason Header
  * gives: white is the surface every card on the page already uses, so
@@ -54,6 +54,7 @@
 import Logo from './Logo.astro';
 import FacebookIcon from '../../assets/icons/facebook.svg';
 import WhatsappIcon from '../../assets/icons/whatsapp.svg';
+import Icon from '../ui/Icon.astro';
 import { currentLocale, ui } from '../../data/i18n';
 import { hasWhatsapp, homeHref, siteConfig, whatsappHref } from '../../data/site';
 
@@ -61,7 +62,7 @@ const locale = currentLocale(Astro);
 const t = ui(locale);
 
 /*
- * The icon row. Both icons always render; each one's URL degrades to the
+ * The social icons always render; each one's URL degrades to the
  * on-page contact section while the field behind it is a TODO, which is
  * the fallback `whatsappHref()` already takes for the header CTA. So an
  * icon is never a dead link, and never silently missing either — the
@@ -91,10 +92,8 @@ const year = new Date().getFullYear();
 ---
 
 <footer class="bg-white shadow-card-up">
-  <div class="mx-auto flex h-header max-w-[var(--width-content)] items-center px-gutter lg:h-header-lg lg:px-gutter-lg">
-    <div
-      class="flex w-full items-center justify-between gap-3 sm:gap-6 md:grid md:grid-cols-3"
-    >
+  <div class="mx-auto max-w-[var(--width-content)] px-gutter lg:px-gutter-lg">
+    <div class="flex h-header items-center justify-between gap-3 sm:gap-6 lg:h-header-lg">
       <!-- `variant="responsive"`, the same as the header: below `sm` the
            wordmark drops and only the petals are left. That's what keeps
            the lockup and the icons on one line on a phone instead of the
@@ -114,9 +113,7 @@ const year = new Date().getFullYear();
            rather than a new colour. -->
       <Logo class="h-14 text-ink-900 lg:h-16" href={homeHref(locale)} variant="responsive" tone="mono" />
 
-      <!-- `justify-self-center` centres the list inside the middle
-           track; the track itself is what centres it on the band. -->
-      <ul class="flex shrink-0 items-center gap-4 md:justify-self-center">
+      <ul class="flex shrink-0 items-center gap-4">
         {
           socials.map(({ label, href, Icon, external }) => (
             <li>
@@ -134,9 +131,22 @@ const year = new Date().getFullYear();
             </li>
           ))
         }
+        <li>
+          <a
+            href={siteConfig.location.mapHref}
+            class="inline-flex text-ink-900 transition-colors duration-[var(--duration-fast)] hover:text-teal-800"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="sr-only">{t.venueLabel}</span>
+            <Icon name="pin" class="h-7 w-7" />
+          </a>
+        </li>
       </ul>
 
-      <p class="min-w-0 text-end text-xs text-ink-600 sm:text-sm">
+    </div>
+    <div class="border-t border-ink-100 py-4 text-center text-xs text-ink-600 sm:text-sm">
+      <p>
         © {year} {siteConfig.name}. {t.rightsReserved}
       </p>
     </div>
