@@ -81,18 +81,18 @@ const beforePanels = beforeDocuments || Boolean(page.documents);
     -->
     <div class="py-10 sm:py-14 lg:py-20">
       {page.introPortrait && (
-        <figure class="relative isolate mx-auto mb-10 max-w-xs rounded-card bg-teal-100 p-3 shadow-elevated">
-          <span aria-hidden="true" class="absolute -start-4 -top-4 -z-10 h-20 w-20 rounded-blob bg-coral-200"></span>
-          <span aria-hidden="true" class="absolute -end-4 -bottom-4 -z-10 h-24 w-24 rounded-blob-alt bg-purple-100"></span>
+        <figure class="relative isolate mx-auto mb-12 w-full max-w-sm rounded-card bg-linear-to-br from-teal-200 via-amber-100 to-purple-100 p-3 shadow-elevated ring-1 ring-teal-300">
+          <span aria-hidden="true" class="absolute -start-5 -top-4 -z-10 h-24 w-24 rounded-blob bg-coral-200"></span>
+          <span aria-hidden="true" class="absolute -end-5 -bottom-5 -z-10 h-28 w-28 rounded-blob-alt bg-purple-200"></span>
           <Image
             src={page.introPortrait.src}
             alt={page.introPortrait.alt}
-            widths={[320, 640]}
-            sizes="(max-width: 640px) 80vw, 320px"
-            class="h-auto w-full rounded-card"
+            widths={[384, 768]}
+            sizes="(max-width: 640px) 86vw, 384px"
+            class="h-auto w-full rounded-card border-4 border-white"
           />
-          <span aria-hidden="true" class="absolute -end-2 top-6 h-5 w-5 rounded-pill bg-amber-500"></span>
-          <span aria-hidden="true" class="absolute -start-2 bottom-8 h-3 w-3 rounded-pill bg-teal-500"></span>
+          <span aria-hidden="true" class="absolute end-3 top-7 h-5 w-5 rounded-pill bg-amber-500 ring-4 ring-white"></span>
+          <span aria-hidden="true" class="absolute start-5 bottom-8 h-3 w-3 rounded-pill bg-teal-500 ring-4 ring-white"></span>
         </figure>
       )}
       <!-- One size step below the home page's h1 (no lg:text-6xl): an

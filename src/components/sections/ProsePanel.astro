@@ -125,7 +125,7 @@ const rules = {
   -->
   <div
     class:list={[
-      portrait && 'flex flex-col items-center gap-8 lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-center lg:gap-12',
+      portrait && 'flex flex-col items-center gap-8 lg:grid lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-center lg:gap-12',
     ]}
   >
     <div class:list={['mx-auto max-w-[var(--width-prose)]', portrait && 'w-full']}>
@@ -201,7 +201,7 @@ const rules = {
 
     {
       portrait && (
-        <figure class="portrait max-lg:order-first lg:mx-0 lg:w-80 lg:max-w-none">
+        <figure class="portrait max-lg:order-first lg:mx-0">
           <span class="portrait-ring" aria-hidden="true" />
           <div class="portrait-frame">
             <Image
@@ -209,7 +209,7 @@ const rules = {
               alt={portrait.alt}
               width={640}
               widths={[240, 320, 480, 640]}
-              sizes="(min-width: 64rem) 20rem, 15rem"
+              sizes="(min-width: 64rem) 24rem, 18rem"
               class="portrait-img"
             />
           </div>
@@ -324,6 +324,14 @@ const rules = {
       inset-inline-end: -0.75rem;
       width: 2.5rem;
       height: 2.5rem;
+    }
+  }
+
+  /* The dedicated introduction panel has enough room for a portrait that
+     carries its own visual weight beside a short opening statement. */
+  @media (width >= 64rem) {
+    .portrait {
+      max-width: none;
     }
   }
 </style>
