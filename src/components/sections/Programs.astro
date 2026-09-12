@@ -150,7 +150,7 @@ const external = hasWhatsapp ? { target: '_blank', rel: 'noopener noreferrer' } 
             {t.programsAskBody}
           </p>
         </div>
-        <Button href={whatsappHref()} variant="primary" size="lg" arrow {...external}>
+        <Button href={whatsappHref(t.whatsappMessage)} variant="primary" size="lg" arrow {...external}>
           {ctaLabel}
         </Button>
       </div>

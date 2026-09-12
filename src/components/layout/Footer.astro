@@ -73,7 +73,7 @@ const facebook = siteConfig.social.facebook;
 const socials = [
   {
     label: hasWhatsapp ? t.whatsapp : t.contactNoun,
-    href: whatsappHref(),
+    href: whatsappHref(t.whatsappMessage),
     Icon: WhatsappIcon,
     /* Only a real off-site URL opens a new tab. */
     external: hasWhatsapp,

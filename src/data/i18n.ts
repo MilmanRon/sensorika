@@ -235,6 +235,7 @@ const he = {
   contactNoun: 'יצירת קשר',
   facebook: 'פייסבוק',
   whatsappCta: 'שלחו הודעה בוואטסאפ',
+  whatsappMessage: 'שלום! אשמח לשמוע יותר על הפעילויות בסנסוריקה',
 
   /* Footer */
   rightsReserved: 'כל הזכויות שמורות.',
@@ -307,6 +308,7 @@ const ru: UiStrings = {
   contactNoun: 'Связаться',
   facebook: 'Facebook',
   whatsappCta: 'Написать в WhatsApp',
+  whatsappMessage: 'Здравствуйте! Хочу узнать подробнее о занятиях в Сенсорике для моего ребёнка.',
 
   /* Footer */
   rightsReserved: 'Все права защищены.',
