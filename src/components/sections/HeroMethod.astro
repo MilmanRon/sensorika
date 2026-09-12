@@ -175,7 +175,13 @@ const rules = {
            in the Rubik import. -->
       <h1
         class="text-center font-display text-brand leading-heading font-extrabold"
-        ><span class="brand-word select-none" dir="ltr" data-brand-word
+        ><span
+          class:list={[
+            'brand-word select-none',
+            { 'brand-word--cyrillic': locale === 'ru' },
+          ]}
+          dir="ltr"
+          data-brand-word
           ><span class="sr-only">{brand}</span><span aria-hidden="true"
             >{
               brandLetters.map((letter) => <span class="brand-letter" data-brand-letter><span class="letter-pop" data-letter-pop /><span class="letter-glyph" data-letter-glyph>{letter}</span></span>)
@@ -239,6 +245,10 @@ const rules = {
   .brand-word {
     display: inline-block;
     white-space: nowrap;
+  }
+
+  .brand-word--cyrillic {
+    font-size: var(--text-brand-cyrillic);
   }
 
   /*

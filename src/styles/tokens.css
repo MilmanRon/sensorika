@@ -290,6 +290,7 @@
    * the gutters open up around it, because 7.5rem is the size the
    * lockup is drawn to be and a 1400px word is a banner, not a mark. */
   --text-brand: min(calc((100vw - 2 * var(--spacing-gutter)) / 5.155), 7.5rem);
+  --text-brand-cyrillic: min(calc((100vw - 2 * var(--spacing-gutter)) / 5.8), 7.5rem);
 }
 
 /**

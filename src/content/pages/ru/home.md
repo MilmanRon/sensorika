@@ -4,7 +4,7 @@ description: Пространство для детей с особыми пот
 order: 0
 nav: false
 brand:
-  word: Sensorika
+  word: Cенcорика
 panels:
   - accent: teal
     eyebrow: Наш метод
