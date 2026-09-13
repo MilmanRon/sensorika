@@ -307,6 +307,13 @@ const pages = defineCollection({
           items: z.array(disclosure).nonempty(),
         })
         .optional(),
+      /** A plain, open text section between the page panels and its terms. */
+      details: z
+        .object({
+          heading: z.string(),
+          items: z.array(z.object({ heading: z.string(), body: z.array(z.string()).nonempty() })).nonempty(),
+        })
+        .optional(),
       /**
        * The page's closing section: reference matter that governs
        * everything above it, as a titled stack of open panels rendered
