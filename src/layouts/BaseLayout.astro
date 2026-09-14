@@ -18,11 +18,19 @@ interface Props {
    * site.
    */
   title: string;
-  /** 1-2 sentence page description for SEO/social previews */
+  /**
+   * 1-2 sentence page description for SEO/social previews.
+   *
+   * NOT RENDERED right now: neither `<meta name="description">` nor
+   * `og:description` is emitted, so a link pasted into WhatsApp previews
+   * with a title and no subtitle. The copy stays in each page's
+   * frontmatter and keeps being passed in, so turning the two tags back
+   * on below is the whole of the change when we want the subtitle back.
+   */
   description: string;
 }
 
-const { title, description } = Astro.props;
+const { title } = Astro.props;
 const siteName = 'Sensorika';
 
 const locale = currentLocale(Astro);
@@ -104,7 +112,6 @@ const alternates = Astro.site
          that tells them which tab is us. The page's own name is still
          on the page, in its h1, and still in og:title below. -->
     <title>{siteName}</title>
-    <meta name="description" content={description} />
     {canonical && <link rel="canonical" href={canonical.href} />}
     {
       alternates.map(({ hreflang, href }) => (
@@ -123,7 +130,6 @@ const alternates = Astro.site
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
     <meta property="og:locale" content={ogLocale} />
     {
       alternates
