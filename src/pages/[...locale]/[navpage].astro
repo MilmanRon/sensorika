@@ -41,6 +41,7 @@ import PageBackdrop from '../../components/layout/PageBackdrop.astro';
 import SideNav from '../../components/layout/SideNav.astro';
 import ProsePage from '../../components/sections/ProsePage.astro';
 import { defaultLocale, isLocale } from '../../data/i18n';
+import { faqPage } from '../../data/structured-data';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 export async function getStaticPaths() {
@@ -87,7 +88,8 @@ const { entry } = Astro.props;
 <BaseLayout
   title={entry.data.title}
   seoTitle={entry.data.seoTitle}
-  description={entry.data.description}>
+  description={entry.data.description}
+  structuredData={entry.data.faq.length > 0 ? [faqPage(entry.data.faq)] : []}>
   <PageBackdrop />
   <Header />
   <SideNav />

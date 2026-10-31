@@ -269,6 +269,14 @@ const he = {
   venueLabel: 'המקום',
   venueName: 'סטודיו טבסקו',
   venueStreet: 'רח. הגליל 6, כרמיאל',
+  /* Structured data (JSON-LD) — never rendered as text, but read by
+     search engines and AI answer tools. The address is venueStreet
+     split into the parts schema.org asks for. */
+  addressStreet: 'רח׳ הגליל 6',
+  addressLocality: 'כרמיאל',
+  founderName: 'אנה מילמן',
+  founderJobTitle: 'מאבחנת ומטפלת בוויסות חושי',
+  expertise: 'ויסות חושי',
 
   /* 404 */
   notFoundTitle: 'הדף לא נמצא',
@@ -357,6 +365,12 @@ const ru: UiStrings = {
   venueLabel: 'Место',
   venueName: 'Студия «Табаско»',
   venueStreet: 'ул. ха-Галиль, 6, Кармиэль',
+  /* Structured data (JSON-LD) — see the Hebrew side. */
+  addressStreet: 'ул. ха-Галиль, 6',
+  addressLocality: 'Кармиэль',
+  founderName: 'Анна Мильман',
+  founderJobTitle: 'Специалист по сенсорной интеграции',
+  expertise: 'Сенсорная интеграция',
 
   /* 404 */
   notFoundTitle: 'Страница не найдена',

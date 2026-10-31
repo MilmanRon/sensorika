@@ -9,6 +9,7 @@ import {
   locales,
   ui,
 } from '../data/i18n';
+import { siteGraph } from '../data/structured-data';
 
 interface Props {
   /**
@@ -31,9 +32,14 @@ interface Props {
    * written once per page, in the page's frontmatter, for both.
    */
   description: string;
+  /**
+   * Page-specific schema.org entities (an FAQPage, say), added to the
+   * clinic/site/person graph every page already carries.
+   */
+  structuredData?: Record<string, unknown>[];
 }
 
-const { title, seoTitle, description } = Astro.props;
+const { title, seoTitle, description, structuredData = [] } = Astro.props;
 
 const locale = currentLocale(Astro);
 const { siteName } = ui(locale);
@@ -86,6 +92,19 @@ const alternates = Astro.site
       href: new URL(alternatePath(Astro.url.pathname, locale, other), Astro.site).href,
     }))
   : [];
+
+/**
+ * One JSON-LD block per page: the clinic, its site and its founder
+ * (src/data/structured-data.ts), plus whatever the page adds. Omitted
+ * without `site`, like the canonical — every @id is an absolute URL.
+ * `<` is escaped so no string in the content can close the script tag.
+ */
+const jsonLd = Astro.site
+  ? JSON.stringify({
+      '@context': 'https://schema.org',
+      '@graph': [...(await siteGraph(locale, Astro.site)), ...structuredData],
+    }).replace(/</g, '\\u003c')
+  : undefined;
 ---
 
 <html lang={lang} dir={dir}>
@@ -150,6 +169,12 @@ const alternates = Astro.site
          until there's a 1200x630 share image in public/. -->
 
     <meta name="twitter:card" content="summary" />
+
+    {
+      jsonLd && (
+        <script type="application/ld+json" is:inline set:html={jsonLd} />
+      )
+    }
   </head>
   <body>
     <slot />
