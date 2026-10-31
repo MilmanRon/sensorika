@@ -47,6 +47,18 @@ export function homeHref(locale: Locale): string {
 export const siteConfig = {
   name: 'Sensorika',
   tagline: '', // TODO: one-line description, once copy is finalized
+  /**
+   * The link-preview image (og:image) and the clinic's image in the
+   * structured data: the logo lockup centred on white at the 1200×630
+   * every platform crops to. One language-neutral image for both
+   * locales — the wordmark is Latin in either.
+   *
+   * It's a file in public/, generated once from src/assets/brand/logo.svg
+   * with sharp (a dependency of Astro already). To regenerate after a
+   * logo change, render logo.svg 840px wide and composite it centred on
+   * a white 1200×630 canvas.
+   */
+  shareImage: { path: '/og-image.png', width: 1200, height: 630 },
   location: {
     /** Shared destination for the venue card in both language versions. */
     mapHref:

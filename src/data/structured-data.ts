@@ -62,6 +62,7 @@ export async function siteGraph(locale: Locale, origin: URL): Promise<JsonLd[]> 
         addressCountry: 'IL',
       },
       areaServed: { '@type': 'City', name: t.addressLocality },
+      image: new URL(siteConfig.shareImage.path, origin).href,
       hasMap: siteConfig.location.mapHref,
       sameAs: Object.values(siteConfig.social).filter(Boolean),
       knowsAbout: [t.expertise, 'NDFA'],

@@ -9,6 +9,7 @@ import {
   locales,
   ui,
 } from '../data/i18n';
+import { siteConfig } from '../data/site';
 import { siteGraph } from '../data/structured-data';
 
 interface Props {
@@ -42,7 +43,10 @@ interface Props {
 const { title, seoTitle, description, structuredData = [] } = Astro.props;
 
 const locale = currentLocale(Astro);
-const { siteName } = ui(locale);
+const { siteName, shareImageAlt } = ui(locale);
+const { shareImage } = siteConfig;
+/* Absolute, like the canonical: scrapers don't resolve relative URLs. */
+const shareImageUrl = Astro.site ? new URL(shareImage.path, Astro.site).href : undefined;
 const pageTitle = seoTitle ?? title;
 
 /**
@@ -165,10 +169,18 @@ const jsonLd = Astro.site
         ))
     }
     {canonical && <meta property="og:url" content={canonical.href} />}
-    <!-- TODO: og:image. Social previews fall back to a bare text card
-         until there's a 1200x630 share image in public/. -->
+    {
+      shareImageUrl && (
+        <>
+          <meta property="og:image" content={shareImageUrl} />
+          <meta property="og:image:width" content={String(shareImage.width)} />
+          <meta property="og:image:height" content={String(shareImage.height)} />
+          <meta property="og:image:alt" content={shareImageAlt} />
+        </>
+      )
+    }
 
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
 
     {
       jsonLd && (
