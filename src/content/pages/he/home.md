@@ -7,6 +7,7 @@ order: 0
 nav: false
 brand:
   word: Sensorika
+  tagline: ויסות חושי לילדים בכרמיאל
 panels:
   - accent: teal
     eyebrow: השיטה שלנו

@@ -288,7 +288,11 @@ const pages = defineCollection({
        * it has to sit in its own LTR box on the RTL line, or it renders
        * backwards.
        */
-      brand: z.object({ word: z.string() }).optional(),
+      /**
+       * The home lockup: the wordmark, and an optional line under it
+       * that says what the clinic is and where. Both are the h1.
+       */
+      brand: z.object({ word: z.string(), tagline: z.string().optional() }).optional(),
       description: z.string(),
       /** Opening line, centered under the h1 in the intro band. */
       intro: z.string().optional(),

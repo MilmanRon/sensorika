@@ -113,9 +113,11 @@ if (!home?.data.brand || home.data.panels.length === 0) {
   );
 }
 
-/* The h1 is the wordmark and nothing else. home.md's `title` is the
-   page's name inside the collection, not a line that renders here. */
-const { word: brand } = home.data.brand;
+/* The h1 is the wordmark and the tagline under it. home.md's `title` is
+   the page's name inside the collection, not a line that renders here.
+   The tagline is what makes the home page's h1 say what the clinic is
+   and where — the wordmark alone told a search engine only the name. */
+const { word: brand, tagline } = home.data.brand;
 const brandLetters = [...brand];
 
 const method = home.data.panels[0];
@@ -187,7 +189,13 @@ const rules = {
               brandLetters.map((letter) => <span class="brand-letter" data-brand-letter><span class="letter-pop" data-letter-pop /><span class="letter-glyph" data-letter-glyph>{letter}</span></span>)
             }</span
           ></span
-        ></h1
+        >{
+          tagline && (
+            <span class="mt-3 block text-xl font-semibold text-balance text-ink-700 sm:mt-4 sm:text-2xl">
+              {tagline}
+            </span>
+          )
+        }</h1
       >
     </div>
 

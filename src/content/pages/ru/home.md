@@ -7,6 +7,7 @@ order: 0
 nav: false
 brand:
   word: Cенcорика
+  tagline: Сенсорная интеграция для детей в Кармиэле
 panels:
   - accent: teal
     eyebrow: Наш метод
