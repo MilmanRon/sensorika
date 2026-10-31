@@ -25,18 +25,15 @@ interface Props {
    */
   seoTitle?: string;
   /**
-   * 1-2 sentence page description for SEO/social previews.
-   *
-   * NOT RENDERED right now: neither `<meta name="description">` nor
-   * `og:description` is emitted, so a link pasted into WhatsApp previews
-   * with a title and no subtitle. The copy stays in each page's
-   * frontmatter and keeps being passed in, so turning the two tags back
-   * on below is the whole of the change when we want the subtitle back.
+   * 1-2 sentence page description, ~120-155 characters: the snippet
+   * under the title in search results, and the grey line under the
+   * title in a WhatsApp preview. Both read the same sentence, so it's
+   * written once per page, in the page's frontmatter, for both.
    */
   description: string;
 }
 
-const { title, seoTitle } = Astro.props;
+const { title, seoTitle, description } = Astro.props;
 
 const locale = currentLocale(Astro);
 const { siteName } = ui(locale);
@@ -120,6 +117,7 @@ const alternates = Astro.site
          recognisable — a tab shows the first ~20 characters — while the
          rest of the title does the search work. -->
     <title>{`${siteName} | ${pageTitle}`}</title>
+    <meta name="description" content={description} />
     {canonical && <link rel="canonical" href={canonical.href} />}
     {
       alternates.map(({ hreflang, href }) => (
@@ -138,6 +136,7 @@ const alternates = Astro.site
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
     <meta property="og:locale" content={ogLocale} />
     {
       alternates
