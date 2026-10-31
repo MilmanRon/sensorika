@@ -51,6 +51,9 @@ faq:
   - question: А если после диагностики окажется, что проблема не связана с сенсорной интеграцией?
     answer: >-
       Диагностика нужна не для того, чтобы обязательно «найти сенсорную проблему», а чтобы понять функциональные трудности ребёнка. Если мы увидим, что основная причина его сложностей находится не в той области, с которой мы работаем, мы честно скажем об этом.
+  - question: Где вы находитесь?
+    answer: >-
+      Мы находимся в Кармиэле. Групповые занятия проходят в студии «Табаско», ул. ха-Галиль, 6. К нам приезжают семьи из Кармиэля и окрестных населённых пунктов — если вы живёте неподалёку и не уверены, подходит ли вам это, напишите нам, и мы вместе всё обсудим.
 ---
 
 <!--
@@ -58,6 +61,10 @@ faq:
   «Частые вопросы», in the source's order — the document the Hebrew page
   was translated from. The source's numbering is dropped from the
   question text because the page renders the numbers itself.
+
+  The sixteenth, «Где вы находитесь?», is not from the clinic: it
+  mirrors the one added to the Hebrew page, so the page says Karmiel in
+  its text and answers the question a parent searching by town asks.
 
   No `intro` and no `panels`, matching the Hebrew page: the source
   supplied neither, and the accordion is the whole page.

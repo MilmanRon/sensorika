@@ -51,12 +51,19 @@ faq:
   - question: ומה אם לאחר האבחון יתברר שהבעיה אינה קשורה לוויסות חושי?
     answer: >-
       מטרת האבחון אינה בהכרח ״למצוא בעיה חושית״, אלא להבין את הקשיים התפקודיים של הילד. אם נראה שהסיבה המרכזית לקשיים שלו נמצאת בתחום שאיננו עובדים בו, נאמר זאת בכנות.
+  - question: איפה אתם נמצאים?
+    answer: >-
+      אנחנו בכרמיאל. הפעילויות הקבוצתיות מתקיימות בסטודיו טבסקו, רח׳ הגליל 6. מגיעות אלינו משפחות מכרמיאל ומהיישובים שבסביבתה — אם אתם גרים בקרבת מקום ולא בטוחים שזה מתאים לכם, כתבו לנו ונבדוק יחד.
 ---
 
 <!--
   All fifteen questions and answers are verbatim from the clinic, in the
   source's order. The source's numbering is dropped from the question
   text because the page renders the numbers itself.
+
+  The sixteenth, "איפה אתם נמצאים?", is not from the clinic: it was added
+  so the page answers the question a parent searching for the clinic
+  by town is asking, and says Karmiel in the page text.
 
   This page has no `intro` line: the source didn't supply one, and the
   h1 doesn't need help. It also has no `panels` — the accordion is the
