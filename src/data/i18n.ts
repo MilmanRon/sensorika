@@ -223,6 +223,7 @@ export function stripLocale(pathname: string, locale: Locale): string {
  */
 const he = {
   /* Chrome */
+  siteName: 'סנסוריקה',
   skipToMain: 'דלגו לתוכן הראשי',
   menu: 'תפריט',
   primaryNav: 'ניווט ראשי',
@@ -296,6 +297,7 @@ export type UiStrings = Record<keyof typeof he, string>;
  */
 const ru: UiStrings = {
   /* Chrome */
+  siteName: 'Сенсорика',
   skipToMain: 'Перейти к основному содержанию',
   menu: 'Меню',
   primaryNav: 'Основная навигация',

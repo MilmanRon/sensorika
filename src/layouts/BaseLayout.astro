@@ -7,17 +7,23 @@ import {
   defaultLocale,
   localeMeta,
   locales,
+  ui,
 } from '../data/i18n';
 
 interface Props {
   /**
-   * The page's own name. It is NOT the tab title — the tab says
-   * "Sensorika" and nothing else on every page (see <title> below) —
-   * but it is still what og:title carries, so a link to a specific page
-   * pasted into WhatsApp still previews as that page rather than as the
-   * site.
+   * The page's own name — its h1, and what the nav calls it unless the
+   * page has a `navLabel`. Used in the <title> and og:title only when
+   * there's no `seoTitle`.
    */
   title: string;
+  /**
+   * What the page is called in search results and link previews, when
+   * that should say more than its on-page name ("שאלות נפוצות" says
+   * nothing about what the questions are about; "בית" says nothing at
+   * all). Written in each page's frontmatter, never in a component.
+   */
+  seoTitle?: string;
   /**
    * 1-2 sentence page description for SEO/social previews.
    *
@@ -30,10 +36,11 @@ interface Props {
   description: string;
 }
 
-const { title } = Astro.props;
-const siteName = 'Sensorika';
+const { title, seoTitle } = Astro.props;
 
 const locale = currentLocale(Astro);
+const { siteName } = ui(locale);
+const pageTitle = seoTitle ?? title;
 
 /**
  * Absolute URL of the page being rendered, for the canonical link and
@@ -104,14 +111,15 @@ const alternates = Astro.site
       rel="stylesheet"
     />
 
-    <!-- THE BARE SITE NAME, on every page. This used to be
-         "{title} · Sensorika", which is the usual advice and is right
-         for a site whose pages are search destinations in their own
-         right. This one is a local clinic: the tab is read by parents
-         who have several of them open, and "Sensorika" is the word
-         that tells them which tab is us. The page's own name is still
-         on the page, in its h1, and still in og:title below. -->
-    <title>{siteName}</title>
+    <!-- THE SITE NAME FIRST, THEN WHAT THE PAGE IS ABOUT. For a while
+         this was the bare site name on every page, so a parent with
+         several tabs open could tell which one was us. But the title is
+         also the blue link in search results and the strongest signal a
+         search engine reads, and "Sensorika" alone told Google nothing
+         about sensory regulation or Karmiel. Brand-first keeps the tab
+         recognisable — a tab shows the first ~20 characters — while the
+         rest of the title does the search work. -->
+    <title>{`${siteName} | ${pageTitle}`}</title>
     {canonical && <link rel="canonical" href={canonical.href} />}
     {
       alternates.map(({ hreflang, href }) => (
@@ -129,7 +137,7 @@ const alternates = Astro.site
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteName} />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={pageTitle} />
     <meta property="og:locale" content={ogLocale} />
     {
       alternates
