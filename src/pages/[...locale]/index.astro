@@ -74,7 +74,10 @@ if (!home) {
 }
 ---
 
-<BaseLayout title={home.data.title} description={home.data.description}>
+<BaseLayout
+  title={home.data.title}
+  seoTitle={home.data.seoTitle}
+  description={home.data.description}>
   <PageBackdrop />
   <Header />
   <SideNav />

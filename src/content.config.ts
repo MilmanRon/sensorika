@@ -256,6 +256,13 @@ const pages = defineCollection({
     z.object({
       /** The page's own h1 — often longer than the nav label. */
       title: z.string(),
+      /**
+       * The page's name in search results and link previews, when it
+       * should say more than the h1 — what the page is about, and where.
+       * BaseLayout puts the site name in front of it. Keep it under ~60
+       * characters with the site name, or Google cuts it off.
+       */
+      seoTitle: z.string().optional(),
       /** The nav label, when the nav calls the page something shorter. */
       hideTitle: z.boolean().default(false),
       /** Optional portrait above the page introduction. */
@@ -281,7 +288,11 @@ const pages = defineCollection({
        * it has to sit in its own LTR box on the RTL line, or it renders
        * backwards.
        */
-      brand: z.object({ word: z.string() }).optional(),
+      /**
+       * The home lockup: the wordmark, and an optional line under it
+       * that says what the clinic is and where. Both are the h1.
+       */
+      brand: z.object({ word: z.string(), tagline: z.string().optional() }).optional(),
       description: z.string(),
       /** Opening line, centered under the h1 in the intro band. */
       intro: z.string().optional(),
